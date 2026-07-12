@@ -30,6 +30,7 @@ main :: proc() {
     camera.target = board_center
     camera.zoom = f32(window_size.y) / f32(board.sprite.height)
 
+    fmt.println(board.tiles)
     for !rl.WindowShouldClose() {
 
         dt = rl.GetFrameTime()
@@ -39,11 +40,20 @@ main :: proc() {
 
         camera_control(&camera, dt)
 
+
         rl.BeginDrawing()
         rl.ClearBackground(rl.BLACK)
         rl.BeginMode2D(camera)
 
         rl.DrawTextureV(board.sprite, board.position, rl.WHITE)
+        mouse_pos := rl.GetMousePosition()
+        world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
+        for tile in board.tiles {
+
+            if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
+                rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
+            }
+        }
 
         rl.EndMode2D()
 
