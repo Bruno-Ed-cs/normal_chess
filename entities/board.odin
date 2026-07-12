@@ -3,9 +3,11 @@ package entities
 import rl "vendor:raylib"
 import "core:fmt"
 
+BoardPos :: [2]i32
+
 Tile :: struct {
 
-    coordenate: [2]i32
+    coordenate: BoardPos
 
 }
 
