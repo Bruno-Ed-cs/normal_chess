@@ -62,6 +62,11 @@ main :: proc() {
         rl.DrawText(fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f", camera.target.x, camera.target.y, camera.zoom, camera.rotation),
             0, 120, 30, rl.YELLOW);
 
+        board_pos, in_bounds := e.world_to_board(&board, world_pos)
+        if (in_bounds) {
+            rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y), 0, 250, 30, rl.YELLOW);
+        }
+
         rl.EndDrawing()
 
     }

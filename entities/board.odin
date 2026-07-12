@@ -40,6 +40,38 @@ board_to_world :: proc(board: ^Board, position: BoardPos) -> (world_pos: Vec2, v
     return
 }
 
+world_to_board :: proc(board: ^Board, position: Vec2) -> (board_pos: BoardPos, in_bounds: bool) {
+
+    board_bounds := rl.Rectangle {
+        x = board.position.x,
+        y = board.position.y,
+        width = f32(board.size.x * tile_size),
+        height = f32(board.size.y * tile_size)
+    }
+
+    if !rl.CheckCollisionPointRec(position, board_bounds) {
+        in_bounds = false
+        board_pos = {-1, -1}
+        return
+    }
+
+
+    for tile in board.tiles {
+
+        if rl.CheckCollisionPointRec(position, tile.hitbox) {
+
+            board_pos = tile.coordenate
+            in_bounds = true
+            break
+
+        }
+
+    }
+
+    return
+
+}
+
 make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) -> Board {
 
     board := Board{
