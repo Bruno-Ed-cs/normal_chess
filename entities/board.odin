@@ -40,6 +40,18 @@ board_to_world :: proc(board: ^Board, position: BoardPos) -> (world_pos: Vec2, v
     return
 }
 
+// returns nill when the position is invalid
+get_tile :: proc(board: ^Board, position: BoardPos) -> ^Tile {
+
+    if position.y >= board.size.y || position.x >= board.size.x ||
+       position.y < 0 || position.x < 0 {
+
+           return nil
+    }
+
+    return &board.tiles[position.x + position.y * board.size.y]
+}
+
 world_to_board :: proc(board: ^Board, position: Vec2) -> (board_pos: BoardPos, in_bounds: bool) {
 
     board_bounds := rl.Rectangle {

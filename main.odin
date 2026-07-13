@@ -32,7 +32,7 @@ main :: proc() {
     white := e.Team {
 
         color = rl.WHITE,
-        name = "white",
+        name = "White",
     }
 
     pieces_container := make([dynamic]e.Piece)
@@ -48,13 +48,18 @@ main :: proc() {
     camera.target = board_center
     camera.zoom = f32(window_size.y) / f32(board.sprite.height)
 
-    fmt.println(board.tiles)
+    //fmt.println(board.tiles)
+    movements: [dynamic]e.Move
+    defer delete(movements)
+
     game_loop: for !rl.WindowShouldClose() {
 
         dt = rl.GetFrameTime()
         window_size.x = rl.GetScreenWidth()
         window_size.y = rl.GetScreenHeight()
         camera.offset = {f32(window_size.x /2), f32(window_size.y /2)}
+
+        //clear(&movements)
 
         camera_control(&camera, dt)
 
@@ -67,6 +72,23 @@ main :: proc() {
         rl.DrawTextureV(board.sprite, board.position, rl.WHITE)
         mouse_pos := rl.GetMousePosition()
         world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
+
+        check_click: if rl.IsMouseButtonPressed(.LEFT) {
+            clear(&movements)
+
+            target_tile, in_bounds := e.world_to_board(&board, world_pos)
+
+            if !in_bounds do break check_click
+            fmt.println(target_tile)
+
+            if tile := e.get_tile(&board, target_tile); tile != nil && tile.piece_ref != nil{
+                tile.piece_ref.movement(tile.piece_ref, &board, &movements) 
+                fmt.println("open movement")
+                fmt.println(movements)
+            }
+
+        }
+
         for tile in board.tiles {
 
             if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
@@ -74,6 +96,21 @@ main :: proc() {
             }
         }
 
+        for move in movements {
+            
+            draw_pos, in_bounds := e.board_to_world(&board, move.pos)
+            if !in_bounds do continue
+            color := rl.RED if move.attack else rl.BLUE
+
+            rec := rl.Rectangle {
+                x = draw_pos.x,
+                y = draw_pos.y,
+                width = e.tile_size,
+                height = e.tile_size
+            }
+
+            rl.DrawRectangleLinesEx(rec, 2.0, color)
+        }
         for &piece in pieces_container {
             tile_pos , ok := e.board_to_world(&board, piece.position)
             rl.DrawTextureEx(piece.sprite, tile_pos, 0.0, 1.0, piece.team.color)
@@ -90,6 +127,7 @@ main :: proc() {
         if (in_bounds) {
             rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y), 0, 250, 30, rl.YELLOW);
         }
+
 
         rl.EndDrawing()
 
