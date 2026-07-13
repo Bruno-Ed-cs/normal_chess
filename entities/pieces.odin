@@ -63,7 +63,7 @@ paw_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) ->
     for diag in diagonal_killers {
 
         if tile := get_tile(board, diag); tile != nil{
-            if tile.piece_ref != nil {
+            if tile.piece_ref != nil && tile.piece_ref.team != self.team{
                 append(moves_buff, Move{ attack = true, pos = diag})
                 moves_count += 1
             }
@@ -80,11 +80,36 @@ paw_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) ->
             if tile.piece_ref == nil {
                 append(moves_buff, Move{attack = false, pos = position})
                 moves_count += 1
+            } else {
+
+                break
             }
         }
 
     }
 
     return moves_count
+
+}
+
+move :: proc(piece: ^Piece, board: ^Board, target: BoardPos) {
+
+    tile := get_tile(board, target)
+
+    if tile == nil do return
+
+    piece.has_moved = true
+    piece.position = target
+
+    if tile.piece_ref != nil {
+        kill(tile.piece_ref)
+        tile.piece_ref = piece
+    }
+
+}
+
+kill :: proc(piece: ^Piece) {
+
+    piece.alive = false
 
 }

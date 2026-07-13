@@ -150,6 +150,12 @@ update :: proc(board: ^Board, pieces: []Piece) {
             if piece.position == tile.coordenate {
                 tile.piece_ref = &piece
             }
+
+        }
+
+        if tile.piece_ref != nil && tile.coordenate != tile.piece_ref.position {
+
+            tile.piece_ref = nil
         }
 
     }
