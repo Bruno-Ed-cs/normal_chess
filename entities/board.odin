@@ -4,7 +4,7 @@ import rl "vendor:raylib"
 import "core:fmt"
 
 BoardPos :: [2]i32
-tile_size :: 48
+tile_size :: 32
 
 Tile :: struct {
 
@@ -130,6 +130,20 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
 
 }
 
+update :: proc(board: ^Board, pieces: []Piece) {
+
+    for &tile in board.tiles {
+        for &piece in pieces {
+
+            if piece.position == tile.coordenate {
+                tile.piece_ref = &piece
+            }
+        }
+
+    }
+
+}
+
 delete_board :: proc(board: ^Board) {
 
     delete(board.tiles)
@@ -137,3 +151,5 @@ delete_board :: proc(board: ^Board) {
     fmt.println("board deleted")
 
 }
+
+

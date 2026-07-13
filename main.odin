@@ -2,18 +2,24 @@ package chess
 
 import rl "vendor:raylib"
 import "core:fmt"
+import "core:strings"
 import e "entities"
 
 window_size := [2]i32{800, 800}
 camera_speed :: 700
 zoom_speed :: 1.0
+textures: map[string]rl.Texture2D
 
 main :: proc() {
+
 
     rl.InitWindow(window_size.x, window_size.y, "Normal Chess")
     defer rl.CloseWindow()
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
+
+    load_textures(&textures)
+    defer for key, texture in textures do rl.UnloadTexture(texture)
 
     camera := rl.Camera2D{
         offset = {f32(window_size.x /2), f32(window_size.y /2)},
@@ -23,6 +29,18 @@ main :: proc() {
     }
     dt := rl.GetFrameTime()
 
+    white := e.Team {
+
+        color = rl.WHITE,
+        name = "white",
+    }
+
+    pieces_container := make([dynamic]e.Piece)
+    
+    for i in 0..<8 {
+        append(&pieces_container, e.make_pawn(&textures, {i32(i), 6}, &white))
+    }
+    
     board := e.make_board(col1 = rl.Color{181, 136, 99, 255}, col2 = rl.Color{240, 217, 181 , 255})
     defer e.delete_board(&board)
 
@@ -31,7 +49,7 @@ main :: proc() {
     camera.zoom = f32(window_size.y) / f32(board.sprite.height)
 
     fmt.println(board.tiles)
-    for !rl.WindowShouldClose() {
+    game_loop: for !rl.WindowShouldClose() {
 
         dt = rl.GetFrameTime()
         window_size.x = rl.GetScreenWidth()
@@ -40,6 +58,7 @@ main :: proc() {
 
         camera_control(&camera, dt)
 
+        e.update(&board, pieces_container[:])
 
         rl.BeginDrawing()
         rl.ClearBackground(rl.BLACK)
@@ -53,6 +72,11 @@ main :: proc() {
             if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
                 rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
             }
+        }
+
+        for &piece in pieces_container {
+            tile_pos , ok := e.board_to_world(&board, piece.position)
+            rl.DrawTextureEx(piece.sprite, tile_pos, 0.0, 1.0, piece.team.color)
         }
 
         rl.EndMode2D()
@@ -99,5 +123,17 @@ camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
         if rl.IsKeyDown(.RIGHT) {
             camera.target.x += camera_speed * dt
         }
+
+}
+
+load_textures :: proc(textures: ^map[string]rl.Texture2D) {
+
+    appdir : [dynamic]u8
+    defer delete(appdir)
+
+    append_string(&appdir, string(rl.GetApplicationDirectory()), "/assets/white_pawn.png")
+    path := strings.clone_to_cstring(string(appdir[:]))
+
+    textures["pawn"] = rl.LoadTexture(path)
 
 }
