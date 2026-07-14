@@ -42,18 +42,21 @@ main :: proc() {
 
     game_loop: for !rl.WindowShouldClose() {
 
+    update: {
+
         dt = rl.GetFrameTime()
         window_size.x = rl.GetScreenWidth()
         window_size.y = rl.GetScreenHeight()
         camera.offset = {f32(window_size.x /2), f32(window_size.y /2)}
 
-        //clear(&movements)
 
         camera_control(&camera, dt)
-
         e.update(&game.board, game.pieces)
         game_control(game, camera)
 
+    }
+
+    drawing: {
         rl.BeginDrawing()
         rl.ClearBackground(rl.BLACK)
         rl.BeginMode2D(camera)
@@ -61,8 +64,6 @@ main :: proc() {
         rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
         mouse_pos := rl.GetMousePosition()
         world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
-
-
 
         for tile in game.board.tiles {
 
@@ -86,6 +87,7 @@ main :: proc() {
 
                 rl.DrawRectangleLinesEx(rec, 2.0, color)
         }
+
         for &piece in game.pieces {
             tile_pos , ok := e.board_to_world(&game.board, piece.position)
             if piece.alive {
@@ -98,6 +100,8 @@ main :: proc() {
         debug_ui(game, camera)
 
         rl.EndDrawing()
+
+        }
 
     }
 

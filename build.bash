@@ -3,5 +3,5 @@
 mkdir -p build
 cp -r assets build
 
-odin build . -debug -out:build/normal_chess.bin 
+odin build ./src -debug -out:build/normal_chess.bin 
 
