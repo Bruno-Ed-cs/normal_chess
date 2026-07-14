@@ -34,7 +34,7 @@ Piece :: struct {
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
 }
 
-make_pawn :: proc(textures: ^map[string]rl.Texture2D, position: BoardPos, team: ^Team) -> (piece: Piece) {
+make_pawn :: proc(texture: rl.Texture2D, position: BoardPos, team: ^Team) -> (piece: Piece) {
 
     piece = Piece {
         class = .pawn,
@@ -42,14 +42,10 @@ make_pawn :: proc(textures: ^map[string]rl.Texture2D, position: BoardPos, team: 
         has_moved = false,
         team = team,
         position = position,
-        movement = paw_movement
+        movement = paw_movement,
+        sprite = texture
     }
     
-    texture, ok := textures["pawn"]
-
-    if ok {
-        piece.sprite = texture
-    }
 
     return
 }

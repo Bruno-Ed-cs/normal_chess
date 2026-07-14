@@ -1,9 +1,10 @@
-package chess
+package main
 
 import rl "vendor:raylib"
 import "core:fmt"
 import "core:strings"
 import e "entities"
+import mat "match"
 
 window_size := [2]i32{800, 800}
 camera_speed :: 700
@@ -21,39 +22,23 @@ main :: proc() {
     load_textures(&textures)
     defer for key, texture in textures do rl.UnloadTexture(texture)
 
+    game := mat.make_normal_match(&textures)
+    defer mat.delete_match(game)
+
     camera := rl.Camera2D{
         offset = {f32(window_size.x /2), f32(window_size.y /2)},
         rotation = 0.0,
         target = {0, 0},
         zoom = 2.6
     }
+
     dt := rl.GetFrameTime()
 
-    white := e.Team {
-
-        color = rl.WHITE,
-        name = "White",
-    }
-
-    pieces_container := make([dynamic]e.Piece)
-
-    for i in 0..<8 {
-        append(&pieces_container, e.make_pawn(&textures, {i32(i), 6}, &white))
-    }
-        append(&pieces_container, e.make_pawn(&textures, {3, 4}, &white))
-        append(&pieces_container, e.make_pawn(&textures, {5, 5}, &white))
-    board := e.make_board(col1 = rl.Color{181, 136, 99, 255}, col2 = rl.Color{240, 217, 181 , 255})
-    defer e.delete_board(&board)
-
-    board_center := [2]f32{f32(board.sprite.width/2), f32(board.sprite.height/2)}
+    board_center := [2]f32{f32(game.board.sprite.width/2), f32(game.board.sprite.height/2)}
     camera.target = board_center
-    camera.zoom = f32(window_size.y) / f32(board.sprite.height)
+    camera.zoom = f32(window_size.y) / f32(game.board.sprite.height)
 
     //fmt.println(board.tiles)
-    movements: [dynamic]e.Move
-    defer delete(movements)
-
-    selected_piece: ^e.Piece
 
     game_loop: for !rl.WindowShouldClose() {
 
@@ -66,93 +51,53 @@ main :: proc() {
 
         camera_control(&camera, dt)
 
-        e.update(&board, pieces_container[:])
+        e.update(&game.board, game.pieces)
+        game_control(game, camera)
 
         rl.BeginDrawing()
         rl.ClearBackground(rl.BLACK)
         rl.BeginMode2D(camera)
 
-        rl.DrawTextureV(board.sprite, board.position, rl.WHITE)
+        rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
         mouse_pos := rl.GetMousePosition()
         world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
 
-        check_click: if rl.IsMouseButtonPressed(.LEFT) {
-
-            target_tile, in_bounds := e.world_to_board(&board, world_pos)
-            if !in_bounds do break check_click
-
-                if selected_piece == nil{
-
-                    fmt.println(target_tile)
-
-                    if tile := e.get_tile(&board, target_tile); tile != nil && tile.piece_ref != nil{
-                        selected_piece = tile.piece_ref
-                        selected_piece.movement(tile.piece_ref, &board, &movements) 
-                        fmt.println("open movement")
-                        fmt.println(movements)
-                    }
-                } else {
-                    for move in movements {
-                        if move.pos == target_tile {
-                            e.move(selected_piece, &board, move.pos)
-                            selected_piece = nil
-                            clear(&movements)
-                            break
-                        }
 
 
-                    }
-                    selected_piece = nil
-                    clear(&movements)
+        for tile in game.board.tiles {
 
+            if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
+                rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
+            }
+        }
+
+        for move in game.movements {
+
+            draw_pos, in_bounds := e.board_to_world(&game.board, move.pos)
+            if !in_bounds do continue
+                color := rl.RED if move.attack else rl.BLUE
+
+                rec := rl.Rectangle {
+                    x = draw_pos.x,
+                    y = draw_pos.y,
+                    width = e.tile_size,
+                    height = e.tile_size
                 }
 
+                rl.DrawRectangleLinesEx(rec, 2.0, color)
+        }
+        for &piece in game.pieces {
+            tile_pos , ok := e.board_to_world(&game.board, piece.position)
+            if piece.alive {
+                rl.DrawTextureEx(piece.sprite, tile_pos, 0.0, 1.0, piece.team.color)
             }
+        }
 
+        rl.EndMode2D()
 
-            for tile in board.tiles {
+        debug_ui(game, camera)
 
-                if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
-                    rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
-                }
-            }
-
-            for move in movements {
-
-                draw_pos, in_bounds := e.board_to_world(&board, move.pos)
-                if !in_bounds do continue
-                    color := rl.RED if move.attack else rl.BLUE
-
-                    rec := rl.Rectangle {
-                        x = draw_pos.x,
-                        y = draw_pos.y,
-                        width = e.tile_size,
-                        height = e.tile_size
-                    }
-
-                    rl.DrawRectangleLinesEx(rec, 2.0, color)
-            }
-            for &piece in pieces_container {
-                tile_pos , ok := e.board_to_world(&board, piece.position)
-                if piece.alive {
-                    rl.DrawTextureEx(piece.sprite, tile_pos, 0.0, 1.0, piece.team.color)
-                }
-            }
-
-            rl.EndMode2D()
-
-            rl.DrawText("Chess", 0, 0, 30, rl.YELLOW);
-            rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", window_size.x, window_size.y), 0, 30, 30, rl.YELLOW);
-            rl.DrawText(fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f", camera.target.x, camera.target.y, camera.zoom, camera.rotation),
-                0, 120, 30, rl.YELLOW);
-
-            board_pos, in_bounds := e.world_to_board(&board, world_pos)
-            if (in_bounds) {
-                rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y), 0, 250, 30, rl.YELLOW);
-            }
-
-
-            rl.EndDrawing()
+        rl.EndDrawing()
 
     }
 
@@ -197,4 +142,59 @@ load_textures :: proc(textures: ^map[string]rl.Texture2D) {
 
     textures["pawn"] = rl.LoadTexture(path)
 
+}
+
+game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
+
+    mouse_pos := rl.GetMousePosition()
+    world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
+
+    check_click: if rl.IsMouseButtonPressed(.LEFT) {
+
+        target_tile, in_bounds := e.world_to_board(&game.board, world_pos)
+        if !in_bounds do break check_click
+
+            if game.selected_piece == nil{
+
+                fmt.println(target_tile)
+
+                if tile := e.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil{
+                    game.selected_piece = tile.piece_ref
+                    game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
+                    fmt.println("open movement")
+                    fmt.println(game.movements)
+                }
+            } else {
+                for move in game.movements {
+                    if move.pos == target_tile {
+                        e.move(game.selected_piece, &game.board, move.pos)
+                        game.selected_piece = nil
+                        clear(&game.movements)
+                        break
+                    }
+
+
+                }
+                game.selected_piece = nil
+                clear(&game.movements)
+
+            }
+
+        }
+    }
+
+debug_ui :: proc(game: ^mat.Match, camera: rl.Camera2D) {
+
+
+    mouse_pos := rl.GetMousePosition()
+    world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
+    rl.DrawText("Chess", 0, 0, 30, rl.YELLOW);
+    rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", window_size.x, window_size.y), 0, 30, 30, rl.YELLOW);
+    rl.DrawText(fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f", camera.target.x, camera.target.y, camera.zoom, camera.rotation),
+        0, 120, 30, rl.YELLOW);
+
+    board_pos, in_bounds := e.world_to_board(&game.board, world_pos)
+    if (in_bounds) {
+        rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y), 0, 250, 30, rl.YELLOW);
+    }
 }
