@@ -147,7 +147,7 @@ update :: proc(board: ^Board, pieces: []Piece) {
     for &tile in board.tiles {
         for &piece in pieces {
 
-            if piece.position == tile.coordenate {
+            if piece.position == tile.coordenate && piece.alive{
                 tile.piece_ref = &piece
             }
 

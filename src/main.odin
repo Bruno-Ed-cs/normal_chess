@@ -70,6 +70,13 @@ main :: proc() {
             }
         }
 
+        if game.selected_piece != nil {
+            
+            pos, valid := e.board_to_world(&game.board, game.selected_piece.position)
+            rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, e.tile_size, e.tile_size}, rl.BLUE)
+        }
+
+
         for move in game.movements {
 
             draw_pos, in_bounds := e.board_to_world(&game.board, move.pos)
@@ -150,7 +157,7 @@ game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
 
                 fmt.println(target_tile)
 
-                if tile := e.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil{
+                if tile := e.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
                     game.selected_piece = tile.piece_ref
                     game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
                     fmt.println("open movement")
