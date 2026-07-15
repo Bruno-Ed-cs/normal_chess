@@ -5,6 +5,7 @@ import "core:fmt"
 import "core:strings"
 import e "entities"
 import mat "match"
+import ass "asset_man"
 
 window_size := [2]i32{800, 800}
 camera_speed :: 700
@@ -138,14 +139,7 @@ camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
 
 load_textures :: proc(textures: ^map[string]rl.Texture2D) {
 
-    appdir : [dynamic]u8
-    defer delete(appdir)
-
-    append_string(&appdir, string(rl.GetApplicationDirectory()), "/assets/white_pawn.png")
-    path := strings.clone_to_cstring(string(appdir[:]))
-
-    textures["pawn"] = rl.LoadTexture(path)
-
+    textures["pawn"] = ass.get_asset("white_pawn.png").(rl.Texture2D)
 }
 
 game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {

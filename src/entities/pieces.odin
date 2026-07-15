@@ -1,6 +1,7 @@
 package entities
 
 import rl "vendor:raylib"
+import ass "../asset_man"
 
 Class :: enum {
     pawn,
@@ -43,7 +44,7 @@ make_pawn :: proc(texture: rl.Texture2D, position: BoardPos, team: ^Team) -> (pi
         team = team,
         position = position,
         movement = paw_movement,
-        sprite = texture
+        sprite = ass.get_asset("white_pawn.png").(rl.Texture2D)
     }
     
 
