@@ -58,6 +58,10 @@ get_asset :: proc(asset_name: string) -> Asset {
     case ".mp3":
         str.write_string(&fullpath, "musics/")
         asset_type = Asset_types.music
+
+    case :
+        fmt.eprintfln("The extension of the asset [%s] is not compatible", asset_name)
+        return asset
     }
 
     str.write_string(&fullpath, asset_name)
@@ -85,7 +89,24 @@ get_asset :: proc(asset_name: string) -> Asset {
 
 }
 
-delete_asset :: proc(asset_name: string) 
+delete_asset :: proc(asset_name: string) {
+    delete_key(&asset_bank, asset_name)
+}
 
-delete_asset_bank :: proc()
+clear_assets :: proc() {
+
+    for key, asset in asset_bank {
+        switch v in asset {
+        case rl.Texture2D:
+            rl.UnloadTexture(v)
+        case rl.Music:
+            rl.UnloadMusicStream(v)
+        case rl.Sound:
+            rl.UnloadSound(v)
+        }
+
+        delete_key(&asset_bank, key)
+    }
+
+}
 

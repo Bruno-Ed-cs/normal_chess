@@ -31,7 +31,6 @@ Piece :: struct {
     team: ^Team,
     position: BoardPos,
     class: Class,
-    sprite: rl.Texture2D,
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
 }
 
@@ -44,7 +43,6 @@ make_pawn :: proc(texture: rl.Texture2D, position: BoardPos, team: ^Team) -> (pi
         team = team,
         position = position,
         movement = paw_movement,
-        sprite = ass.get_asset("white_pawn.png").(rl.Texture2D)
     }
     
 

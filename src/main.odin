@@ -20,9 +20,6 @@ main :: proc() {
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
 
-    load_textures(&textures)
-    defer for key, texture in textures do rl.UnloadTexture(texture)
-
     game := mat.make_normal_match(&textures)
     defer mat.delete_match(game)
 
@@ -92,7 +89,7 @@ main :: proc() {
         for &piece in game.pieces {
             tile_pos , ok := e.board_to_world(&game.board, piece.position)
             if piece.alive {
-                rl.DrawTextureEx(piece.sprite, tile_pos, 0.0, 1.0, piece.team.color)
+                rl.DrawTextureEx(ass.get_asset("black_pawn.png").(rl.Texture2D), tile_pos, 0.0, 1.0, piece.team.color)
             }
         }
 
@@ -105,6 +102,8 @@ main :: proc() {
         }
 
     }
+
+    ass.clear_assets()
 
 }
 
@@ -135,11 +134,6 @@ camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
         camera.target.x += camera_speed * dt
     }
 
-}
-
-load_textures :: proc(textures: ^map[string]rl.Texture2D) {
-
-    textures["pawn"] = ass.get_asset("white_pawn.png").(rl.Texture2D)
 }
 
 game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
@@ -195,4 +189,6 @@ debug_ui :: proc(game: ^mat.Match, camera: rl.Camera2D) {
     if (in_bounds) {
         rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y), 0, 250, 30, rl.YELLOW);
     }
+
+    rl.DrawFPS(10, 300)
 }
