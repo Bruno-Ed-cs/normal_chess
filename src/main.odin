@@ -2,7 +2,6 @@ package main
 
 import rl "vendor:raylib"
 import "core:fmt"
-import "core:strings"
 import e "entities"
 import mat "match"
 import ass "asset_man"
@@ -51,6 +50,7 @@ main :: proc() {
         camera_control(&camera, dt)
         e.update(&game.board, game.pieces)
         game_control(game, camera)
+        mat.update_match(game)
 
     }
 

@@ -45,14 +45,14 @@ make_pawn :: proc(position: BoardPos, team: ^Team) -> (piece: Piece) {
         has_moved = false,
         team = team,
         position = position,
-        movement = paw_movement,
+        movement = pawn_movement,
     }
     
 
     return
 }
 
-paw_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
 
     moves_count: int
 
@@ -166,3 +166,9 @@ make_team :: proc(name: string, color: rl.Color, cemitery: [2]i32) -> Team {
     return team
 
 }
+
+delete_team :: proc(team: ^Team) {
+
+    rl.UnloadRenderTexture(team.piece_sprites)
+}
+
