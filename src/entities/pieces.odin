@@ -17,6 +17,8 @@ Team :: struct {
     score: i32,
     color: rl.Color,
     name: string,
+    cemitery_direction: [2]int,
+    piece_sprites: rl.RenderTexture2D
 }
 
 Move :: struct {
@@ -106,5 +108,47 @@ move :: proc(piece: ^Piece, board: ^Board, target: BoardPos) {
 kill :: proc(piece: ^Piece) {
 
     piece.alive = false
+
+}
+
+make_team :: proc(name: string, color: rl.Color, cemitery: [2]int) -> Team {
+
+    base_spritesheet := ass.get_asset("sprite_sheet.png").(rl.Texture2D)
+    sprite_image := rl.LoadImageFromTexture(base_spritesheet)
+    defer rl.UnloadImage(sprite_image)
+
+    team := Team{
+        cemitery_direction = cemitery,
+        name = name,
+        score = 0,
+        color = color,
+        piece_sprites = rl.LoadRenderTexture(sprite_image.width, sprite_image.height)
+    }
+
+    base_pixels := rl.LoadImageColors(sprite_image)
+    defer rl.UnloadImageColors(base_pixels)
+
+    size := sprite_image.height * sprite_image.width
+
+    for i in 0..<size {
+
+        primary_col := rl.Color{255, 255, 255, 255} 
+        secondary_col := rl.Color{153, 153, 153, 255}
+
+        if base_pixels[i] == primary_col {
+            base_pixels[i] = color
+        }
+
+        if base_pixels[i] == secondary_col {
+
+            base_pixels[i] = rl.ColorBrightness(base_pixels[i], 1.20)
+            base_pixels[i] = rl.ColorAlphaBlend(base_pixels[i], color, rl.Color{70, 60, 108, 255})
+        }
+
+    }
+
+    rl.UpdateTexture(team.piece_sprites.texture, base_pixels)
+
+    return team
 
 }

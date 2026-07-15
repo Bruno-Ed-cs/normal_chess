@@ -22,24 +22,14 @@ make_normal_match :: proc(textures: ^map[string]rl.Texture2D) -> (game: ^Match) 
     game.movements = make([dynamic]ent.Move)
     game.selected_piece = nil
 
-    game.teams[0] = ent.Team{
-        color = rl.WHITE,
-        name = "white",
-        score = 0
-    }
-
-    game.teams[1] = ent.Team{
-        color = rl.BLACK,
-        name = "black",
-        score = 0
-    }
-
+    game.teams[1] = ent.make_team("White", rl.LIGHTGRAY, {0, -1})
+    game.teams[0] = ent.make_team("Black", rl.DARKGRAY, {0, 1})
 
     for i in 0..<8 {
         game.pieces[i] = ent.make_pawn(textures["pawn"], {i32(i), 6}, &game.teams[0])
     }
-    game.pieces[8] = ent.make_pawn(textures["pawn"], {3, 4}, &game.teams[0])
-    game.pieces[9] = ent.make_pawn(textures["pawn"], {5, 5}, &game.teams[0])
+    game.pieces[8] = ent.make_pawn(textures["pawn"], {3, 4}, &game.teams[1])
+    game.pieces[9] = ent.make_pawn(textures["pawn"], {5, 5}, &game.teams[1])
 
 
     return 

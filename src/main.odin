@@ -89,7 +89,7 @@ main :: proc() {
         for &piece in game.pieces {
             tile_pos , ok := e.board_to_world(&game.board, piece.position)
             if piece.alive {
-                rl.DrawTextureEx(ass.get_asset("black_pawn.png").(rl.Texture2D), tile_pos, 0.0, 1.0, piece.team.color)
+                rl.DrawTextureRec(piece.team.piece_sprites.texture, rl.Rectangle{0, 0, 32, 32} , tile_pos, rl.WHITE)
             }
         }
 
