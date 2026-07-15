@@ -11,8 +11,7 @@ Match :: struct {
     board: ent.Board,
 }
 
-make_normal_match :: proc(textures: ^map[string]rl.Texture2D) -> (game: ^Match) {
-
+make_normal_match :: proc() -> (game: ^Match) {
 
     game = new(Match)
 
@@ -22,14 +21,13 @@ make_normal_match :: proc(textures: ^map[string]rl.Texture2D) -> (game: ^Match) 
     game.movements = make([dynamic]ent.Move)
     game.selected_piece = nil
 
-    game.teams[1] = ent.make_team("White", rl.LIGHTGRAY, {0, -1})
-    game.teams[0] = ent.make_team("Black", rl.DARKGRAY, {0, 1})
+    game.teams[0] = ent.make_team("White", rl.LIGHTGRAY, {0, -1})
+    game.teams[1] = ent.make_team("Black", rl.DARKGRAY, {0, 1})
 
     for i in 0..<8 {
-        game.pieces[i] = ent.make_pawn(textures["pawn"], {i32(i), 6}, &game.teams[0])
+        game.pieces[i] = ent.make_pawn({i32(i), 6}, &game.teams[0])
+        game.pieces[i + 8] = ent.make_pawn({i32(i), 1}, &game.teams[1])
     }
-    game.pieces[8] = ent.make_pawn(textures["pawn"], {3, 4}, &game.teams[1])
-    game.pieces[9] = ent.make_pawn(textures["pawn"], {5, 5}, &game.teams[1])
 
 
     return 
@@ -41,5 +39,6 @@ delete_match :: proc(match: ^Match) {
     delete(match.teams)
     delete(match.movements)
     ent.delete_board(&match.board)
+    free(match)
 
 }

@@ -20,7 +20,7 @@ main :: proc() {
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
 
-    game := mat.make_normal_match(&textures)
+    game := mat.make_normal_match()
     defer mat.delete_match(game)
 
     camera := rl.Camera2D{

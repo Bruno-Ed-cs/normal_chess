@@ -2,6 +2,7 @@ package entities
 
 import rl "vendor:raylib"
 import ass "../asset_man"
+import "core:fmt"
 
 Class :: enum {
     pawn,
@@ -14,10 +15,10 @@ Class :: enum {
 }
 
 Team :: struct {
-    score: i32,
+    score: int,
     color: rl.Color,
     name: string,
-    cemitery_direction: [2]int,
+    cemitery_direction: [2]i32,
     piece_sprites: rl.RenderTexture2D
 }
 
@@ -36,7 +37,7 @@ Piece :: struct {
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
 }
 
-make_pawn :: proc(texture: rl.Texture2D, position: BoardPos, team: ^Team) -> (piece: Piece) {
+make_pawn :: proc(position: BoardPos, team: ^Team) -> (piece: Piece) {
 
     piece = Piece {
         class = .pawn,
@@ -55,10 +56,27 @@ paw_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) ->
 
     moves_count: int
 
-    diagonal_killers := [2]BoardPos{{self.position.x -1, self.position.y -1}, {self.position.x +1, self.position.y -1}}
+    diagonal_killers : [2]BoardPos
 
-    for diag in diagonal_killers {
+    switch self.team.cemitery_direction {
 
+    case {1, 0}:
+        diagonal_killers[0] = {self.position.x +1, self.position.y +1}
+        diagonal_killers[1] = {self.position.x +1, self.position.y -1} 
+    case {-1, 0}:
+        diagonal_killers[0] = {self.position.x -1, self.position.y +1}
+        diagonal_killers[1] = {self.position.x -1, self.position.y -1} 
+    case {0, -1}:
+        diagonal_killers[0] = {self.position.x +1, self.position.y -1}
+        diagonal_killers[1] = {self.position.x -1, self.position.y -1} 
+    case {0, 1}:
+        diagonal_killers[0] = {self.position.x +1, self.position.y +1}
+        diagonal_killers[1] = {self.position.x -1, self.position.y +1} 
+
+    }
+
+    for &diag in diagonal_killers {
+        fmt.println(diag)
         if tile := get_tile(board, diag); tile != nil{
             if tile.piece_ref != nil && tile.piece_ref.team != self.team{
                 append(moves_buff, Move{ attack = true, pos = diag})
@@ -68,20 +86,16 @@ paw_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) ->
     }
 
     move_len := 1 if self.has_moved else 2
+    last_move := self.position
     for index in 1..=move_len {
 
-        position := BoardPos{self.position.x, self.position.y - i32(index)}
-        if tile := get_tile(board, position );
-        tile != nil {
+        move := last_move + self.team.cemitery_direction
 
-            if tile.piece_ref == nil {
-                append(moves_buff, Move{attack = false, pos = position})
-                moves_count += 1
-            } else {
+        if get_tile(board, move).piece_ref != nil do continue
 
-                break
-            }
-        }
+        last_move = move
+        moves_count += 1
+        append(moves_buff, Move{ attack = false, pos = move})
 
     }
 
@@ -111,7 +125,7 @@ kill :: proc(piece: ^Piece) {
 
 }
 
-make_team :: proc(name: string, color: rl.Color, cemitery: [2]int) -> Team {
+make_team :: proc(name: string, color: rl.Color, cemitery: [2]i32) -> Team {
 
     base_spritesheet := ass.get_asset("sprite_sheet.png").(rl.Texture2D)
     sprite_image := rl.LoadImageFromTexture(base_spritesheet)
