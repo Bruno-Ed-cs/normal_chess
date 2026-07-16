@@ -55,6 +55,12 @@ Piece :: struct {
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
 }
 
+queen_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+
+    return bishop_movement(self, board, moves_buff) + rook_movement(self, board, moves_buff)
+
+}
+
 bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
 
     moves_count: int
@@ -182,6 +188,7 @@ make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Pie
         piece.movement = bishop_movement
     case .king:
     case .queen:
+        piece.movement = queen_movement
     case .knight:
         piece.movement = knight_movement
 
