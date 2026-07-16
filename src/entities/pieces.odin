@@ -46,6 +46,45 @@ Piece :: struct {
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
 }
 
+knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+
+    moves_count :int
+
+    for dir in Directions {
+
+        middle := self.position + dir * 2
+
+        move1 := middle + swizzle(dir, 1, 0)
+        move2 := middle - swizzle(dir, 1, 0)
+
+        if tile := get_tile(board, move1); tile != nil {
+
+            if tile.piece_ref == nil {
+                append(moves_buff, Move{attack = false, pos = move1})
+                moves_count += 1
+            } else if tile.piece_ref.team != self.team {
+                append(moves_buff, Move{attack = true, pos = move1})
+                moves_count += 1
+            }
+
+        }
+
+        if tile := get_tile(board, move2); tile != nil {
+
+            if tile.piece_ref == nil {
+                append(moves_buff, Move{attack = false, pos = move2})
+                moves_count += 1
+            } else if tile.piece_ref.team != self.team {
+                append(moves_buff, Move{attack = true, pos = move2})
+                moves_count += 1
+            }
+        }
+
+    }
+
+    return moves_count
+}
+
 rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
 
     moves_count :int
@@ -102,6 +141,7 @@ make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Pie
     case .king:
     case .queen:
     case .knight:
+        piece.movement = knight_movement
 
     }
 

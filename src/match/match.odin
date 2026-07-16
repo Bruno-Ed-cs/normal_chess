@@ -54,7 +54,13 @@ make_normal_match :: proc() -> (game: ^Match) {
     for i in 0..<2{
 
         game.pieces[i + 16] = ent.make_piece(.rook, {i32(i * 7), 7}, &game.teams[0])
-        game.pieces[i + 20] = ent.make_piece(.rook, {i32(i * 7), 0}, &game.teams[1])
+        game.pieces[i + 18] = ent.make_piece(.rook, {i32(i * 7), 0}, &game.teams[1])
+    }
+
+    for i in 0..<2{
+
+        game.pieces[i + 20] = ent.make_piece(.knight, {i32(1 + i * 5), 7}, &game.teams[0])
+        game.pieces[i + 22] = ent.make_piece(.knight, {i32(1 + i * 5), 0}, &game.teams[1])
     }
 
 
