@@ -23,6 +23,7 @@ Diagonals :: [Diag][2]i32 {
 
 }
 
+
 Class :: enum {
     pawn,
     rook,
@@ -53,6 +54,47 @@ Piece :: struct {
     position: BoardPos,
     class: Class,
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
+}
+
+king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+
+    move_count: int
+
+    #unroll for dir in Directions {
+
+            pos := self.position + dir
+            tile := get_tile(board, pos)
+
+            if tile == nil {
+
+            } else if tile.piece_ref == nil {
+                append(moves_buff, Move{attack = false, pos = pos})
+                move_count += 1
+            } else if tile.piece_ref.team != self.team {
+                append(moves_buff, Move{attack = true, pos = pos})
+                move_count += 1
+            }
+
+    }
+
+    #unroll for diag in Diagonals {
+
+            pos := self.position + diag
+            tile := get_tile(board, pos)
+
+            if tile == nil {
+
+            } else if tile.piece_ref == nil {
+                append(moves_buff, Move{attack = false, pos = pos})
+                move_count += 1
+            } else if tile.piece_ref.team != self.team {
+                append(moves_buff, Move{attack = true, pos = pos})
+                move_count += 1
+            }
+    }
+
+    return move_count 
+
 }
 
 queen_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
@@ -187,6 +229,7 @@ make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Pie
     case .bishop:
         piece.movement = bishop_movement
     case .king:
+        piece.movement = king_movement
     case .queen:
         piece.movement = queen_movement
     case .knight:
