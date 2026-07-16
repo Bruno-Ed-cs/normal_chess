@@ -51,6 +51,12 @@ make_normal_match :: proc() -> (game: ^Match) {
         game.pieces[i + 8] = ent.make_pawn({i32(i), 1}, &game.teams[1])
     }
 
+    for i in 0..<2{
+
+        game.pieces[i + 16] = ent.make_rook({i32(i * 7), 7}, &game.teams[0])
+        game.pieces[i + 20] = ent.make_rook({i32(i * 7), 0}, &game.teams[1])
+    }
+
 
     return 
 }

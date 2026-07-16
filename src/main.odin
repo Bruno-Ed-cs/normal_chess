@@ -96,7 +96,30 @@ main :: proc() {
         for &piece in game.pieces {
             tile_pos , ok := e.board_to_world(&game.board, piece.position)
             if piece.alive {
-                rl.DrawTextureRec(piece.team.piece_sprites.texture, rl.Rectangle{0, 0, 32, 32} , tile_pos, rl.WHITE)
+                source := rl.Rectangle {0, 0, 32, 32}
+
+                switch piece.class {
+
+                case .pawn:
+                case .rook:
+                    source.x = 32
+                    source.y = 0
+                case .bishop:
+                    source.x = 0
+                    source.y = 32
+                case .king:
+                    source.x = 32 * 2
+                    source.y = 32
+                case .queen:
+                    source.x = 32 * 2
+                    source.y = 0
+                case .knight:
+                    source.x = 32
+                    source.y = 32
+
+                }
+
+                rl.DrawTextureRec(piece.team.piece_sprites.texture, source , tile_pos, rl.WHITE)
             }
         }
 

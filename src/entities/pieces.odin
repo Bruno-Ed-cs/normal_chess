@@ -4,6 +4,16 @@ import rl "vendor:raylib"
 import ass "../asset_man"
 import "core:fmt"
 
+Dir :: enum {up, down, left, right}
+
+Directions :: [Dir][2]i32 {
+    .up = {0, -1},
+    .down = {0, 1},
+    .left = {1, 0},
+    .right = {-1, 0}
+
+}
+
 Class :: enum {
     pawn,
     rook,
@@ -11,7 +21,6 @@ Class :: enum {
     king,
     queen,
     knight,
-    tower
 }
 
 Team :: struct {
@@ -35,6 +44,55 @@ Piece :: struct {
     position: BoardPos,
     class: Class,
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
+}
+
+make_rook :: proc(position: BoardPos, team: ^Team) -> (piece: Piece) {
+
+    return Piece {
+        class = .rook,
+        alive = true,
+        has_moved = false,
+        team = team,
+        position = position,
+        movement = rook_movement,
+    }
+
+}
+
+rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+
+    moves_count :int
+
+    for dir in Directions {
+
+        move := self.position
+        walked :int = 1
+
+        for ;;walked += 1{
+
+            move += dir
+            tile := get_tile(board, move)
+
+            if tile == nil do break
+
+                moves_count += 1
+
+                if tile.piece_ref == nil {
+                    append(moves_buff, Move{ attack = false, pos = move})
+                } else {
+                    if tile.piece_ref.team != self.team {
+                        append(moves_buff, Move{ attack = true, pos = move})
+                    }
+
+                    break
+                }
+
+            }
+
+
+        }
+
+        return moves_count
 }
 
 make_pawn :: proc(position: BoardPos, team: ^Team) -> (piece: Piece) {
@@ -91,7 +149,9 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
 
         move := last_move + self.team.cemitery_direction
 
-        if get_tile(board, move).piece_ref != nil do continue
+        tile := get_tile(board, move)
+        if tile == nil do continue
+        if tile.piece_ref != nil do continue
 
         last_move = move
         moves_count += 1
