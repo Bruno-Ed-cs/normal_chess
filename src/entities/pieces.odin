@@ -5,12 +5,21 @@ import ass "../asset_man"
 import "core:fmt"
 
 Dir :: enum {up, down, left, right}
+Diag :: enum {up_left, up_right, down_left, down_right}
 
 Directions :: [Dir][2]i32 {
     .up = {0, -1},
     .down = {0, 1},
     .left = {1, 0},
     .right = {-1, 0}
+
+}
+
+Diagonals :: [Diag][2]i32 {
+    .up_left = {-1, 1},
+    .up_right = {1, 1},
+    .down_left = {-1, -1},
+    .down_right = {1, -1}
 
 }
 
@@ -44,6 +53,38 @@ Piece :: struct {
     position: BoardPos,
     class: Class,
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
+}
+
+bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+
+    moves_count: int
+
+    for diag in Diagonals {
+
+        for multipliyer: i32 = 1;; multipliyer += 1 {
+
+            fmt.println(self.position + multipliyer * diag)
+            tile := get_tile(board, self.position + multipliyer * diag)
+
+            if tile == nil do break 
+
+            if tile.piece_ref == nil {
+                append(moves_buff, Move{attack = false, pos = self.position + multipliyer * diag})
+                moves_count += 1
+            } else if tile.piece_ref.team != self.team {
+                append(moves_buff, Move{attack = true, pos = self.position + multipliyer * diag})
+                moves_count += 1
+                break
+            } else {
+                break
+            }
+
+        }
+
+    }
+
+    return moves_count
+
 }
 
 knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
@@ -138,6 +179,7 @@ make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Pie
     case .rook:
         piece.movement = rook_movement
     case .bishop:
+        piece.movement = bishop_movement
     case .king:
     case .queen:
     case .knight:

@@ -63,6 +63,11 @@ make_normal_match :: proc() -> (game: ^Match) {
         game.pieces[i + 22] = ent.make_piece(.knight, {i32(1 + i * 5), 0}, &game.teams[1])
     }
 
+    for i in 0..<2{
+
+        game.pieces[i + 24] = ent.make_piece(.bishop, {i32(2 + i * 3), 7}, &game.teams[0])
+        game.pieces[i + 26] = ent.make_piece(.bishop, {i32(2 + i * 3), 0}, &game.teams[1])
+    }
 
     return 
 }
