@@ -46,19 +46,6 @@ Piece :: struct {
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
 }
 
-make_rook :: proc(position: BoardPos, team: ^Team) -> (piece: Piece) {
-
-    return Piece {
-        class = .rook,
-        alive = true,
-        has_moved = false,
-        team = team,
-        position = position,
-        movement = rook_movement,
-    }
-
-}
-
 rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
 
     moves_count :int
@@ -95,17 +82,28 @@ rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
         return moves_count
 }
 
-make_pawn :: proc(position: BoardPos, team: ^Team) -> (piece: Piece) {
+make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Piece) {
 
     piece = Piece {
-        class = .pawn,
+        class = class,
         alive = true,
         has_moved = false,
         team = team,
         position = position,
-        movement = pawn_movement,
     }
+
+    switch class {
     
+    case .pawn:
+        piece.movement = pawn_movement
+    case .rook:
+        piece.movement = rook_movement
+    case .bishop:
+    case .king:
+    case .queen:
+    case .knight:
+
+    }
 
     return
 }
