@@ -187,7 +187,9 @@ game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
                     fmt.println("open movement")
                     fmt.println(game.movements)
                 }
+
             } else {
+
                 for move in game.movements {
                     if move.pos == target_tile {
                         e.move(game.selected_piece, &game.board, move.pos)

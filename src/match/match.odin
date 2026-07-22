@@ -21,7 +21,7 @@ last_king_standing_win :: proc(game: ^Match) -> ^ent.Team {
     kinger: ^ent.Piece
 
     for &piece in game.pieces {
-        if piece.class == .king {
+        if piece.class == .king && piece.alive{
 
             king_count += 1
             kinger = &piece
@@ -47,36 +47,53 @@ make_normal_match :: proc() -> (game: ^Match) {
     game.teams[0] = ent.make_team("White", rl.LIGHTGRAY, {0, -1})
     game.teams[1] = ent.make_team("Black", rl.DARKGRAY, {0, 1})
 
-    for i in 0..<8 {
-        game.pieces[i] = ent.make_piece(.pawn, {i32(i), 6}, &game.teams[0])
-        game.pieces[i + 8] = ent.make_piece(.pawn, {i32(i), 1}, &game.teams[1])
-    }
-
-    for i in 0..<2{
-
-        game.pieces[i + 16] = ent.make_piece(.rook, {i32(i * 7), 7}, &game.teams[0])
-        game.pieces[i + 18] = ent.make_piece(.rook, {i32(i * 7), 0}, &game.teams[1])
-    }
-
-    for i in 0..<2{
-
-        game.pieces[i + 20] = ent.make_piece(.knight, {i32(1 + i * 5), 7}, &game.teams[0])
-        game.pieces[i + 22] = ent.make_piece(.knight, {i32(1 + i * 5), 0}, &game.teams[1])
-    }
-
-    for i in 0..<2{
-
-        game.pieces[i + 24] = ent.make_piece(.bishop, {i32(2 + i * 3), 7}, &game.teams[0])
-        game.pieces[i + 26] = ent.make_piece(.bishop, {i32(2 + i * 3), 0}, &game.teams[1])
-    }
-
-    game.pieces[29] = ent.make_piece(.queen, {4, 7}, &game.teams[0])
-    game.pieces[30] = ent.make_piece(.queen, {4, 0}, &game.teams[1])
-
-    game.pieces[31] = ent.make_piece(.king, {3, 7}, &game.teams[0])
-    game.pieces[32] = ent.make_piece(.king, {3, 0}, &game.teams[1])
+    populate_normal_formation(game.pieces[:], &game.teams[0], &game.teams[1])
 
     return 
+}
+
+populate_normal_formation :: proc(pieces_bank: []ent.Piece, team1, team2: ^ent.Team) {
+
+    assert(len(pieces_bank) >= 32, "insuficient space for this formation")
+
+
+    for i in 0..<8 {
+        pieces_bank[i] = ent.make_piece(.pawn, {i32(i), 6}, team1)
+        pieces_bank[i + 8] = ent.make_piece(.pawn, {i32(i), 1}, team2)
+    }
+
+    for i in 0..<2{
+
+        pieces_bank[i + 16] = ent.make_piece(.rook, {i32(i * 7), 7}, team1)
+        pieces_bank[i + 18] = ent.make_piece(.rook, {i32(i * 7), 0}, team2)
+    }
+
+    for i in 0..<2{
+
+        pieces_bank[i + 20] = ent.make_piece(.knight, {i32(1 + i * 5), 7}, team1)
+        pieces_bank[i + 22] = ent.make_piece(.knight, {i32(1 + i * 5), 0}, team2)
+    }
+
+    for i in 0..<2{
+
+        pieces_bank[i + 24] = ent.make_piece(.bishop, {i32(2 + i * 3), 7}, team1)
+        pieces_bank[i + 26] = ent.make_piece(.bishop, {i32(2 + i * 3), 0}, team2)
+    }
+
+    pieces_bank[29] = ent.make_piece(.queen, {4, 7}, team1)
+    pieces_bank[30] = ent.make_piece(.queen, {4, 0}, team2)
+
+    pieces_bank[31] = ent.make_piece(.king, {3, 7}, team1)
+    pieces_bank[32] = ent.make_piece(.king, {3, 0}, team2)
+
+}
+
+reset_normal_match :: proc(self: ^Match) {
+
+    populate_normal_formation(self.pieces[:], &self.teams[0], &self.teams[1])
+    clear(&self.movements)
+    self.selected_piece = nil
+    self.curr_turn = 0
 }
 
 delete_match :: proc(match: ^Match) {
@@ -99,7 +116,7 @@ update_match :: proc(self: ^Match) {
 
     if winner != nil {
         winner.score += 1
-
+        reset_normal_match(self)
     }
 
 }
