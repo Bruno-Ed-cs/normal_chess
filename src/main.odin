@@ -9,7 +9,6 @@ import ass "asset_man"
 window_size := [2]i32{800, 800}
 camera_speed :: 700
 zoom_speed :: 1.0
-textures: map[string]rl.Texture2D
 
 main :: proc() {
 
@@ -180,9 +179,11 @@ game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
 
                 fmt.println(target_tile)
 
+                cur_team := mat.get_team_turn(game)
+
                 if tile := e.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
                     game.selected_piece = tile.piece_ref
-                    game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
+                    if cur_team == game.selected_piece.team do game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
                     fmt.println("open movement")
                     fmt.println(game.movements)
                 }
@@ -190,6 +191,7 @@ game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
                 for move in game.movements {
                     if move.pos == target_tile {
                         e.move(game.selected_piece, &game.board, move.pos)
+                        mat.end_turn(game)
                         game.selected_piece = nil
                         clear(&game.movements)
                         break

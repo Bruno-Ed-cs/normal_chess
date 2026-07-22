@@ -8,6 +8,7 @@ Match :: struct {
     selected_piece: ^ent.Piece,
     pieces: []ent.Piece,
     teams: []ent.Team,
+    curr_turn: int,
     movements: [dynamic]ent.Move,
     board: ent.Board,
     //returns nil when no one won yet
@@ -100,5 +101,22 @@ update_match :: proc(self: ^Match) {
         winner.score += 1
 
     }
+
+}
+
+end_turn :: proc(self: ^Match) {
+
+    self.curr_turn += 1 
+
+    if self.curr_turn >= len(self.teams) do self.curr_turn = 0 
+    if self.curr_turn < 0 do self.curr_turn = 0
+
+}
+
+get_team_turn :: proc(self: ^Match) -> ^ent.Team {
+
+    assert(self.curr_turn >= 0 && self.curr_turn < len(self.teams), "the team index in the current turn is out of sync with the array")
+
+    return &self.teams[self.curr_turn]
 
 }
