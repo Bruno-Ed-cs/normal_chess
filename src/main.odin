@@ -124,6 +124,7 @@ main :: proc() {
 
         rl.EndMode2D()
 
+        gui(game)
         debug_ui(game, camera)
 
         rl.EndDrawing()
@@ -226,3 +227,19 @@ debug_ui :: proc(game: ^mat.Match, camera: rl.Camera2D) {
 
     rl.DrawFPS(10, 300)
 }
+
+gui :: proc(game: ^mat.Match) {
+
+    center := rl.Vector2{f32(window_size.x /2), f32(window_size.y /2)}
+    font_size :: 32
+
+    cur_team: cstring = fmt.caprintf("Turn: %s", mat.get_team_turn(game).name)
+    score: cstring = fmt.caprintf("%s: %d | %s: %d", game.teams[0].name, game.teams[0].score, game.teams[1].name, game.teams[1].score)
+
+    team_wid := rl.MeasureText(cur_team, font_size)
+    score_wid := rl.MeasureText(score, font_size)
+
+    rl.DrawText(score, i32(center.x) - score_wid /2, 0, font_size, rl.GRAY)
+    rl.DrawText(cur_team, i32(center.x) - team_wid /2, window_size.y - 32, font_size, rl.GRAY)
+}
+
