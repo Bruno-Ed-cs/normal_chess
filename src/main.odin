@@ -2,8 +2,7 @@ package main
 
 import rl "vendor:raylib"
 import "core:fmt"
-import e "entities"
-import mat "match"
+import gm "game"
 import ass "asset_man"
 
 window_size := [2]i32{800, 800}
@@ -18,8 +17,8 @@ main :: proc() {
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
 
-    game := mat.make_normal_match()
-    defer mat.delete_match(game)
+    game := gm.make_normal_match()
+    defer gm.delete_match(game)
 
     camera := rl.Camera2D{
         offset = {f32(window_size.x /2), f32(window_size.y /2)},
@@ -47,9 +46,9 @@ main :: proc() {
 
 
         camera_control(&camera, dt)
-        e.update(&game.board, game.pieces)
+        gm.update(&game.board, game.pieces)
         game_control(game, camera)
-        mat.update_match(game)
+        gm.update_match(game)
 
     }
 
@@ -71,29 +70,29 @@ main :: proc() {
 
         if game.selected_piece != nil {
             
-            pos, valid := e.board_to_world(&game.board, game.selected_piece.position)
-            rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, e.tile_size, e.tile_size}, rl.BLUE)
+            pos, valid := gm.board_to_world(&game.board, game.selected_piece.position)
+            rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, gm.tile_size, gm.tile_size}, rl.BLUE)
         }
 
 
         for move in game.movements {
 
-            draw_pos, in_bounds := e.board_to_world(&game.board, move.pos)
+            draw_pos, in_bounds := gm.board_to_world(&game.board, move.destiny)
             if !in_bounds do continue
                 color := rl.RED if move.attack else rl.BLUE
 
                 rec := rl.Rectangle {
                     x = draw_pos.x,
                     y = draw_pos.y,
-                    width = e.tile_size,
-                    height = e.tile_size
+                    width = gm.tile_size,
+                    height = gm.tile_size
                 }
 
                 rl.DrawRectangleLinesEx(rec, 2.0, color)
         }
 
         for &piece in game.pieces {
-            tile_pos , ok := e.board_to_world(&game.board, piece.position)
+            tile_pos , ok := gm.board_to_world(&game.board, piece.position)
             if piece.alive {
                 source := rl.Rectangle {0, 0, 32, 32}
 
@@ -166,23 +165,23 @@ camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
 
 }
 
-game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
+game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
     mouse_pos := rl.GetMousePosition()
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
 
     check_click: if rl.IsMouseButtonPressed(.LEFT) {
 
-        target_tile, in_bounds := e.world_to_board(&game.board, world_pos)
+        target_tile, in_bounds := gm.world_to_board(&game.board, world_pos)
         if !in_bounds do break check_click
 
             if game.selected_piece == nil{
 
                 fmt.println(target_tile)
 
-                cur_team := mat.get_team_turn(game)
+                cur_team := gm.get_team_turn(game)
 
-                if tile := e.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
+                if tile := gm.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
                     game.selected_piece = tile.piece_ref
                     if cur_team == game.selected_piece.team do game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
                     fmt.println("open movement")
@@ -192,9 +191,9 @@ game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
             } else {
 
                 for move in game.movements {
-                    if move.pos == target_tile {
-                        e.move(game.selected_piece, &game.board, move.pos)
-                        mat.end_turn(game)
+                    if move.destiny == target_tile {
+                        gm.move(game.selected_piece, &game.board, move.destiny)
+                        gm.end_turn(game)
                         game.selected_piece = nil
                         clear(&game.movements)
                         break
@@ -210,7 +209,7 @@ game_control :: proc(game: ^mat.Match, camera: rl.Camera2D) {
         }
     }
 
-debug_ui :: proc(game: ^mat.Match, camera: rl.Camera2D) {
+debug_ui :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
 
     mouse_pos := rl.GetMousePosition()
@@ -220,7 +219,7 @@ debug_ui :: proc(game: ^mat.Match, camera: rl.Camera2D) {
     rl.DrawText(fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f", camera.target.x, camera.target.y, camera.zoom, camera.rotation),
         0, 120, 30, rl.YELLOW);
 
-    board_pos, in_bounds := e.world_to_board(&game.board, world_pos)
+    board_pos, in_bounds := gm.world_to_board(&game.board, world_pos)
     if (in_bounds) {
         rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y), 0, 250, 30, rl.YELLOW);
     }
@@ -228,12 +227,12 @@ debug_ui :: proc(game: ^mat.Match, camera: rl.Camera2D) {
     rl.DrawFPS(10, 300)
 }
 
-gui :: proc(game: ^mat.Match) {
+gui :: proc(game: ^gm.Match) {
 
     center := rl.Vector2{f32(window_size.x /2), f32(window_size.y /2)}
     font_size :: 32
 
-    cur_team: cstring = fmt.caprintf("Turn: %s", mat.get_team_turn(game).name)
+    cur_team: cstring = fmt.caprintf("Turn: %s", gm.get_team_turn(game).name)
     score: cstring = fmt.caprintf("%s: %d | %s: %d", game.teams[0].name, game.teams[0].score, game.teams[1].name, game.teams[1].score)
 
     team_wid := rl.MeasureText(cur_team, font_size)

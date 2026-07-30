@@ -1,24 +1,23 @@
-package match
+package game
 
-import ent "../entities"
 import rl "vendor:raylib"
 
 
 Match :: struct {
-    selected_piece: ^ent.Piece,
-    pieces: []ent.Piece,
-    teams: []ent.Team,
+    selected_piece: ^Piece,
+    pieces: []Piece,
+    teams: []Team,
     curr_turn: int,
-    movements: [dynamic]ent.Move,
-    board: ent.Board,
+    movements: [dynamic]Move,
+    board: Board,
     //returns nil when no one won yet
-    win_condition: proc(game: ^Match) -> ^ent.Team,
+    win_condition: proc(game: ^Match) -> ^Team,
 }
 
-last_king_standing_win :: proc(game: ^Match) -> ^ent.Team {
+last_king_standing_win :: proc(game: ^Match) -> ^Team {
 
     king_count := 0
-    kinger: ^ent.Piece
+    kinger: ^Piece
 
     for &piece in game.pieces {
         if piece.class == .king && piece.alive{
@@ -37,54 +36,54 @@ make_normal_match :: proc() -> (game: ^Match) {
 
     game = new(Match)
 
-    game.board = ent.make_board()
-    game.pieces = make([]ent.Piece, game.board.size.x * game.board.size.y)
-    game.teams = make([]ent.Team, 2)
-    game.movements = make([dynamic]ent.Move)
+    game.board = make_board()
+    game.pieces = make([]Piece, game.board.size.x * game.board.size.y)
+    game.teams = make([]Team, 2)
+    game.movements = make([dynamic]Move)
     game.selected_piece = nil
     game.win_condition = last_king_standing_win
 
-    game.teams[0] = ent.make_team("White", rl.LIGHTGRAY, {0, -1})
-    game.teams[1] = ent.make_team("Black", rl.DARKGRAY, {0, 1})
+    game.teams[0] = make_team("White", rl.LIGHTGRAY, {0, -1})
+    game.teams[1] = make_team("Black", rl.DARKGRAY, {0, 1})
 
     populate_normal_formation(game.pieces[:], &game.teams[0], &game.teams[1])
 
     return 
 }
 
-populate_normal_formation :: proc(pieces_bank: []ent.Piece, team1, team2: ^ent.Team) {
+populate_normal_formation :: proc(pieces_bank: []Piece, team1, team2: ^Team) {
 
     assert(len(pieces_bank) >= 32, "insuficient space for this formation")
 
 
     for i in 0..<8 {
-        pieces_bank[i] = ent.make_piece(.pawn, {i32(i), 6}, team1)
-        pieces_bank[i + 8] = ent.make_piece(.pawn, {i32(i), 1}, team2)
+        pieces_bank[i] = make_piece(.pawn, {i32(i), 6}, team1)
+        pieces_bank[i + 8] = make_piece(.pawn, {i32(i), 1}, team2)
     }
 
     for i in 0..<2{
 
-        pieces_bank[i + 16] = ent.make_piece(.rook, {i32(i * 7), 7}, team1)
-        pieces_bank[i + 18] = ent.make_piece(.rook, {i32(i * 7), 0}, team2)
+        pieces_bank[i + 16] = make_piece(.rook, {i32(i * 7), 7}, team1)
+        pieces_bank[i + 18] = make_piece(.rook, {i32(i * 7), 0}, team2)
     }
 
     for i in 0..<2{
 
-        pieces_bank[i + 20] = ent.make_piece(.knight, {i32(1 + i * 5), 7}, team1)
-        pieces_bank[i + 22] = ent.make_piece(.knight, {i32(1 + i * 5), 0}, team2)
+        pieces_bank[i + 20] = make_piece(.knight, {i32(1 + i * 5), 7}, team1)
+        pieces_bank[i + 22] = make_piece(.knight, {i32(1 + i * 5), 0}, team2)
     }
 
     for i in 0..<2{
 
-        pieces_bank[i + 24] = ent.make_piece(.bishop, {i32(2 + i * 3), 7}, team1)
-        pieces_bank[i + 26] = ent.make_piece(.bishop, {i32(2 + i * 3), 0}, team2)
+        pieces_bank[i + 24] = make_piece(.bishop, {i32(2 + i * 3), 7}, team1)
+        pieces_bank[i + 26] = make_piece(.bishop, {i32(2 + i * 3), 0}, team2)
     }
 
-    pieces_bank[29] = ent.make_piece(.queen, {4, 7}, team1)
-    pieces_bank[30] = ent.make_piece(.queen, {4, 0}, team2)
+    pieces_bank[29] = make_piece(.queen, {4, 7}, team1)
+    pieces_bank[30] = make_piece(.queen, {4, 0}, team2)
 
-    pieces_bank[31] = ent.make_piece(.king, {3, 7}, team1)
-    pieces_bank[32] = ent.make_piece(.king, {3, 0}, team2)
+    pieces_bank[31] = make_piece(.king, {3, 7}, team1)
+    pieces_bank[32] = make_piece(.king, {3, 0}, team2)
 
 }
 
@@ -101,9 +100,9 @@ delete_match :: proc(match: ^Match) {
     delete(match.pieces)
     delete(match.teams)
     delete(match.movements)
-    ent.delete_board(&match.board)
+    delete_board(&match.board)
     for &i in match.teams {
-        ent.delete_team(&i)
+        delete_team(&i)
     }
     free(match)
 
@@ -130,7 +129,7 @@ end_turn :: proc(self: ^Match) {
 
 }
 
-get_team_turn :: proc(self: ^Match) -> ^ent.Team {
+get_team_turn :: proc(self: ^Match) -> ^Team {
 
     assert(self.curr_turn >= 0 && self.curr_turn < len(self.teams), "the team index in the current turn is out of sync with the array")
 

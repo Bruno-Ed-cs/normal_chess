@@ -1,4 +1,4 @@
-package entities
+package game
 
 import rl "vendor:raylib"
 import "core:fmt"
