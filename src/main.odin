@@ -4,6 +4,7 @@ import rl "vendor:raylib"
 import "core:fmt"
 import gm "game"
 import ass "asset_man"
+import ui "ui"
 
 window_size := [2]i32{800, 800}
 camera_speed :: 700
@@ -20,11 +21,19 @@ main :: proc() {
     game := gm.make_normal_match()
     defer gm.delete_match(game)
 
+    interfaces := ui.init_ui_stack()
+    defer ui.delete_ui_stack(interfaces)
+
+
     camera := rl.Camera2D{
         offset = {f32(window_size.x /2), f32(window_size.y /2)},
         rotation = 0.0,
         target = {0, 0},
         zoom = 2.6
+    }
+
+    when ODIN_DEBUG {
+        ui.push_ui(interfaces, new_debug_ui(game, &camera))
     }
 
     dt := rl.GetFrameTime()
@@ -124,7 +133,7 @@ main :: proc() {
         rl.EndMode2D()
 
         gui(game)
-        debug_ui(game, camera)
+        ui.execute_ui_stack(interfaces)
 
         rl.EndDrawing()
 
@@ -184,8 +193,8 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
                 if tile := gm.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
                     game.selected_piece = tile.piece_ref
                     if cur_team == game.selected_piece.team do game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
-                    fmt.println("open movement")
-                    fmt.println(game.movements)
+                        fmt.println("open movement")
+                        fmt.println(game.movements)
                 }
 
             } else {
@@ -209,22 +218,51 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
         }
     }
 
-debug_ui :: proc(game: ^gm.Match, camera: rl.Camera2D) {
+DebugInfo :: struct {
+    game: ^gm.Match,
+    camera: ^rl.Camera2D
 
+}
+
+free_debug_ui :: proc(workspace: rawptr) {
+
+    free(workspace)
+
+}
+
+new_debug_ui :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> ui.Ui {
+
+    info := new(DebugInfo)
+    info.camera = camera
+    info.game = game
+
+    return ui.Ui {
+        callback = debug_ui,
+        workspace = info,
+        cleanup = free_debug_ui
+    }
+
+}
+
+debug_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
+
+    info := cast(^DebugInfo)workspace
 
     mouse_pos := rl.GetMousePosition()
-    world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
+    world_pos := rl.GetScreenToWorld2D(mouse_pos, info.camera^)
     rl.DrawText("Chess", 0, 0, 30, rl.YELLOW);
     rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", window_size.x, window_size.y), 0, 30, 30, rl.YELLOW);
-    rl.DrawText(fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f", camera.target.x, camera.target.y, camera.zoom, camera.rotation),
+    rl.DrawText(fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f", info.camera.target.x, info.camera.target.y, info.camera.zoom, info.camera.rotation),
         0, 120, 30, rl.YELLOW);
 
-    board_pos, in_bounds := gm.world_to_board(&game.board, world_pos)
+    board_pos, in_bounds := gm.world_to_board(&info.game.board, world_pos)
     if (in_bounds) {
         rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y), 0, 250, 30, rl.YELLOW);
     }
 
     rl.DrawFPS(10, 300)
+
+    return ui.UiSig.ok
 }
 
 gui :: proc(game: ^gm.Match) {

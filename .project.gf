@@ -1,4 +1,4 @@
 [executable]
-path=build/normal_chess.bin
+path=src.bin
 arguments=
 ask_directory=1
