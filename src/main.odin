@@ -32,19 +32,26 @@ main :: proc() {
         zoom = 2.6
     }
 
-    when ODIN_DEBUG {
-        ui.push_ui(interfaces, new_debug_ui(game, &camera))
-    }
-
     dt := rl.GetFrameTime()
 
     board_center := [2]f32{f32(game.board.sprite.width/2), f32(game.board.sprite.height/2)}
     camera.target = board_center
     camera.zoom = f32(window_size.y) / f32(game.board.sprite.height)
 
+    debug_id: int
+
     //fmt.println(board.tiles)
 
     game_loop: for !rl.WindowShouldClose() {
+
+        if rl.IsKeyReleased(.F3) {
+
+            if !ui.is_ui_active(interfaces, debug_id) {
+                debug_id = ui.push_ui(interfaces, new_debug_ui(game, &camera))
+            } else {
+                ui.remove_ui(interfaces, debug_id) 
+            }
+        }
 
     update: {
 
@@ -262,7 +269,7 @@ debug_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
 
     rl.DrawFPS(10, 300)
 
-    return ui.UiSig.ok
+    return ui.UiSig.move_down
 }
 
 gui :: proc(game: ^gm.Match) {
