@@ -39,6 +39,7 @@ main :: proc() {
     camera.zoom = f32(window_size.y) / f32(game.board.sprite.height)
 
     debug_id: int
+    ui.push_ui(interfaces, new_match_ui(game))
 
     //fmt.println(board.tiles)
 
@@ -139,7 +140,6 @@ main :: proc() {
 
         rl.EndMode2D()
 
-        gui(game)
         ui.execute_ui_stack(interfaces)
 
         rl.EndDrawing()
@@ -272,8 +272,20 @@ debug_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
     return ui.UiSig.move_down
 }
 
-gui :: proc(game: ^gm.Match) {
+new_match_ui :: proc(match: ^gm.Match) -> ui.Ui {
 
+    hud := ui.Ui {
+        callback = match_ui,
+        workspace = match
+
+    }
+
+    return hud
+}
+
+match_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
+
+    game := cast(^gm.Match)workspace
     center := rl.Vector2{f32(window_size.x /2), f32(window_size.y /2)}
     font_size :: 32
 
@@ -285,5 +297,7 @@ gui :: proc(game: ^gm.Match) {
 
     rl.DrawText(score, i32(center.x) - score_wid /2, 0, font_size, rl.GRAY)
     rl.DrawText(cur_team, i32(center.x) - team_wid /2, window_size.y - 32, font_size, rl.GRAY)
+
+    return ui.UiSig.ok
 }
 
