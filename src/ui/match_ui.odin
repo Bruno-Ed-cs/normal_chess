@@ -4,7 +4,6 @@ import fmt "core:fmt"
 import g "../globals"
 import rl "vendor:raylib"
 
-
 new_match_ui :: proc(match: ^gm.Match) -> Ui {
 
     hud := Ui {
