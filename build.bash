@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+shopt -s expand_aliases
+source ~/.bashrc
 
 mkdir -p build
 cp -r assets build

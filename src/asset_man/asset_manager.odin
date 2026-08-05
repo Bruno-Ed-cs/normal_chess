@@ -28,7 +28,6 @@ get_asset :: proc(asset_name: string) -> Asset {
         return asset
     }
 
-
     fullpath: str.Builder
     str.builder_init(&fullpath)
     defer str.builder_destroy(&fullpath)
@@ -107,6 +106,8 @@ clear_assets :: proc() {
 
         delete_key(&asset_bank, key)
     }
+
+    delete(asset_bank)
 
 }
 

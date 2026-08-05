@@ -46,11 +46,12 @@ delete_ui_stack :: proc(stack: ^UiStack) {
 
     for ui in stack.stack {
 
-        ui.cleanup(ui.workspace)
+        if ui.cleanup != nil do ui.cleanup(ui.workspace)
 
     }
 
     delete(stack.stack)
+    free(stack)
 }
 
 push_ui :: proc(stack: ^UiStack, ui: Ui) -> int {
@@ -71,7 +72,7 @@ clean_stack :: proc(stack: ^UiStack) {
 
     for ui in stack.stack {
 
-        ui.cleanup(ui.workspace)
+        if ui.cleanup != nil do ui.cleanup(ui.workspace)
 
     }
 
@@ -83,8 +84,11 @@ execute_ui_stack :: proc(stack: ^UiStack) {
 
     sig_buff: [dynamic]SigIndex
     reserve(&sig_buff, len(stack.stack))
+    defer delete(sig_buff)
 
     for index := 0; index < len(stack.stack); index += 1{
+
+        if stack.stack[index].callback == nil do continue
 
         top := true if index == len(stack.stack) else false
         result := stack.stack[index].callback(stack.stack[index].workspace, top)

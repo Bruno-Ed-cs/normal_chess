@@ -1,1 +1,5 @@
 build/
+output.txt
+*.vim
+*.bin
+*.gf

@@ -5,13 +5,28 @@ import "core:fmt"
 import gm "game"
 import ass "asset_man"
 import ui "ui"
+import "core:mem"
 
 window_size := [2]i32{800, 800}
 camera_speed :: 700
 zoom_speed :: 1.0
 
 main :: proc() {
+    when ODIN_DEBUG {
+        track: mem.Tracking_Allocator
+        mem.tracking_allocator_init(&track, context.allocator)
+        context.allocator = mem.tracking_allocator(&track)
 
+        defer {
+            if len(track.allocation_map) > 0 {
+                fmt.eprintf("=== %v allocations not freed: ===\n", len(track.allocation_map))
+                for _, entry in track.allocation_map {
+                    fmt.eprintf("- %v bytes @ %v\n", entry.size, entry.location)
+                }
+            }
+            mem.tracking_allocator_destroy(&track)
+        }
+    }
 
     rl.InitWindow(window_size.x, window_size.y, "Normal Chess")
     defer rl.CloseWindow()
@@ -41,9 +56,9 @@ main :: proc() {
     debug_id: int
     ui.push_ui(interfaces, new_match_ui(game))
 
-    //fmt.println(board.tiles)
-
     game_loop: for !rl.WindowShouldClose() {
+
+        free_all(context.temp_allocator)
 
         if rl.IsKeyReleased(.F3) {
 
@@ -54,95 +69,95 @@ main :: proc() {
             }
         }
 
-    update: {
+        update: {
 
-        dt = rl.GetFrameTime()
-        window_size.x = rl.GetScreenWidth()
-        window_size.y = rl.GetScreenHeight()
-        camera.offset = {f32(window_size.x /2), f32(window_size.y /2)}
+            dt = rl.GetFrameTime()
+            window_size.x = rl.GetScreenWidth()
+            window_size.y = rl.GetScreenHeight()
+            camera.offset = {f32(window_size.x /2), f32(window_size.y /2)}
 
 
-        camera_control(&camera, dt)
-        gm.update(&game.board, game.pieces)
-        game_control(game, camera)
-        gm.update_match(game)
+            camera_control(&camera, dt)
+            gm.update(&game.board, game.pieces)
+            game_control(game, camera)
+            gm.update_match(game)
 
-    }
-
-    drawing: {
-        rl.BeginDrawing()
-        rl.ClearBackground(rl.BLACK)
-        rl.BeginMode2D(camera)
-
-        rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
-        mouse_pos := rl.GetMousePosition()
-        world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
-
-        for tile in game.board.tiles {
-
-            if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
-                rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
-            }
         }
 
-        if game.selected_piece != nil {
-            
-            pos, valid := gm.board_to_world(&game.board, game.selected_piece.position)
-            rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, gm.tile_size, gm.tile_size}, rl.BLUE)
-        }
+        drawing: {
+            rl.BeginDrawing()
+            rl.ClearBackground(rl.BLACK)
+            rl.BeginMode2D(camera)
 
+            rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
+            mouse_pos := rl.GetMousePosition()
+            world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
 
-        for move in game.movements {
+            for tile in game.board.tiles {
 
-            draw_pos, in_bounds := gm.board_to_world(&game.board, move.destiny)
-            if !in_bounds do continue
-                color := rl.RED if move.attack else rl.BLUE
-
-                rec := rl.Rectangle {
-                    x = draw_pos.x,
-                    y = draw_pos.y,
-                    width = gm.tile_size,
-                    height = gm.tile_size
+                if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
+                    rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
                 }
-
-                rl.DrawRectangleLinesEx(rec, 2.0, color)
-        }
-
-        for &piece in game.pieces {
-            tile_pos , ok := gm.board_to_world(&game.board, piece.position)
-            if piece.alive {
-                source := rl.Rectangle {0, 0, 32, 32}
-
-                switch piece.class {
-
-                case .pawn:
-                case .rook:
-                    source.x = 32
-                    source.y = 0
-                case .bishop:
-                    source.x = 0
-                    source.y = 32
-                case .king:
-                    source.x = 32 * 2
-                    source.y = 32
-                case .queen:
-                    source.x = 32 * 2
-                    source.y = 0
-                case .knight:
-                    source.x = 32
-                    source.y = 32
-
-                }
-
-                rl.DrawTextureRec(piece.team.piece_sprites.texture, source , tile_pos, rl.WHITE)
             }
-        }
 
-        rl.EndMode2D()
+            if game.selected_piece != nil {
 
-        ui.execute_ui_stack(interfaces)
+                pos, valid := gm.board_to_world(&game.board, game.selected_piece.position)
+                rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, gm.tile_size, gm.tile_size}, rl.BLUE)
+            }
 
-        rl.EndDrawing()
+
+            for move in game.movements {
+
+                draw_pos, in_bounds := gm.board_to_world(&game.board, move.destiny)
+                if !in_bounds do continue
+                    color := rl.RED if move.attack else rl.BLUE
+
+                    rec := rl.Rectangle {
+                        x = draw_pos.x,
+                        y = draw_pos.y,
+                        width = gm.tile_size,
+                        height = gm.tile_size
+                    }
+
+                    rl.DrawRectangleLinesEx(rec, 2.0, color)
+            }
+
+            for &piece in game.pieces {
+                tile_pos , ok := gm.board_to_world(&game.board, piece.position)
+                if piece.alive {
+                    source := rl.Rectangle {0, 0, 32, 32}
+
+                    switch piece.class {
+
+                    case .pawn:
+                    case .rook:
+                        source.x = 32
+                        source.y = 0
+                    case .bishop:
+                        source.x = 0
+                        source.y = 32
+                    case .king:
+                        source.x = 32 * 2
+                        source.y = 32
+                    case .queen:
+                        source.x = 32 * 2
+                        source.y = 0
+                    case .knight:
+                        source.x = 32
+                        source.y = 32
+
+                    }
+
+                    rl.DrawTextureRec(piece.team.piece_sprites.texture, source , tile_pos, rl.WHITE)
+                }
+            }
+
+            rl.EndMode2D()
+
+            ui.execute_ui_stack(interfaces)
+
+            rl.EndDrawing()
 
         }
 
@@ -225,79 +240,85 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
         }
     }
 
-DebugInfo :: struct {
-    game: ^gm.Match,
-    camera: ^rl.Camera2D
-
-}
-
-free_debug_ui :: proc(workspace: rawptr) {
-
-    free(workspace)
-
-}
-
-new_debug_ui :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> ui.Ui {
-
-    info := new(DebugInfo)
-    info.camera = camera
-    info.game = game
-
-    return ui.Ui {
-        callback = debug_ui,
-        workspace = info,
-        cleanup = free_debug_ui
-    }
-
-}
-
-debug_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
-
-    info := cast(^DebugInfo)workspace
-
-    mouse_pos := rl.GetMousePosition()
-    world_pos := rl.GetScreenToWorld2D(mouse_pos, info.camera^)
-    rl.DrawText("Chess", 0, 0, 30, rl.YELLOW);
-    rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", window_size.x, window_size.y), 0, 30, 30, rl.YELLOW);
-    rl.DrawText(fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f", info.camera.target.x, info.camera.target.y, info.camera.zoom, info.camera.rotation),
-        0, 120, 30, rl.YELLOW);
-
-    board_pos, in_bounds := gm.world_to_board(&info.game.board, world_pos)
-    if (in_bounds) {
-        rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y), 0, 250, 30, rl.YELLOW);
-    }
-
-    rl.DrawFPS(10, 300)
-
-    return ui.UiSig.move_down
-}
-
-new_match_ui :: proc(match: ^gm.Match) -> ui.Ui {
-
-    hud := ui.Ui {
-        callback = match_ui,
-        workspace = match
+    DebugInfo :: struct {
+        game: ^gm.Match,
+        camera: ^rl.Camera2D
 
     }
 
-    return hud
-}
+    free_debug_ui :: proc(workspace: rawptr) {
 
-match_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
+        work := cast(^DebugInfo)workspace
+        free(work)
 
-    game := cast(^gm.Match)workspace
-    center := rl.Vector2{f32(window_size.x /2), f32(window_size.y /2)}
-    font_size :: 32
+    }
 
-    cur_team: cstring = fmt.caprintf("Turn: %s", gm.get_team_turn(game).name)
-    score: cstring = fmt.caprintf("%s: %d | %s: %d", game.teams[0].name, game.teams[0].score, game.teams[1].name, game.teams[1].score)
+    new_debug_ui :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> ui.Ui {
 
-    team_wid := rl.MeasureText(cur_team, font_size)
-    score_wid := rl.MeasureText(score, font_size)
+        info := new(DebugInfo)
+        info.camera = camera
+        info.game = game
 
-    rl.DrawText(score, i32(center.x) - score_wid /2, 0, font_size, rl.GRAY)
-    rl.DrawText(cur_team, i32(center.x) - team_wid /2, window_size.y - 32, font_size, rl.GRAY)
+        return ui.Ui {
+            callback = debug_ui,
+            workspace = info,
+            cleanup = free_debug_ui
+        }
 
-    return ui.UiSig.ok
-}
+    }
+
+    debug_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
+
+        info := cast(^DebugInfo)workspace
+
+        mouse_pos := rl.GetMousePosition()
+        world_pos := rl.GetScreenToWorld2D(mouse_pos, info.camera^)
+        rl.DrawText("Chess", 0, 0, 30, rl.YELLOW);
+        rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", window_size.x, window_size.y, allocator = context.temp_allocator),
+            0, 30, 30, rl.YELLOW);
+        rl.DrawText(
+            fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f",
+                info.camera.target.x, info.camera.target.y, info.camera.zoom, info.camera.rotation, allocator = context.temp_allocator),
+            0, 120, 30, rl.YELLOW);
+
+        board_pos, in_bounds := gm.world_to_board(&info.game.board, world_pos)
+        if (in_bounds) {
+            rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y, allocator = context.temp_allocator),
+                0, 250, 30, rl.YELLOW);
+        }
+
+        rl.DrawFPS(10, 300)
+
+        return ui.UiSig.move_down
+    }
+
+    new_match_ui :: proc(match: ^gm.Match) -> ui.Ui {
+
+        hud := ui.Ui {
+            callback = match_ui,
+            workspace = match
+
+        }
+
+        return hud
+    }
+
+    match_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
+
+        game := cast(^gm.Match)workspace
+        center := rl.Vector2{f32(window_size.x /2), f32(window_size.y /2)}
+        font_size :: 32
+
+        cur_team: cstring = fmt.caprintf("Turn: %s", gm.get_team_turn(game).name, allocator = context.temp_allocator)
+        score: cstring = fmt.caprintf("%s: %d | %s: %d", game.teams[0].name, game.teams[0].score, game.teams[1].name, game.teams[1].score, 
+            allocator = context.temp_allocator)
+
+        team_wid := rl.MeasureText(cur_team, font_size)
+        score_wid := rl.MeasureText(score, font_size)
+
+        rl.DrawText(score, i32(center.x) - score_wid /2, 0, font_size, rl.GRAY)
+        rl.DrawText(cur_team, i32(center.x) - team_wid /2, window_size.y - 32, font_size, rl.GRAY)
+
+        return ui.UiSig.ok
+    }
 
