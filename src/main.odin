@@ -6,12 +6,11 @@ import gm "game"
 import ass "asset_man"
 import ui "ui"
 import "core:mem"
+import g "globals"
 
-window_size := [2]i32{800, 800}
-camera_speed :: 700
-zoom_speed :: 1.0
 
 main :: proc() {
+
     when ODIN_DEBUG {
         track: mem.Tracking_Allocator
         mem.tracking_allocator_init(&track, context.allocator)
@@ -28,7 +27,7 @@ main :: proc() {
         }
     }
 
-    rl.InitWindow(window_size.x, window_size.y, "Normal Chess")
+    rl.InitWindow(g.window_size.x, g.window_size.y, "Normal Chess")
     defer rl.CloseWindow()
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
@@ -41,7 +40,7 @@ main :: proc() {
 
 
     camera := rl.Camera2D{
-        offset = {f32(window_size.x /2), f32(window_size.y /2)},
+        offset = {f32(g.window_size.x /2), f32(g.window_size.y /2)},
         rotation = 0.0,
         target = {0, 0},
         zoom = 2.6
@@ -51,10 +50,10 @@ main :: proc() {
 
     board_center := [2]f32{f32(game.board.sprite.width/2), f32(game.board.sprite.height/2)}
     camera.target = board_center
-    camera.zoom = f32(window_size.y) / f32(game.board.sprite.height)
+    camera.zoom = f32(g.window_size.y) / f32(game.board.sprite.height)
 
     debug_id: int
-    ui.push_ui(interfaces, new_match_ui(game))
+    ui.push_ui(interfaces, ui.new_match_ui(game))
 
     game_loop: for !rl.WindowShouldClose() {
 
@@ -72,9 +71,9 @@ main :: proc() {
         update: {
 
             dt = rl.GetFrameTime()
-            window_size.x = rl.GetScreenWidth()
-            window_size.y = rl.GetScreenHeight()
-            camera.offset = {f32(window_size.x /2), f32(window_size.y /2)}
+            g.window_size.x = rl.GetScreenWidth()
+            g.window_size.y = rl.GetScreenHeight()
+            camera.offset = {f32(g.window_size.x /2), f32(g.window_size.y /2)}
 
 
             camera_control(&camera, dt)
@@ -170,28 +169,28 @@ main :: proc() {
 camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
 
     if rl.IsKeyDown(.LEFT_CONTROL) && rl.IsKeyDown(.EQUAL) {
-        camera.zoom += zoom_speed * dt
+        camera.zoom += g.zoom_speed * dt
     }
 
     if rl.IsKeyDown(.LEFT_CONTROL) && rl.IsKeyDown(.MINUS) {
-        camera.zoom -= zoom_speed * dt
+        camera.zoom -= g.zoom_speed * dt
 
     }
 
     if rl.IsKeyDown(.DOWN) {
-        camera.target.y += camera_speed * dt
+        camera.target.y += g.camera_speed * dt
     }
 
     if rl.IsKeyDown(.UP) {
-        camera.target.y -= camera_speed * dt
+        camera.target.y -= g.camera_speed * dt
     }
 
     if rl.IsKeyDown(.LEFT) {
-        camera.target.x -= camera_speed * dt
+        camera.target.x -= g.camera_speed * dt
     }
 
     if rl.IsKeyDown(.RIGHT) {
-        camera.target.x += camera_speed * dt
+        camera.target.x += g.camera_speed * dt
     }
 
 }
@@ -274,7 +273,7 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
         mouse_pos := rl.GetMousePosition()
         world_pos := rl.GetScreenToWorld2D(mouse_pos, info.camera^)
         rl.DrawText("Chess", 0, 0, 30, rl.YELLOW);
-        rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", window_size.x, window_size.y, allocator = context.temp_allocator),
+        rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", g.window_size.x, g.window_size.y, allocator = context.temp_allocator),
             0, 30, 30, rl.YELLOW);
         rl.DrawText(
             fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f",
@@ -292,33 +291,4 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
         return ui.UiSig.move_down
     }
 
-    new_match_ui :: proc(match: ^gm.Match) -> ui.Ui {
-
-        hud := ui.Ui {
-            callback = match_ui,
-            workspace = match
-
-        }
-
-        return hud
-    }
-
-    match_ui :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
-
-        game := cast(^gm.Match)workspace
-        center := rl.Vector2{f32(window_size.x /2), f32(window_size.y /2)}
-        font_size :: 32
-
-        cur_team: cstring = fmt.caprintf("Turn: %s", gm.get_team_turn(game).name, allocator = context.temp_allocator)
-        score: cstring = fmt.caprintf("%s: %d | %s: %d", game.teams[0].name, game.teams[0].score, game.teams[1].name, game.teams[1].score, 
-            allocator = context.temp_allocator)
-
-        team_wid := rl.MeasureText(cur_team, font_size)
-        score_wid := rl.MeasureText(score, font_size)
-
-        rl.DrawText(score, i32(center.x) - score_wid /2, 0, font_size, rl.GRAY)
-        rl.DrawText(cur_team, i32(center.x) - team_wid /2, window_size.y - 32, font_size, rl.GRAY)
-
-        return ui.UiSig.ok
-    }
 

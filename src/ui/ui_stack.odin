@@ -1,4 +1,4 @@
-package ui_stack
+package ui
 
 import "core:slice"
 
