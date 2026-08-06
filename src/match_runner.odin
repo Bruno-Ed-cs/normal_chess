@@ -5,7 +5,6 @@ import "core:fmt"
 import gm "game"
 import ass "asset_man"
 import ui "ui"
-import "core:mem"
 import g "globals"
 
 match_runner :: proc() {
@@ -177,6 +176,20 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
     mouse_pos := rl.GetMousePosition()
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
 
+    hovering, in_bounds := gm.world_to_board(&game.board, world_pos)
+
+    rl.SetMouseCursor(.DEFAULT)
+
+    if in_bounds{
+        tile := gm.get_tile(&game.board, hovering)
+        if tile != nil && tile.piece_ref != nil {
+
+            if tile.piece_ref.team == gm.get_team_turn(game) do rl.SetMouseCursor(.POINTING_HAND)
+        }
+
+    } 
+    // fmt.println(in_bounds)
+
     check_click: if rl.IsMouseButtonPressed(.LEFT) {
 
         target_tile, in_bounds := gm.world_to_board(&game.board, world_pos)
@@ -184,15 +197,17 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
             if game.selected_piece == nil{
 
-                fmt.println(target_tile)
+                // fmt.println(target_tile)
 
                 cur_team := gm.get_team_turn(game)
 
                 if tile := gm.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
-                    game.selected_piece = tile.piece_ref
-                    if cur_team == game.selected_piece.team do game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
+                    if cur_team == tile.piece_ref.team { 
+                        game.selected_piece = tile.piece_ref
+                        game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
                         fmt.println("open movement")
                         fmt.println(game.movements)
+                    }
                 }
 
             } else {
