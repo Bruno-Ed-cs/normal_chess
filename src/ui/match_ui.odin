@@ -41,17 +41,31 @@ match_ui :: proc(workspace: rawptr, top: bool) -> UiSig {
 
 
     score_hei :i32 = 120
+    largest_wid: i32
     for score in scores {
 
         score_wid := rl.MeasureText(score, font_size)
+        largest_wid = score_wid if score_wid > largest_wid else largest_wid
+    }
 
+    score_backdrop := rl.Rectangle{
+        x = f32(g.window_size.x - largest_wid - 30),
+        y = f32(score_hei - 5),
+        width = f32(largest_wid + 20),
+        height = f32(font_size * len(scores) + 10)
+    }
+    col := rl.Color{ 11, 11, 11, 120 }
+
+    rl.DrawRectangleRec(score_backdrop, col)
+
+    for score in scores {
+        score_wid := rl.MeasureText(score, font_size)
         rl.DrawText(score,
             g.window_size.x - score_wid - 20,
             score_hei,
-            font_size, rl.GRAY)
+            font_size, rl.WHITE)
 
         score_hei += font_size + 5
-
     }
 
 
@@ -59,7 +73,7 @@ match_ui :: proc(workspace: rawptr, top: bool) -> UiSig {
     team_color := gm.get_team_turn(game).color
 
     oposite_color := hl.invert_color(team_color)
-    oposite_color.a = 200
+    oposite_color.a = 210
 
     text_pos := [2]i32{
         g.window_size.x - team_wid -20,
