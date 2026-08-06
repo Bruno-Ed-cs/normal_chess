@@ -37,7 +37,7 @@ Team :: struct {
     score: int,
     color: rl.Color,
     name: string,
-    cemitery_direction: [2]i32,
+    march_direction: [2]i32,
     piece_sprites: rl.RenderTexture2D
 }
 
@@ -229,7 +229,7 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
 
     diagonal_killers : [2]BoardPos
 
-    switch self.team.cemitery_direction {
+    switch self.team.march_direction {
 
     case {1, 0}:
         diagonal_killers[0] = {self.position.x +1, self.position.y +1}
@@ -260,7 +260,7 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
     last_move := self.position
     for index in 1..=move_len {
 
-        move := last_move + self.team.cemitery_direction
+        move := last_move + self.team.march_direction
 
         tile := get_tile(board, move)
         if tile == nil do continue
@@ -338,7 +338,7 @@ make_team :: proc(name: string, color: rl.Color, cemitery: [2]i32) -> Team {
     defer rl.UnloadImage(sprite_image)
 
     team := Team{
-        cemitery_direction = cemitery,
+        march_direction = cemitery,
         name = name,
         score = 0,
         color = color,
