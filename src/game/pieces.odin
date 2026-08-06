@@ -7,8 +7,6 @@ import "core:fmt"
 Dir :: enum {up, down, left, right}
 Diag :: enum {up_left, up_right, down_left, down_right}
 
-
-
 Directions :: [Dir][2]i32 {
     .up = {0, -1},
     .down = {0, 1},
@@ -34,14 +32,6 @@ Class :: enum {
     knight,
 }
 
-Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
-    .pawn = pawn_movement,
-    .rook = rook_movement,
-    .bishop = bishop_movement,
-    .king = king_movement,
-    .queen = queen_movement,
-    .knight = knight_movement
-}
 
 Team :: struct {
     score: int,
@@ -53,7 +43,7 @@ Team :: struct {
 
 Move :: struct {
     attack: bool,
-    destiny: BoardPos,
+    target: BoardPos,
     origin: BoardPos,
     side_effect: proc(game: ^Match, caller: i32),
 }
@@ -69,6 +59,15 @@ Piece :: struct {
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
 }
 
+Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+    .pawn = pawn_movement,
+    .rook = rook_movement,
+    .bishop = bishop_movement,
+    .king = king_movement,
+    .queen = queen_movement,
+    .knight = knight_movement
+}
+
 king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
 
     move_count: int
@@ -81,10 +80,10 @@ king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
             if tile == nil {
 
             } else if tile.piece_ref == nil {
-                append(moves_buff, Move{attack = false, destiny = pos})
+                append(moves_buff, Move{attack = false, target = pos, origin = self.position})
                 move_count += 1
             } else if tile.piece_ref.team != self.team {
-                append(moves_buff, Move{attack = true, destiny = pos})
+                append(moves_buff, Move{attack = true, target = pos, origin = self.position})
                 move_count += 1
             }
 
@@ -98,10 +97,10 @@ king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
             if tile == nil {
 
             } else if tile.piece_ref == nil {
-                append(moves_buff, Move{attack = false, destiny = pos})
+                append(moves_buff, Move{attack = false, target = pos, origin = self.position})
                 move_count += 1
             } else if tile.piece_ref.team != self.team {
-                append(moves_buff, Move{attack = true, destiny = pos})
+                append(moves_buff, Move{attack = true, target = pos, origin = self.position})
                 move_count += 1
             }
     }
@@ -130,10 +129,10 @@ bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move)
             if tile == nil do break 
 
             if tile.piece_ref == nil {
-                append(moves_buff, Move{attack = false, destiny = self.position + multipliyer * diag})
+                append(moves_buff, Move{attack = false, target = self.position + multipliyer * diag, origin = self.position})
                 moves_count += 1
             } else if tile.piece_ref.team != self.team {
-                append(moves_buff, Move{attack = true, destiny = self.position + multipliyer * diag})
+                append(moves_buff, Move{attack = true, target = self.position + multipliyer * diag, origin = self.position})
                 moves_count += 1
                 break
             } else {
@@ -162,10 +161,10 @@ knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move)
         if tile := get_tile(board, move1); tile != nil {
 
             if tile.piece_ref == nil {
-                append(moves_buff, Move{attack = false, destiny = move1})
+                append(moves_buff, Move{attack = false, target = move1, origin = self.position})
                 moves_count += 1
             } else if tile.piece_ref.team != self.team {
-                append(moves_buff, Move{attack = true, destiny = move1})
+                append(moves_buff, Move{attack = true, target = move1, origin = self.position})
                 moves_count += 1
             }
 
@@ -174,10 +173,10 @@ knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move)
         if tile := get_tile(board, move2); tile != nil {
 
             if tile.piece_ref == nil {
-                append(moves_buff, Move{attack = false, destiny = move2})
+                append(moves_buff, Move{attack = false, target = move2, origin = self.position})
                 moves_count += 1
             } else if tile.piece_ref.team != self.team {
-                append(moves_buff, Move{attack = true, destiny = move2})
+                append(moves_buff, Move{attack = true, target = move2, origin = self.position})
                 moves_count += 1
             }
         }
@@ -206,10 +205,10 @@ rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
                 moves_count += 1
 
                 if tile.piece_ref == nil {
-                    append(moves_buff, Move{ attack = false, destiny = move})
+                    append(moves_buff, Move{ attack = false, target = move, origin = self.position})
                 } else {
                     if tile.piece_ref.team != self.team {
-                        append(moves_buff, Move{ attack = true, destiny = move})
+                        append(moves_buff, Move{ attack = true, target = move, origin = self.position})
                     }
 
                     break
@@ -223,35 +222,6 @@ rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
         return moves_count
 }
 
-make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Piece) {
-
-    piece = Piece {
-        class = class,
-        alive = true,
-        has_moved = false,
-        team = team,
-        position = position,
-    }
-
-    switch class {
-    
-    case .pawn:
-        piece.movement = pawn_movement
-    case .rook:
-        piece.movement = rook_movement
-    case .bishop:
-        piece.movement = bishop_movement
-    case .king:
-        piece.movement = king_movement
-    case .queen:
-        piece.movement = queen_movement
-    case .knight:
-        piece.movement = knight_movement
-
-    }
-
-    return
-}
 
 pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
 
@@ -280,7 +250,7 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
         fmt.println(diag)
         if tile := get_tile(board, diag); tile != nil{
             if tile.piece_ref != nil && tile.piece_ref.team != self.team{
-                append(moves_buff, Move{ attack = true, destiny = diag})
+                append(moves_buff, Move{ attack = true, target = diag, origin = self.position})
                 moves_count += 1
             }
         }
@@ -298,7 +268,7 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
 
         last_move = move
         moves_count += 1
-        append(moves_buff, Move{ attack = false, destiny = move})
+        append(moves_buff, Move{ attack = false, target = move, origin = self.position})
 
     }
 
@@ -306,6 +276,39 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
 
 }
 
+make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Piece) {
+
+    @(static) next_id: i32 = 1
+
+    piece = Piece {
+        class = class,
+        alive = true,
+        has_moved = false,
+        team = team,
+        position = position,
+        id = next_id
+    }
+    next_id += 1
+
+    switch class {
+    
+    case .pawn:
+        piece.movement = pawn_movement
+    case .rook:
+        piece.movement = rook_movement
+    case .bishop:
+        piece.movement = bishop_movement
+    case .king:
+        piece.movement = king_movement
+    case .queen:
+        piece.movement = queen_movement
+    case .knight:
+        piece.movement = knight_movement
+
+    }
+
+    return
+}
 move :: proc(piece: ^Piece, board: ^Board, target: BoardPos) {
 
     tile := get_tile(board, target)

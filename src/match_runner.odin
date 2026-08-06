@@ -12,6 +12,8 @@ match_runner :: proc() {
     game := gm.make_normal_match()
     defer gm.delete_match(game)
 
+    fmt.println(game.pieces)
+
     interfaces := ui.init_ui_stack()
     defer ui.delete_ui_stack(interfaces)
 
@@ -85,7 +87,7 @@ match_runner :: proc() {
 
             for move in game.movements {
 
-                draw_pos, in_bounds := gm.board_to_world(&game.board, move.destiny)
+                draw_pos, in_bounds := gm.board_to_world(&game.board, move.target)
                 if !in_bounds do continue
                     color := rl.RED if move.attack else rl.BLUE
 
@@ -213,8 +215,8 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
             } else {
 
                 for move in game.movements {
-                    if move.destiny == target_tile {
-                        gm.move(game.selected_piece, &game.board, move.destiny)
+                    if move.target == target_tile {
+                        gm.move(game.selected_piece, &game.board, move.target)
                         gm.end_turn(game)
                         game.selected_piece = nil
                         clear(&game.movements)
