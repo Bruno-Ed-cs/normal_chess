@@ -81,7 +81,7 @@ match_ui :: proc(workspace: rawptr, top: bool) -> UiSig {
         text_pos.y,
         font_size, team_color)
 
-    fmt.println(team_color, oposite_color)
+    // fmt.println(team_color, oposite_color)
 
 
     return UiSig.ok
