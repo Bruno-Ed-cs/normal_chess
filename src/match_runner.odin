@@ -17,7 +17,6 @@ match_runner :: proc() {
     interfaces := ui.init_ui_stack()
     defer ui.delete_ui_stack(interfaces)
 
-
     camera := rl.Camera2D{
         offset = {f32(g.window_size.x /2), f32(g.window_size.y /2)},
         rotation = 0.0,
@@ -47,17 +46,23 @@ match_runner :: proc() {
             }
         }
 
+        if rl.IsKeyReleased(.P) {
+            g.pause = !g.pause
+        }
+
         update: {
 
             dt = rl.GetFrameTime()
             g.window_size.x = rl.GetScreenWidth()
             g.window_size.y = rl.GetScreenHeight()
             camera.offset = {f32(g.window_size.x /2), f32(g.window_size.y /2)}
+            zoom_factor := (f32(g.window_size.y) / f32(game.board.size.y * gm.tile_size))
+            camera.zoom = zoom_factor - zoom_factor * 0.02
 
 
             camera_control(&camera, dt)
+            if !g.pause do game_control(game, camera)
             gm.update(&game.board, game.pieces)
-            game_control(game, camera)
             gm.update_match(game)
 
         }
@@ -89,7 +94,10 @@ match_runner :: proc() {
 
                 draw_pos, in_bounds := gm.board_to_world(&game.board, move.target)
                 if !in_bounds do continue
-                    color := rl.RED if move.attack else rl.BLUE
+                    color: rl.Color = rl.BLUE
+
+                    if move.attack do color = rl.RED
+                    if move.side_effect != nil do color = rl.GREEN
 
                     rec := rl.Rectangle {
                         x = draw_pos.x,
@@ -187,6 +195,10 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
         if tile != nil && tile.piece_ref != nil {
 
             if tile.piece_ref.team == gm.get_team_turn(game) do rl.SetMouseCursor(.POINTING_HAND)
+        }
+
+        for move in game.movements {
+            if move.target == tile.coordenate do rl.SetMouseCursor(.POINTING_HAND)
         }
 
     } 
