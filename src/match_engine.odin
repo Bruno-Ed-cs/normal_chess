@@ -1,19 +1,15 @@
 package main
 
 import rl "vendor:raylib"
-import "core:fmt"
 import gm "game"
 import ass "asset_man"
 import ui "ui"
 import g "globals"
+import "core:fmt"
 
-match_runner :: proc() {
-
-    game := gm.make_normal_match()
-    defer gm.delete_match(game)
+match_engine :: proc(game: ^gm.Match) {
 
     fmt.println(game.pieces)
-
     interfaces := ui.init_ui_stack()
     defer ui.delete_ui_stack(interfaces)
 

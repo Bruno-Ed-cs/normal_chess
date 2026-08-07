@@ -4,6 +4,7 @@ import rl "vendor:raylib"
 import "core:fmt"
 import "core:mem"
 import g "globals"
+import gm "game"
 
 
 main :: proc() {
@@ -29,6 +30,9 @@ main :: proc() {
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
 
-    match_runner()
+    game := gm.make_normal_match()
+    defer gm.delete_match(game)
+
+    match_engine(game)
 
 }
