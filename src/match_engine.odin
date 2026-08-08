@@ -27,7 +27,7 @@ match_engine :: proc(game: ^gm.Match) {
     camera.zoom = f32(g.window_size.y) / f32(game.board.sprite.height)
 
     debug_id: int
-    ui.push_ui(interfaces, ui.new_match_ui(game))
+    ui.push_ui(interfaces, ui.match_ui(game))
 
     game_loop: for !rl.WindowShouldClose() {
 
