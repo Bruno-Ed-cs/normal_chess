@@ -31,8 +31,8 @@ main :: proc() {
     rl.SetWindowState({.WINDOW_RESIZABLE})
 
     game := gm.make_normal_match()
-    defer gm.delete_match(game)
 
     match_engine(game)
 
+    gm.delete_match(game)
 }

@@ -36,7 +36,7 @@ match_engine :: proc(game: ^gm.Match) {
         if rl.IsKeyReleased(.F3) {
 
             if !ui.is_ui_active(interfaces, debug_id) {
-                debug_id = ui.push_ui(interfaces, ui.new_debug_ui(game, &camera))
+                debug_id = ui.push_ui(interfaces, ui.debug_ui(game, &camera))
             } else {
                 ui.remove_ui(interfaces, debug_id) 
             }
