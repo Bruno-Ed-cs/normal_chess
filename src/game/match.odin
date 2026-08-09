@@ -37,7 +37,7 @@ make_normal_match :: proc() -> (game: ^Match) {
     game = new(Match)
 
     game.board = make_board()
-    game.pieces = make([]Piece, game.board.size.x * game.board.size.y)
+    game.pieces = make([]Piece, 32)
     game.teams = make([]Team, 2)
     game.movements = make([dynamic]Move)
     game.selected_piece = nil
@@ -79,11 +79,11 @@ populate_normal_formation :: proc(pieces_bank: []Piece, team1, team2: ^Team) {
         pieces_bank[i + 26] = make_piece(.bishop, {i32(2 + i * 3), 0}, team2)
     }
 
-    pieces_bank[29] = make_piece(.queen, {4, 7}, team1)
-    pieces_bank[30] = make_piece(.queen, {4, 0}, team2)
+    pieces_bank[28] = make_piece(.queen, {4, 7}, team1)
+    pieces_bank[29] = make_piece(.queen, {4, 0}, team2)
 
-    pieces_bank[31] = make_piece(.king, {3, 7}, team1)
-    pieces_bank[32] = make_piece(.king, {3, 0}, team2)
+    pieces_bank[30] = make_piece(.king, {3, 7}, team1)
+    pieces_bank[31] = make_piece(.king, {3, 0}, team2)
 
 }
 

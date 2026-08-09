@@ -1,9 +1,11 @@
+#+feature using-stmt
 package ui
 import gm "../game"
 import fmt "core:fmt"
 import g "../globals"
 import rl "vendor:raylib"
 import hl "../helpers"
+import rf "core:reflect"
 
 DebugInfo :: struct {
     game: ^gm.Match,
@@ -62,10 +64,11 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
 
         callback = proc(workspace: rawptr, top: bool) -> UiSig {
 
+            using g
+
             game := cast(^gm.Match)workspace
 
             center := rl.Vector2{f32(g.window_size.x /2), f32(g.window_size.y /2)}
-            font_size :: 32
 
             cur_team: cstring = fmt.ctprintf("Turn: %s", gm.get_team_turn(game).name)
 
@@ -79,7 +82,12 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
             }
 
 
-            score_hei :i32 = 120
+            anchor := scr_pos({
+                0.98,
+                0.02
+            })
+
+            score_hei :f32 = anchor.y + font_size + 20
             largest_wid: i32
             for score in scores {
 
@@ -88,7 +96,7 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
             }
 
             score_backdrop := rl.Rectangle{
-                x = f32(g.window_size.x - largest_wid - 30),
+                x = f32(i32(anchor.x) - largest_wid - 10),
                 y = f32(score_hei - 5),
                 width = f32(largest_wid + 20),
                 height = f32(font_size * len(scores) + 10)
@@ -100,8 +108,8 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
             for score in scores {
                 score_wid := rl.MeasureText(score, font_size)
                 rl.DrawText(score,
-                    g.window_size.x - score_wid - 20,
-                    score_hei,
+                    i32(anchor.x) - score_wid,
+                    i32(score_hei),
                     font_size, rl.WHITE)
 
                 score_hei += font_size + 5
@@ -114,9 +122,9 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
             oposite_color := hl.invert_color(team_color)
             oposite_color.a = 210
 
-            text_pos := [2]i32{
-                g.window_size.x - team_wid -20,
-                20
+            text_pos := [2]f32{
+                anchor.x - f32(team_wid),
+                anchor.y,
             }
 
             backdrop := rl.Rectangle {
@@ -130,8 +138,8 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
             rl.DrawRectangleRec(backdrop, oposite_color)
 
             rl.DrawText(cur_team, 
-                text_pos.x,
-                text_pos.y,
+                i32(text_pos.x),
+                i32(text_pos.y),
                 font_size, team_color)
 
             // fmt.println(team_color, oposite_color)
@@ -144,4 +152,68 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
 
 }
 
+PromotionWork :: struct {
+    game: ^gm.Match,
+    piece_id: i32
 
+}
+
+promotion_ui :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
+
+    assert(piece_id >= 0)
+
+    work := new(PromotionWork)
+    work.piece_id = piece_id
+    work.game = game
+
+    return Ui {
+        workspace = work,
+        callback = proc(workspace: rawptr, top: bool) -> UiSig{
+
+            work := cast(^PromotionWork)workspace
+            
+            width := 240.0
+            margin := 5.0
+            padding := 10.0
+
+            anchor := scr_pos({0.5, 0.5})
+            anchor.x -= 240 / 2
+            anchor.y -= (len(gm.Class) - 2) * f32(g.font_size + padding + margin) 
+
+            promotion: gm.Class
+            pressed := false
+            piece := gm.get_piece(work.game, work.piece_id) 
+            if piece == nil do return .pop
+
+            for opt in gm.Class {
+
+                if piece.class == opt do continue
+                if opt == .king do continue
+
+                if center_button(rf.enum_string(opt), f32(width - margin), anchor, f32(padding)) {
+                    pressed = true if top else false
+                    promotion = opt
+                }
+
+                anchor.y += f32(margin + g.font_size + padding)
+
+            }
+
+            if pressed {
+
+                gm.promote(piece, promotion)
+                fmt.println("pressed", work.piece_id, piece)
+                return .pop
+
+            }
+
+            return .move_top
+
+        },
+
+        cleanup = proc(workspace: rawptr) {
+            free(workspace)
+        }
+    }
+
+}

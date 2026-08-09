@@ -378,3 +378,21 @@ delete_team :: proc(team: ^Team) {
     rl.UnloadRenderTexture(team.piece_sprites)
 }
 
+promote :: proc(target: ^Piece, new_role: Class) {
+
+    moves := Movements
+
+    target.class = new_role
+    target.movement = moves[new_role]
+
+}
+
+get_piece :: proc(game: ^Match, id: i32) -> ^Piece {
+
+    for &piece in game.pieces {
+        if piece.id == id do return &piece
+    }
+
+    return nil
+
+}

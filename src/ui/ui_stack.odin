@@ -90,7 +90,7 @@ execute_ui_stack :: proc(stack: ^UiStack) {
 
         if stack.layers[index].callback == nil do continue
 
-        top := true if index == len(stack.layers) else false
+        top := true if index == len(stack.layers) - 1 else false
         result := stack.layers[index].callback(stack.layers[index].workspace, top)
 
         signal := SigIndex{

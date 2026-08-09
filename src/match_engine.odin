@@ -28,6 +28,7 @@ match_engine :: proc(game: ^gm.Match) {
 
     debug_id: int
     ui.push_ui(interfaces, ui.match_ui(game))
+    promotion_ui := 0
 
     game_loop: for !rl.WindowShouldClose() {
 
@@ -60,6 +61,43 @@ match_engine :: proc(game: ^gm.Match) {
             if !g.pause do game_control(game, camera)
             gm.update(&game.board, game.pieces)
             gm.update_match(game)
+
+            for &piece in game.pieces {
+
+                if ui.is_ui_active(interfaces, promotion_ui) do break
+
+                if piece.class == .pawn {
+
+                    if piece.team.march_direction.x != 0 {
+                        if piece.team.march_direction.x == 1 {
+                            if piece.position.x == game.board.size.x -1 do promotion_ui = ui.push_ui(interfaces, ui.promotion_ui(game, piece.id))
+                        }
+
+                        if piece.team.march_direction.x == -1 {
+                            if piece.position.x == 0 do promotion_ui = ui.push_ui(interfaces, ui.promotion_ui(game, piece.id))
+                        }
+                    }
+
+                    if piece.team.march_direction.y != 0 {
+
+                        if piece.team.march_direction.y == 1 {
+                            if piece.position.y == game.board.size.y -1 do promotion_ui = ui.push_ui(interfaces, ui.promotion_ui(game, piece.id))
+                        }
+
+                        if piece.team.march_direction.y == -1 {
+                            if piece.position.y == 0 do promotion_ui = ui.push_ui(interfaces, ui.promotion_ui(game, piece.id))
+                        }
+                    }
+                }
+
+            }
+
+            // if rl.IsKeyReleased(.SPACE) {
+            //     for &piece in game.pieces {
+            //         if piece.class == gm.Class.pawn do gm.promote(&piece, .queen)
+            //     }
+            //
+            // }
 
         }
 

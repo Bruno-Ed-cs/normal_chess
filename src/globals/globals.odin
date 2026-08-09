@@ -5,4 +5,5 @@ camera_speed :: 700
 zoom_speed :: 1.0
 pause: bool = false
 
+font_size :: 32
 
