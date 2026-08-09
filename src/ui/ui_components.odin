@@ -80,10 +80,11 @@ center_button :: proc(title: string , width: f32, pos: [2]f32, padding: f32 = 10
 
         col1 = rl.Color{50, 50, 50, 240}
         col2 = rl.BLUE
+        rl.SetMouseCursor(.POINTING_HAND)
     }
 
-    rl.DrawRectangleRounded(body, 0.75, 4, col1)
-    rl.DrawRectangleRoundedLines(body, 0.75, 4, col2)
+    rl.DrawRectangleRounded(body, 2, 2, col1)
+    rl.DrawRectangleRoundedLines(body, 2, 2, col2)
     rl.DrawText(label, text_pos.x, text_pos.y, g.font_size, col2)
 
     if rl.CheckCollisionPointRec(rl.GetMousePosition(), body) && rl.IsMouseButtonPressed(.LEFT) do return true

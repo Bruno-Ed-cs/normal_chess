@@ -28,11 +28,14 @@ match_engine :: proc(game: ^gm.Match) {
 
     debug_id: int
     ui.push_ui(interfaces, ui.match_ui(game))
+    // ui.push_ui(interfaces, ui.promotion_ui(game, 1))
     promotion_ui := 0
 
     game_loop: for !rl.WindowShouldClose() {
 
         free_all(context.temp_allocator)
+
+        rl.SetMouseCursor(.DEFAULT)
 
         if rl.IsKeyReleased(.F3) {
 
@@ -61,6 +64,7 @@ match_engine :: proc(game: ^gm.Match) {
             if !g.pause do game_control(game, camera)
             gm.update(&game.board, game.pieces)
             gm.update_match(game)
+
 
             for &piece in game.pieces {
 
@@ -110,12 +114,12 @@ match_engine :: proc(game: ^gm.Match) {
             mouse_pos := rl.GetMousePosition()
             world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
 
-            for tile in game.board.tiles {
-
-                if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
-                    rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
-                }
-            }
+            // for tile in game.board.tiles {
+            //
+            //     if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
+            //         rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
+            //     }
+            // }
 
             if game.selected_piece != nil {
 
@@ -221,8 +225,6 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
 
     hovering, in_bounds := gm.world_to_board(&game.board, world_pos)
-
-    rl.SetMouseCursor(.DEFAULT)
 
     if in_bounds{
         tile := gm.get_tile(&game.board, hovering)

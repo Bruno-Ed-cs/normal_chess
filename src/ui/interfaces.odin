@@ -103,7 +103,8 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
             }
             col := rl.Color{ 11, 11, 11, 120 }
 
-            rl.DrawRectangleRec(score_backdrop, col)
+            rl.DrawRectangleRounded(score_backdrop, 0.10, 1, col)
+            rl.DrawRectangleRoundedLines(score_backdrop, 0.10, 1, rl.WHITE)
 
             for score in scores {
                 score_wid := rl.MeasureText(score, font_size)
@@ -135,8 +136,8 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
 
             }
 
-            rl.DrawRectangleRec(backdrop, oposite_color)
-
+            rl.DrawRectangleRounded(backdrop, 0.10, 1, oposite_color)
+            rl.DrawRectangleRoundedLines(backdrop, 0.10, 1, team_color)
             rl.DrawText(cur_team, 
                 i32(text_pos.x),
                 i32(text_pos.y),
@@ -171,19 +172,41 @@ promotion_ui :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
         callback = proc(workspace: rawptr, top: bool) -> UiSig{
 
             work := cast(^PromotionWork)workspace
+
+            g.pause = true
             
-            width := 240.0
-            margin := 5.0
-            padding := 10.0
+            width :f32 = 240.0
+            margin :f32 = 5.0
+            padding :f32 = 10.0
 
             anchor := scr_pos({0.5, 0.5})
             anchor.x -= 240 / 2
-            anchor.y -= (len(gm.Class) - 2) * f32(g.font_size + padding + margin) 
+            anchor.y -= ((len(gm.Class) - 2) * f32(g.font_size + padding + margin)) / 2
+
+            box_title := g.font_size * 2 + margin * 2 + padding 
+            box := rl.Rectangle{
+                width = width + padding + margin,
+                height = (g.font_size + padding + margin) * (len(gm.Class) - 2) + box_title,
+                x = anchor.x - margin - padding/2,
+                y = anchor.y - box_title
+
+            }
+
+            box_text: cstring = "Promotion!"
+            box_text_wid := rl.MeasureText(box_text, g.font_size)
+            box_text_pos := [2]f32{
+                box.x + (box.width - f32(box_text_wid)) / 2,
+                box.y + margin + padding + g.font_size/4
+            }
 
             promotion: gm.Class
             pressed := false
             piece := gm.get_piece(work.game, work.piece_id) 
             if piece == nil do return .pop
+
+            rl.DrawRectangleRounded(box, 0.20, 1, rl.Color{10, 10, 10, 200})
+            rl.DrawRectangleRoundedLines(box, 0.20, 1, rl.WHITE)
+            rl.DrawText(box_text, i32(box_text_pos.x), i32(box_text_pos.y), g.font_size, rl.WHITE)
 
             for opt in gm.Class {
 
@@ -203,6 +226,7 @@ promotion_ui :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
 
                 gm.promote(piece, promotion)
                 fmt.println("pressed", work.piece_id, piece)
+                g.pause = false
                 return .pop
 
             }
