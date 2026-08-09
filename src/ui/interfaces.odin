@@ -64,8 +64,6 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
 
         callback = proc(workspace: rawptr, top: bool) -> UiSig {
 
-            using g
-
             game := cast(^gm.Match)workspace
 
             center := rl.Vector2{f32(g.window_size.x /2), f32(g.window_size.y /2)}
@@ -87,11 +85,11 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
                 0.02
             })
 
-            score_hei :f32 = anchor.y + font_size + 20
+            score_hei :f32 = anchor.y + g.font_size + 20
             largest_wid: i32
             for score in scores {
 
-                score_wid := rl.MeasureText(score, font_size)
+                score_wid := rl.MeasureText(score, g.font_size)
                 largest_wid = score_wid if score_wid > largest_wid else largest_wid
             }
 
@@ -99,25 +97,25 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
                 x = f32(i32(anchor.x) - largest_wid - 10),
                 y = f32(score_hei - 5),
                 width = f32(largest_wid + 20),
-                height = f32(font_size * len(scores) + 10)
+                height = f32(g.font_size * len(scores) + 10)
             }
             col := rl.Color{ 11, 11, 11, 120 }
 
-            rl.DrawRectangleRounded(score_backdrop, 0.10, 1, col)
-            rl.DrawRectangleRoundedLines(score_backdrop, 0.10, 1, rl.WHITE)
+            rl.DrawRectangleRounded(score_backdrop, g.roundness, g.segments, col)
+            rl.DrawRectangleRoundedLines(score_backdrop, g.roundness, g.segments, g.text_color)
 
             for score in scores {
-                score_wid := rl.MeasureText(score, font_size)
+                score_wid := rl.MeasureText(score, g.font_size)
                 rl.DrawText(score,
                     i32(anchor.x) - score_wid,
                     i32(score_hei),
-                    font_size, rl.WHITE)
+                    g.font_size, rl.WHITE)
 
-                score_hei += font_size + 5
+                score_hei += g.font_size + 5
             }
 
 
-            team_wid := rl.MeasureText(cur_team, font_size)
+            team_wid := rl.MeasureText(cur_team, g.font_size)
             team_color := gm.get_team_turn(game).color
 
             oposite_color := hl.invert_color(team_color)
@@ -130,18 +128,18 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
 
             backdrop := rl.Rectangle {
                 width = f32(team_wid + 20),
-                height = f32(font_size + 10),
+                height = f32(g.font_size + 10),
                 x = f32(text_pos.x - 10),
                 y = f32(text_pos.y - 5)
 
             }
 
-            rl.DrawRectangleRounded(backdrop, 0.10, 1, oposite_color)
-            rl.DrawRectangleRoundedLines(backdrop, 0.10, 1, team_color)
+            rl.DrawRectangleRounded(backdrop, g.roundness, g.segments, team_color)
+            rl.DrawRectangleRoundedLines(backdrop, g.roundness, g.segments, oposite_color)
             rl.DrawText(cur_team, 
                 i32(text_pos.x),
                 i32(text_pos.y),
-                font_size, team_color)
+                g.font_size, oposite_color)
 
             // fmt.println(team_color, oposite_color)
 
@@ -176,7 +174,7 @@ promotion_ui :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
             g.pause = true
             
             width :f32 = 240.0
-            margin :f32 = 5.0
+            margin :f32 = 10.0
             padding :f32 = 10.0
 
             anchor := scr_pos({0.5, 0.5})
@@ -204,9 +202,9 @@ promotion_ui :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
             piece := gm.get_piece(work.game, work.piece_id) 
             if piece == nil do return .pop
 
-            rl.DrawRectangleRounded(box, 0.20, 1, rl.Color{10, 10, 10, 200})
-            rl.DrawRectangleRoundedLines(box, 0.20, 1, rl.WHITE)
-            rl.DrawText(box_text, i32(box_text_pos.x), i32(box_text_pos.y), g.font_size, rl.WHITE)
+            rl.DrawRectangleRounded(box, g.roundness, g.segments, g.background_color)
+            rl.DrawRectangleRoundedLines(box, g.roundness, g.segments, g.text_color)
+            rl.DrawText(box_text, i32(box_text_pos.x), i32(box_text_pos.y), g.font_size, g.text_color)
 
             for opt in gm.Class {
 
