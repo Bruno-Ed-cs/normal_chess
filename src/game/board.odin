@@ -40,7 +40,7 @@ board_to_world :: proc(board: ^Board, position: BoardPos) -> (world_pos: Vec2, v
     return
 }
 
-// returns nill when the position is invalid
+// returns nil when the position is invalid
 get_tile :: proc(board: ^Board, position: BoardPos) -> ^Tile {
 
     if position.y >= board.size.y || position.x >= board.size.x ||
@@ -142,7 +142,7 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
 
 }
 
-update :: proc(board: ^Board, pieces: []Piece) {
+update :: proc(board: ^Board, pieces: ^[dynamic]Piece) {
 
     for &tile in board.tiles {
         for &piece in pieces {

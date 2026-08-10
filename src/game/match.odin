@@ -5,7 +5,7 @@ import rl "vendor:raylib"
 
 Match :: struct {
     selected_piece: ^Piece,
-    pieces: []Piece,
+    pieces: [dynamic]Piece,
     teams: []Team,
     curr_turn: int,
     movements: [dynamic]Move,
@@ -37,7 +37,7 @@ make_normal_match :: proc() -> (game: ^Match) {
     game = new(Match)
 
     game.board = make_board()
-    game.pieces = make([]Piece, 32)
+    game.pieces = make([dynamic]Piece, 0, 32)
     game.teams = make([]Team, 2)
     game.movements = make([dynamic]Move)
     game.selected_piece = nil
@@ -46,50 +46,47 @@ make_normal_match :: proc() -> (game: ^Match) {
     game.teams[0] = make_team("White", rl.LIGHTGRAY, {0, -1})
     game.teams[1] = make_team("Black", rl.DARKGRAY, {0, 1})
 
-    populate_normal_formation(game.pieces[:], &game.teams[0], &game.teams[1])
+    populate_normal_formation(&game.pieces, &game.teams[0], &game.teams[1])
 
     return 
 }
 
-populate_normal_formation :: proc(pieces_bank: []Piece, team1, team2: ^Team) {
-
-    assert(len(pieces_bank) >= 32, "insuficient space for this formation")
-
+populate_normal_formation :: proc(pieces_bank: ^[dynamic]Piece, team1, team2: ^Team) {
 
     for i in 0..<8 {
-        pieces_bank[i] = make_piece(.pawn, {i32(i), 6}, team1)
-        pieces_bank[i + 8] = make_piece(.pawn, {i32(i), 1}, team2)
+        append(pieces_bank, make_piece(.pawn, {i32(i), 6}, team1))
+        append(pieces_bank, make_piece(.pawn, {i32(i), 1}, team2))
     }
 
     for i in 0..<2{
 
-        pieces_bank[i + 16] = make_piece(.rook, {i32(i * 7), 7}, team1)
-        pieces_bank[i + 18] = make_piece(.rook, {i32(i * 7), 0}, team2)
+        append(pieces_bank, make_piece(.rook, {i32(i * 7), 7}, team1))
+        append(pieces_bank, make_piece(.rook, {i32(i * 7), 0}, team2))
     }
 
     for i in 0..<2{
 
-        pieces_bank[i + 20] = make_piece(.knight, {i32(1 + i * 5), 7}, team1)
-        pieces_bank[i + 22] = make_piece(.knight, {i32(1 + i * 5), 0}, team2)
+        append(pieces_bank, make_piece(.knight, {i32(1 + i * 5), 7}, team1))
+        append(pieces_bank, make_piece(.knight, {i32(1 + i * 5), 0}, team2))
     }
 
     for i in 0..<2{
 
-        pieces_bank[i + 24] = make_piece(.bishop, {i32(2 + i * 3), 7}, team1)
-        pieces_bank[i + 26] = make_piece(.bishop, {i32(2 + i * 3), 0}, team2)
+        append(pieces_bank, make_piece(.bishop, {i32(2 + i * 3), 7}, team1))
+        append(pieces_bank, make_piece(.bishop, {i32(2 + i * 3), 0}, team2))
     }
 
-    pieces_bank[28] = make_piece(.queen, {4, 7}, team1)
-    pieces_bank[29] = make_piece(.queen, {4, 0}, team2)
+    append(pieces_bank, make_piece(.queen, {4, 7}, team1) )
+    append(pieces_bank, make_piece(.queen, {4, 0}, team2) )
 
-    pieces_bank[30] = make_piece(.king, {3, 7}, team1)
-    pieces_bank[31] = make_piece(.king, {3, 0}, team2)
+    append(pieces_bank, make_piece(.king, {3, 7}, team1))
+    append(pieces_bank, make_piece(.king, {3, 0}, team2))
 
 }
 
 reset_normal_match :: proc(self: ^Match) {
 
-    populate_normal_formation(self.pieces[:], &self.teams[0], &self.teams[1])
+    populate_normal_formation(&self.pieces, &self.teams[0], &self.teams[1])
     clear(&self.movements)
     self.selected_piece = nil
     self.curr_turn = 0

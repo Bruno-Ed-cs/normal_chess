@@ -62,7 +62,7 @@ match_engine :: proc(game: ^gm.Match) {
 
             camera_control(&camera, dt)
             if !g.pause do game_control(game, camera)
-            gm.update(&game.board, game.pieces)
+            gm.update(&game.board, &game.pieces)
             gm.update_match(game)
 
 
@@ -255,8 +255,8 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
                     if cur_team == tile.piece_ref.team { 
                         game.selected_piece = tile.piece_ref
                         game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
-                        fmt.println("open movement")
-                        fmt.println(game.movements)
+                        // fmt.println("open movement")
+                        // fmt.println(game.movements)
                     }
                 }
 
@@ -265,6 +265,10 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
                 for move in game.movements {
                     if move.target == target_tile {
                         gm.move(game.selected_piece, &game.board, move.target)
+                        
+                        if move.side_effect != nil {
+                            move.side_effect(game, game.selected_piece.id)
+                        }
                         gm.end_turn(game)
                         game.selected_piece = nil
                         clear(&game.movements)
