@@ -86,6 +86,7 @@ populate_normal_formation :: proc(pieces_bank: ^[dynamic]Piece, team1, team2: ^T
 
 reset_normal_match :: proc(self: ^Match) {
 
+    clear(&self.pieces)
     populate_normal_formation(&self.pieces, &self.teams[0], &self.teams[1])
     clear(&self.movements)
     self.selected_piece = nil
