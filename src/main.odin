@@ -5,6 +5,7 @@ import "core:fmt"
 import "core:mem"
 import g "globals"
 import gm "game"
+import ass "asset_man"
 
 
 main :: proc() {
@@ -29,6 +30,7 @@ main :: proc() {
     defer rl.CloseWindow()
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
+    ass.init_asset_man()
 
     game := gm.make_normal_match()
 

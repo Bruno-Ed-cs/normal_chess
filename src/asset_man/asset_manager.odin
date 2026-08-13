@@ -4,6 +4,8 @@ import str "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
 
+
+
 Asset :: union {
     rl.Texture2D,
     rl.Music,
@@ -20,9 +22,23 @@ Asset_types :: enum {
 
 asset_bank: map[string]Asset
 
+
+init_asset_man :: proc() {
+
+    spritesheet := #load("sprite_sheet.png")
+    // fmt.println(spritesheet)
+
+    sprite := rl.LoadImageFromMemory(".png", raw_data(spritesheet), i32(len(spritesheet)))
+    defer rl.UnloadImage(sprite)
+
+    asset_bank["sprite_sheet.png"] = rl.LoadTextureFromImage(sprite)
+
+}
+
 get_asset :: proc(asset_name: string) -> Asset {
 
     asset, ok := asset_bank[asset_name]
+    fmt.println(asset_bank)
 
     if ok {
         return asset

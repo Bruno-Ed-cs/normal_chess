@@ -9,7 +9,7 @@ import "core:fmt"
 
 match_engine :: proc(game: ^gm.Match) {
 
-    fmt.println(game.pieces)
+    //fmt.println(game.pieces)
     interfaces := ui.init_ui_stack()
     defer ui.delete_ui_stack(interfaces)
 
