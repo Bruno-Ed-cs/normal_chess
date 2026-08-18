@@ -6,6 +6,9 @@ camera_speed :: 700
 zoom_speed :: 1.0
 pause: bool = false
 
+max_pieces :: 1000
+max_moves :: 10000
+
 font_size :: 32
 roundness :: 0.16
 segments :: 2

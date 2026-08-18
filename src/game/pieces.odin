@@ -3,6 +3,7 @@ package game
 import rl "vendor:raylib"
 import ass "../asset_man"
 import "core:fmt"
+import g "../globals"
 
 Dir :: enum {up, down, left, right}
 Diag :: enum {up_left, up_right, down_left, down_right}
@@ -56,10 +57,10 @@ Piece :: struct {
     id: i32,
     position: BoardPos,
     class: Class,
-    movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int
+    movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int
 }
 
-Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
     .pawn = pawn_movement,
     .rook = rook_movement,
     .bishop = bishop_movement,
@@ -68,7 +69,7 @@ Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move
     .knight = knight_movement
 }
 
-king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
 
     move_count: int
 
@@ -203,13 +204,13 @@ castleling :: proc(game: ^Match, caller: i32) {
 
 }
 
-queen_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+queen_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
 
     return bishop_movement(self, board, moves_buff) + rook_movement(self, board, moves_buff)
 
 }
 
-bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
 
     moves_count: int
 
@@ -241,7 +242,7 @@ bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move)
 
 }
 
-knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
 
     moves_count :int
 
@@ -280,7 +281,7 @@ knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move)
     return moves_count
 }
 
-rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
 
     moves_count :int
 
@@ -317,7 +318,7 @@ rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -
 }
 
 
-pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic]Move) -> int {
+pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
 
     moves_count: int
 

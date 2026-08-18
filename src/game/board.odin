@@ -1,6 +1,7 @@
 package game
 
 import rl "vendor:raylib"
+import g "../globals"
 import "core:fmt"
 
 BoardPos :: [2]i32
@@ -142,7 +143,7 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
 
 }
 
-update :: proc(board: ^Board, pieces: ^[dynamic]Piece) {
+update :: proc(board: ^Board, pieces: []Piece) {
 
     for &tile in board.tiles {
         for &piece in pieces {

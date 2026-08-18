@@ -3,10 +3,10 @@ package main
 import rl "vendor:raylib"
 import "core:fmt"
 import "core:mem"
+import "core:log"
 import g "globals"
 import gm "game"
 import ass "asset_man"
-
 
 main :: proc() {
 
@@ -25,6 +25,8 @@ main :: proc() {
             mem.tracking_allocator_destroy(&track)
         }
     }
+
+    context.logger = log.create_console_logger()
 
     rl.InitWindow(g.window_size.x, g.window_size.y, "Normal Chess")
     defer rl.CloseWindow()

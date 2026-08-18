@@ -62,7 +62,7 @@ match_engine :: proc(game: ^gm.Match) {
 
             camera_control(&camera, dt)
             if !g.pause do game_control(game, camera)
-            gm.update(&game.board, &game.pieces)
+            gm.update(&game.board, game.pieces[:])
             gm.update_match(game)
 
 

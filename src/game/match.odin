@@ -1,14 +1,14 @@
 package game
 
 import rl "vendor:raylib"
-
+import g "../globals"
 
 Match :: struct {
     selected_piece: ^Piece,
-    pieces: [dynamic]Piece,
+    pieces: [dynamic; g.max_pieces]Piece,
     teams: []Team,
     curr_turn: int,
-    movements: [dynamic]Move,
+    movements: [dynamic; g.max_moves]Move,
     board: Board,
     //returns nil when no one won yet
     win_condition: proc(game: ^Match) -> ^Team,
@@ -37,9 +37,7 @@ make_normal_match :: proc() -> (game: ^Match) {
     game = new(Match)
 
     game.board = make_board()
-    game.pieces = make([dynamic]Piece, 0, 32)
     game.teams = make([]Team, 2)
-    game.movements = make([dynamic]Move)
     game.selected_piece = nil
     game.win_condition = last_king_standing_win
 
@@ -51,7 +49,7 @@ make_normal_match :: proc() -> (game: ^Match) {
     return 
 }
 
-populate_normal_formation :: proc(pieces_bank: ^[dynamic]Piece, team1, team2: ^Team) {
+populate_normal_formation :: proc(pieces_bank: ^[dynamic; g.max_pieces]Piece, team1, team2: ^Team) {
 
     for i in 0..<8 {
         append(pieces_bank, make_piece(.pawn, {i32(i), 6}, team1))
@@ -95,9 +93,7 @@ reset_normal_match :: proc(self: ^Match) {
 
 delete_match :: proc(match: ^Match) {
 
-    delete(match.pieces)
     delete(match.teams)
-    delete(match.movements)
     delete_board(&match.board)
     for &i in match.teams {
         delete_team(&i)
