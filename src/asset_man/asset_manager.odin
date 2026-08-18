@@ -3,8 +3,7 @@ package asset_man
 import str "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
-
-
+import "core:os"
 
 Asset :: union {
     rl.Texture2D,
@@ -21,11 +20,18 @@ Asset_types :: enum {
 }
 
 asset_bank: map[string]Asset
-
+error_sprite: rl.Texture2D
 
 init_asset_man :: proc() {
 
-    spritesheet := #load("sprite_sheet.png")
+    spritesheet := #load("../../assets/sprites/sprite_sheet.png")
+
+    if !rl.IsTextureReady(error_sprite) {
+        err_source := #load("../../assets/sprites/error_texture.png")
+        err_img := rl.LoadImageFromMemory(".png", raw_data(err_source), i32(len(err_source)))
+        defer rl.UnloadImage(err_img)
+        error_sprite = rl.LoadTextureFromImage(err_img)
+    }
     // fmt.println(spritesheet)
 
     sprite := rl.LoadImageFromMemory(".png", raw_data(spritesheet), i32(len(spritesheet)))
@@ -48,7 +54,13 @@ get_asset :: proc(asset_name: string) -> Asset {
     str.builder_init(&fullpath)
     defer str.builder_destroy(&fullpath)
 
-    str.write_string(&fullpath, string(rl.GetApplicationDirectory()))
+    path, err := os.get_executable_directory(context.temp_allocator)
+    if err != nil {
+        fmt.eprintln("Error while gettingg executable directory", err)
+        return error_sprite
+    }
+
+    str.write_string(&fullpath, string(path))
     str.write_string(&fullpath, "assets/")
 
     dot_i := str.index(asset_name, ".")
@@ -76,27 +88,27 @@ get_asset :: proc(asset_name: string) -> Asset {
 
     case :
         fmt.eprintfln("The extension of the asset [%s] is not compatible", asset_name)
-        return asset
+        return error_sprite
     }
 
     str.write_string(&fullpath, asset_name)
 
-    path := str.to_cstring(&fullpath)
+    path_c := str.to_cstring(&fullpath)
 
-    if !rl.FileExists(path) {
-        fmt.eprintfln("The file [%s] does not exist", path)
-        return asset
+    if !rl.FileExists(path_c) {
+        fmt.eprintfln("The file [%s] does not exist", path_c)
+        return error_sprite
     }
 
     switch asset_type {
         case .texture:
-            asset_bank[asset_name] = rl.LoadTexture(path)
+            asset_bank[asset_name] = rl.LoadTexture(path_c)
 
         case .music:
-            asset_bank[asset_name] = rl.LoadMusicStream(path)
+            asset_bank[asset_name] = rl.LoadMusicStream(path_c)
 
         case .sound:
-            asset_bank[asset_name] = rl.LoadSound(path)
+            asset_bank[asset_name] = rl.LoadSound(path_c)
 
     }
 
