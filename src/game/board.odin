@@ -2,6 +2,7 @@ package game
 
 import rl "vendor:raylib"
 import g "../globals"
+import "core:log"
 import "core:fmt"
 
 BoardPos :: [2]i32
@@ -112,7 +113,7 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
 
 
         } else {
-            fmt.println("the coordenate is invalid", tile_pos)
+            log.error("the coordenate is invalid", tile_pos)
         }
     }
 
@@ -167,7 +168,7 @@ delete_board :: proc(board: ^Board) {
 
     delete(board.tiles)
     rl.UnloadRenderTexture(board.render)
-    fmt.println("board deleted")
+    log.debug("board deleted")
 
 }
 

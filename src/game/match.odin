@@ -2,6 +2,11 @@ package game
 
 import rl "vendor:raylib"
 import g "../globals"
+import "core:encoding/json"
+import "core:mem"
+import "core:log"
+import "core:os"
+import str "core:strings"
 
 Match :: struct {
     selected_piece: ^Piece,
@@ -12,6 +17,57 @@ Match :: struct {
     board: Board,
     //returns nil when no one won yet
     win_condition: proc(game: ^Match) -> ^Team,
+}
+
+MatchRecord :: struct {
+    pieces: []PieceRecord,
+    board_size: [2]i32,
+    teams: []TeamRecord
+}
+
+
+record_normal_match :: proc(game: ^Match) {
+
+    record: MatchRecord
+    record.board_size = game.board.size
+    pieces: [32]PieceRecord
+    teams: [2]TeamRecord
+
+    for team, i in game.teams {
+
+        teams[i] = TeamRecord {
+            march = team.march_direction,
+            name = team.name,
+            color = team.color
+
+        }
+
+
+    }
+
+    record.teams = teams[:]
+
+    for piece, i in game.pieces {
+
+        pieces[i] = PieceRecord {
+            class = piece.class,
+            position = piece.position,
+            team = piece.team.name
+
+        }
+
+    }
+
+    record.pieces = pieces[:]
+
+    json_data, jerr := json.marshal(record, {pretty = true, indentation = 1})
+    if jerr != nil {
+        log.error(jerr)
+        return
+    }
+
+    
+    _ = os.write_entire_file("standard.json", json_data)
 }
 
 last_king_standing_win :: proc(game: ^Match) -> ^Team {
@@ -30,6 +86,58 @@ last_king_standing_win :: proc(game: ^Match) -> ^Team {
 
     if king_count != 1 do return nil
     return kinger.team
+}
+
+// the path is relative to the executable
+make_match_from_file :: proc(filepath: string) -> ^Match {
+
+    file, ferr := os.read_entire_file(filepath, context.allocator)
+    defer if ferr == nil do delete(file)
+    if ferr != nil {
+
+        log.fatal("Error loading board", ferr)
+        file = #load("../../assets/boards/standard.json")
+
+    } 
+
+
+    match_data: MatchRecord
+    uerr := json.unmarshal(file, &match_data, allocator = context.temp_allocator)
+    if uerr != nil {
+        log.fatal("Error unmarshaling", uerr, file)
+        return nil
+
+    }
+
+
+    match := new(Match)
+
+    match.board = make_board(match_data.board_size)
+    match.win_condition = last_king_standing_win
+
+    teams := make([dynamic]Team)
+
+    for team in match_data.teams {
+
+        append(&teams, make_team(str.clone(team.name), team.color, team.march))
+    }
+
+    match.teams = teams[:]
+
+    for piece in match_data.pieces {
+
+        for &team in teams {
+            if piece.team == team.name {
+                append(&match.pieces, make_piece(piece.class, piece.position, &team))
+            }
+
+        }
+
+    }
+
+    return match
+
+
 }
 
 make_normal_match :: proc() -> (game: ^Match) {

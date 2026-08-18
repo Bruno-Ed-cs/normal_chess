@@ -1,0 +1,188 @@
+INFO: Initializing raylib 6.0
+INFO: Platform backend: DESKTOP (GLFW)
+INFO: Supported raylib modules:
+INFO:     > rcore:..... loaded (mandatory)
+INFO:     > rlgl:...... loaded (mandatory)
+INFO:     > rshapes:... loaded (optional)
+INFO:     > rtextures:. loaded (optional)
+INFO:     > rtext:..... loaded (optional)
+INFO:     > rmodels:... loaded (optional)
+INFO:     > raudio:.... loaded (optional)
+INFO: DISPLAY: Device initialized successfully 
+INFO:     > Display size: 1920 x 1080
+INFO:     > Screen size:  1200 x 800
+INFO:     > Render size:  1200 x 800
+INFO:     > Viewport offsets: 0, 0
+INFO: GLAD: OpenGL extensions loaded successfully
+INFO: GL: Supported extensions count: 241
+INFO: GL: OpenGL device information:
+INFO:     > Vendor:   AMD
+INFO:     > Renderer: AMD Radeon Graphics (radeonsi, renoir, ACO, DRM 3.64, 7.1.6-artix1-1)
+INFO:     > Version:  4.6 (Core Profile) Mesa 26.1.6-arch1.1
+INFO:     > GLSL:     4.60
+INFO: GL: VAO extension detected, VAO functions loaded successfully
+INFO: GL: NPOT textures extension detected, full NPOT textures supported
+INFO: GL: DXT compressed textures supported
+INFO: GL: ETC2/EAC compressed textures supported
+INFO: PLATFORM: DESKTOP (GLFW - X11): Initialized successfully
+DEBUG: TEXTURE: Load mipmap level 0 (1 x 1), size: 4, offset: 0
+INFO: TEXTURE: [ID 1] Texture loaded successfully (1x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 1] Default texture loaded successfully
+INFO: SHADER: [ID 1] Vertex shader compiled successfully
+INFO: SHADER: [ID 2] Fragment shader compiled successfully
+INFO: SHADER: [ID 3] Program shader loaded successfully
+INFO: SHADER: [ID 3] Default shader loaded successfully
+INFO: RLGL: Render batch vertex buffers loaded successfully in RAM (CPU)
+INFO: RLGL: Render batch vertex buffers loaded successfully in VRAM (GPU)
+INFO: RLGL: Default OpenGL state initialized successfully
+DEBUG: TEXTURE: Load mipmap level 0 (128 x 128), size: 32768, offset: 0
+INFO: TEXTURE: [ID 2] Texture loaded successfully (128x128 | GRAY_ALPHA | 1 mipmaps)
+INFO: FONT: Default font loaded successfully (224 glyphs)
+INFO: SYSTEM: Working Directory: /home/huevo/Projects/odin/normal_chess
+INFO: GLFW: Selected monitor: [0] eDP-1
+INFO: IMAGE: Data loaded successfully (32x32 | R8G8B8A8 | 1 mipmaps)
+DEBUG: TEXTURE: Load mipmap level 0 (32 x 32), size: 4096, offset: 0
+INFO: TEXTURE: [ID 3] Texture loaded successfully (32x32 | R8G8B8A8 | 1 mipmaps)
+INFO: IMAGE: Data loaded successfully (96x128 | R8G8B8A8 | 1 mipmaps)
+DEBUG: TEXTURE: Load mipmap level 0 (96 x 128), size: 49152, offset: 0
+INFO: TEXTURE: [ID 4] Texture loaded successfully (96x128 | R8G8B8A8 | 1 mipmaps)
+[DEBUG] --- [2026-08-18 14:35:45] [asset_manager.odin:41:init_asset_man()] >>> ALLOCATOR(mode=.Alloc_Non_Zeroed, size=896, alignment=64)
+[DEBUG] --- [2026-08-18 14:35:45] [match.odin:37:make_normal_match()] >>> ALLOCATOR(mode=.Alloc, size=368152, alignment=8)
+[DEBUG] --- [2026-08-18 14:35:45] [board.odin:94:make_board()] >>> ALLOCATOR(mode=.Alloc, size=2048, alignment=8)
+DEBUG: TEXTURE: Load mipmap level 0 (256 x 256), size: 262144, offset: 0
+INFO: TEXTURE: [ID 5] Texture loaded successfully (256x256 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 1] Depth renderbuffer loaded successfully (32 bits)
+INFO: FBO: [ID 1] Framebuffer object created successfully
+[DEBUG] --- [2026-08-18 14:35:45] [match.odin:40:make_normal_match()] >>> ALLOCATOR(mode=.Alloc, size=176, alignment=8)
+[DEBUG] --- [2026-08-18 14:35:45] [asset_manager.odin:48:get_asset()] map[sprite_sheet.png=Texture{id = 4, width = 96, height = 128, mipmaps = 1, format = "UNCOMPRESSED_R8G8B8A8"}]
+INFO: TEXTURE: [ID 4] Pixel data retrieved successfully
+DEBUG: TEXTURE: Load mipmap level 0 (96 x 128), size: 49152, offset: 0
+INFO: TEXTURE: [ID 6] Texture loaded successfully (96x128 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 2] Depth renderbuffer loaded successfully (32 bits)
+INFO: FBO: [ID 2] Framebuffer object created successfully
+[DEBUG] --- [2026-08-18 14:35:45] [asset_manager.odin:48:get_asset()] map[sprite_sheet.png=Texture{id = 4, width = 96, height = 128, mipmaps = 1, format = "UNCOMPRESSED_R8G8B8A8"}]
+INFO: TEXTURE: [ID 4] Pixel data retrieved successfully
+DEBUG: TEXTURE: Load mipmap level 0 (96 x 128), size: 49152, offset: 0
+INFO: TEXTURE: [ID 7] Texture loaded successfully (96x128 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 3] Depth renderbuffer loaded successfully (32 bits)
+INFO: FBO: [ID 3] Framebuffer object created successfully
+[DEBUG] --- [2026-08-18 14:35:45] [ui_stack.odin:37:init_ui_stack()] >>> ALLOCATOR(mode=.Alloc, size=48, alignment=8)
+[DEBUG] --- [2026-08-18 14:35:45] [ui_stack.odin:38:init_ui_stack()] >>> ALLOCATOR(mode=.Alloc, size=160, alignment=8)
+[DEBUG] --- [2026-08-18 14:35:52] [pieces.odin:346:pawn_movement()] [6, 5]
+[DEBUG] --- [2026-08-18 14:35:52] [pieces.odin:346:pawn_movement()] [4, 5]
+[DEBUG] --- [2026-08-18 14:35:53] [pieces.odin:346:pawn_movement()] [6, 2]
+[DEBUG] --- [2026-08-18 14:35:53] [pieces.odin:346:pawn_movement()] [4, 2]
+[DEBUG] --- [2026-08-18 14:35:57] [pieces.odin:346:pawn_movement()] [6, 3]
+[DEBUG] --- [2026-08-18 14:35:57] [pieces.odin:346:pawn_movement()] [4, 3]
+[DEBUG] --- [2026-08-18 14:35:59] [pieces.odin:222:bishop_movement()] [4, 8]
+[DEBUG] --- [2026-08-18 14:35:59] [pieces.odin:222:bishop_movement()] [6, 8]
+[DEBUG] --- [2026-08-18 14:35:59] [pieces.odin:222:bishop_movement()] [4, 6]
+[DEBUG] --- [2026-08-18 14:35:59] [pieces.odin:222:bishop_movement()] [6, 6]
+[DEBUG] --- [2026-08-18 14:36:00] [pieces.odin:222:bishop_movement()] [3, 8]
+[DEBUG] --- [2026-08-18 14:36:00] [pieces.odin:222:bishop_movement()] [5, 8]
+[DEBUG] --- [2026-08-18 14:36:00] [pieces.odin:222:bishop_movement()] [3, 6]
+[DEBUG] --- [2026-08-18 14:36:00] [pieces.odin:222:bishop_movement()] [5, 6]
+[DEBUG] --- [2026-08-18 14:36:00] [pieces.odin:222:bishop_movement()] [6, 5]
+[DEBUG] --- [2026-08-18 14:36:00] [pieces.odin:222:bishop_movement()] [7, 4]
+[DEBUG] --- [2026-08-18 14:36:00] [pieces.odin:222:bishop_movement()] [8, 3]
+[DEBUG] --- [2026-08-18 14:36:03] [pieces.odin:222:bishop_movement()] [3, 1]
+[DEBUG] --- [2026-08-18 14:36:03] [pieces.odin:222:bishop_movement()] [5, 1]
+[DEBUG] --- [2026-08-18 14:36:03] [pieces.odin:222:bishop_movement()] [6, 2]
+[DEBUG] --- [2026-08-18 14:36:03] [pieces.odin:222:bishop_movement()] [7, 3]
+[DEBUG] --- [2026-08-18 14:36:03] [pieces.odin:222:bishop_movement()] [8, 4]
+[DEBUG] --- [2026-08-18 14:36:03] [pieces.odin:222:bishop_movement()] [3, -1]
+[DEBUG] --- [2026-08-18 14:36:03] [pieces.odin:222:bishop_movement()] [5, -1]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [6, 5]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [5, 6]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [4, 7]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [3, 8]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [8, 5]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [6, 3]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [5, 2]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [4, 1]
+[DEBUG] --- [2026-08-18 14:36:05] [pieces.odin:222:bishop_movement()] [8, 3]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [6, 4]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [5, 5]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [4, 6]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [8, 4]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [6, 2]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [5, 1]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [4, 0]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [3, -1]
+[DEBUG] --- [2026-08-18 14:36:07] [pieces.odin:222:bishop_movement()] [8, 2]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [3, 2]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [2, 3]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [1, 4]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [0, 5]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [-1, 6]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [5, 2]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [6, 3]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [7, 4]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [8, 5]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [3, 0]
+[DEBUG] --- [2026-08-18 14:36:08] [pieces.odin:222:bishop_movement()] [5, 0]
+[DEBUG] --- [2026-08-18 14:36:11] [pieces.odin:346:pawn_movement()] [5, 5]
+[DEBUG] --- [2026-08-18 14:36:11] [pieces.odin:346:pawn_movement()] [3, 5]
+[DEBUG] --- [2026-08-18 14:36:13] [pieces.odin:346:pawn_movement()] [5, 2]
+[DEBUG] --- [2026-08-18 14:36:13] [pieces.odin:346:pawn_movement()] [3, 2]
+[DEBUG] --- [2026-08-18 14:36:15] [pieces.odin:346:pawn_movement()] [7, 5]
+[DEBUG] --- [2026-08-18 14:36:15] [pieces.odin:346:pawn_movement()] [5, 5]
+[DEBUG] --- [2026-08-18 14:36:17] [pieces.odin:346:pawn_movement()] [7, 2]
+[DEBUG] --- [2026-08-18 14:36:17] [pieces.odin:346:pawn_movement()] [5, 2]
+[DEBUG] --- [2026-08-18 14:36:23] [pieces.odin:346:pawn_movement()] [7, 3]
+[DEBUG] --- [2026-08-18 14:36:23] [pieces.odin:346:pawn_movement()] [5, 3]
+[DEBUG] --- [2026-08-18 14:36:25] [pieces.odin:346:pawn_movement()] [8, 5]
+[DEBUG] --- [2026-08-18 14:36:25] [pieces.odin:346:pawn_movement()] [6, 5]
+[DEBUG] --- [2026-08-18 14:36:28] [pieces.odin:346:pawn_movement()] [8, 2]
+[DEBUG] --- [2026-08-18 14:36:28] [pieces.odin:346:pawn_movement()] [6, 2]
+[DEBUG] --- [2026-08-18 14:36:55] [pieces.odin:346:pawn_movement()] [5, 5]
+[DEBUG] --- [2026-08-18 14:36:55] [pieces.odin:346:pawn_movement()] [3, 5]
+[DEBUG] --- [2026-08-18 14:36:58] [pieces.odin:346:pawn_movement()] [5, 2]
+[DEBUG] --- [2026-08-18 14:36:58] [pieces.odin:346:pawn_movement()] [3, 2]
+[DEBUG] --- [2026-08-18 14:37:00] [pieces.odin:346:pawn_movement()] [6, 5]
+[DEBUG] --- [2026-08-18 14:37:00] [pieces.odin:346:pawn_movement()] [4, 5]
+[DEBUG] --- [2026-08-18 14:37:01] [pieces.odin:346:pawn_movement()] [6, 2]
+[DEBUG] --- [2026-08-18 14:37:01] [pieces.odin:346:pawn_movement()] [4, 2]
+[DEBUG] --- [2026-08-18 14:37:02] [pieces.odin:346:pawn_movement()] [6, 3]
+[DEBUG] --- [2026-08-18 14:37:02] [pieces.odin:346:pawn_movement()] [4, 3]
+[DEBUG] --- [2026-08-18 14:37:04] [pieces.odin:346:pawn_movement()] [6, 4]
+[DEBUG] --- [2026-08-18 14:37:04] [pieces.odin:346:pawn_movement()] [4, 4]
+[DEBUG] --- [2026-08-18 14:37:06] [pieces.odin:346:pawn_movement()] [5, 2]
+[DEBUG] --- [2026-08-18 14:37:06] [pieces.odin:346:pawn_movement()] [3, 2]
+[DEBUG] --- [2026-08-18 14:37:07] [pieces.odin:346:pawn_movement()] [5, 5]
+[DEBUG] --- [2026-08-18 14:37:07] [pieces.odin:346:pawn_movement()] [3, 5]
+[DEBUG] --- [2026-08-18 14:37:08] [pieces.odin:346:pawn_movement()] [5, 1]
+[DEBUG] --- [2026-08-18 14:37:08] [pieces.odin:346:pawn_movement()] [3, 1]
+[DEBUG] --- [2026-08-18 14:37:10] [pieces.odin:346:pawn_movement()] [5, 6]
+[DEBUG] --- [2026-08-18 14:37:10] [pieces.odin:346:pawn_movement()] [3, 6]
+[DEBUG] --- [2026-08-18 14:37:12] [pieces.odin:346:pawn_movement()] [5, 0]
+[DEBUG] --- [2026-08-18 14:37:12] [pieces.odin:346:pawn_movement()] [3, 0]
+[DEBUG] --- [2026-08-18 14:37:15] [pieces.odin:346:pawn_movement()] [6, 5]
+[DEBUG] --- [2026-08-18 14:37:15] [pieces.odin:346:pawn_movement()] [4, 5]
+[DEBUG] --- [2026-08-18 14:37:17] [pieces.odin:346:pawn_movement()] [6, 2]
+[DEBUG] --- [2026-08-18 14:37:17] [pieces.odin:346:pawn_movement()] [4, 2]
+[DEBUG] --- [2026-08-18 14:37:20] [pieces.odin:346:pawn_movement()] [5, 5]
+[DEBUG] --- [2026-08-18 14:37:20] [pieces.odin:346:pawn_movement()] [3, 5]
+[DEBUG] --- [2026-08-18 14:37:22] [pieces.odin:346:pawn_movement()] [5, 2]
+[DEBUG] --- [2026-08-18 14:37:22] [pieces.odin:346:pawn_movement()] [3, 2]
+[DEBUG] --- [2026-08-18 14:37:24] [pieces.odin:346:pawn_movement()] [6, 3]
+[DEBUG] --- [2026-08-18 14:37:24] [pieces.odin:346:pawn_movement()] [4, 3]
+[DEBUG] --- [2026-08-18 14:37:25] [pieces.odin:346:pawn_movement()] [6, 4]
+[DEBUG] --- [2026-08-18 14:37:25] [pieces.odin:346:pawn_movement()] [4, 4]
+[DEBUG] --- [2026-08-18 14:37:27] [pieces.odin:346:pawn_movement()] [5, 2]
+[DEBUG] --- [2026-08-18 14:37:27] [pieces.odin:346:pawn_movement()] [3, 2]
+INFO: TEXTURE: [ID 4] Unloaded texture data from VRAM (GPU)
+[DEBUG] --- [2026-08-18 14:37:32] [asset_manager.odin:139:clear_assets()] <<< ALLOCATOR(mode=.Free, ptr=0x558F25C7B500, size=896)
+[DEBUG] --- [2026-08-18 14:37:32] [ui_stack.odin:53:delete_ui_stack()] <<< ALLOCATOR(mode=.Free, ptr=0x558F26868508, size=160)
+[DEBUG] --- [2026-08-18 14:37:32] [ui_stack.odin:54:delete_ui_stack()] <<< ALLOCATOR(mode=.Free, ptr=0x558F267924C8)
+[DEBUG] --- [2026-08-18 14:37:32] [match.odin:96:delete_match()] <<< ALLOCATOR(mode=.Free, ptr=0x558F267FD268, size=176)
+[DEBUG] --- [2026-08-18 14:37:32] [board.odin:169:delete_board()] <<< ALLOCATOR(mode=.Free, ptr=0x558F2678A458, size=2048)
+INFO: FBO: [ID 1] Unloaded framebuffer from VRAM (GPU)
+[DEBUG] --- [2026-08-18 14:37:32] [board.odin:171:delete_board()] board deleted
+INFO: FBO: [ID 2] Unloaded framebuffer from VRAM (GPU)
+INFO: FBO: [ID 3] Unloaded framebuffer from VRAM (GPU)
+[DEBUG] --- [2026-08-18 14:37:32] [match.odin:101:delete_match()] <<< ALLOCATOR(mode=.Free, ptr=0x558F267FF5A8)
+INFO: TEXTURE: [ID 2] Unloaded texture data from VRAM (GPU)
+INFO: SHADER: [ID 3] Default shader unloaded successfully
+INFO: TEXTURE: [ID 1] Default texture unloaded successfully
+INFO: Window closed successfully

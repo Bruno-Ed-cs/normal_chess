@@ -4,6 +4,7 @@ import str "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
 import "core:os"
+import "core:log"
 
 Asset :: union {
     rl.Texture2D,
@@ -44,7 +45,7 @@ init_asset_man :: proc() {
 get_asset :: proc(asset_name: string) -> Asset {
 
     asset, ok := asset_bank[asset_name]
-    fmt.println(asset_bank)
+    log.debug(asset_bank)
 
     if ok {
         return asset
@@ -56,7 +57,7 @@ get_asset :: proc(asset_name: string) -> Asset {
 
     path, err := os.get_executable_directory(context.temp_allocator)
     if err != nil {
-        fmt.eprintln("Error while gettingg executable directory", err)
+        log.error("Error while gettingg executable directory", err)
         return error_sprite
     }
 
@@ -66,7 +67,7 @@ get_asset :: proc(asset_name: string) -> Asset {
     dot_i := str.index(asset_name, ".")
 
     if dot_i < 0 {
-        fmt.eprintfln("The asset [%s] does not have a file extension", asset_name)
+        log.error("The asset [%s] does not have a file extension", asset_name)
     }
 
     extension := asset_name[dot_i:]
@@ -87,7 +88,7 @@ get_asset :: proc(asset_name: string) -> Asset {
         asset_type = Asset_types.music
 
     case :
-        fmt.eprintfln("The extension of the asset [%s] is not compatible", asset_name)
+        log.error("The extension of the asset [%s] is not compatible", asset_name)
         return error_sprite
     }
 
@@ -96,7 +97,7 @@ get_asset :: proc(asset_name: string) -> Asset {
     path_c := str.to_cstring(&fullpath)
 
     if !rl.FileExists(path_c) {
-        fmt.eprintfln("The file [%s] does not exist", path_c)
+        log.error("The file [%s] does not exist", path_c)
         return error_sprite
     }
 

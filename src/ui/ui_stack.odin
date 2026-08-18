@@ -82,7 +82,7 @@ clean_stack :: proc(stack: ^UiStack) {
 
 execute_ui_stack :: proc(stack: ^UiStack) {
 
-    sig_buff: [dynamic]SigIndex
+    sig_buff := make([dynamic]SigIndex, context.temp_allocator)
     reserve(&sig_buff, len(stack.layers))
     defer delete(sig_buff)
 

@@ -3,6 +3,7 @@ package game
 import rl "vendor:raylib"
 import ass "../asset_man"
 import "core:fmt"
+import "core:log"
 import g "../globals"
 
 Dir :: enum {up, down, left, right}
@@ -42,6 +43,12 @@ Team :: struct {
     piece_sprites: rl.RenderTexture2D
 }
 
+TeamRecord :: struct {
+    color: rl.Color,
+    name: string,
+    march: [2]i32,
+}
+
 Move :: struct {
     attack: bool,
     target: BoardPos,
@@ -58,6 +65,12 @@ Piece :: struct {
     position: BoardPos,
     class: Class,
     movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int
+}
+
+PieceRecord :: struct {
+    team: string,
+    position: BoardPos,
+    class: Class
 }
 
 Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
@@ -180,7 +193,7 @@ castleling :: proc(game: ^Match, caller: i32) {
             if target := tile.piece_ref; target.class == .rook && target.team == piece.team{
                 
                 if dist := rl.Vector2Distance(Vec2(piece.position), Vec2(target.position));distance > dist {
-                    fmt.println(dist, target.position)
+                    log.debug(dist, target.position)
 
                     distance = dist
                     closest_tower = target
@@ -218,7 +231,7 @@ bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.ma
 
         for multipliyer: i32 = 1;; multipliyer += 1 {
 
-            fmt.println(self.position + multipliyer * diag)
+            log.debug(self.position + multipliyer * diag)
             tile := get_tile(board, self.position + multipliyer * diag)
 
             if tile == nil do break 
@@ -342,7 +355,7 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
     }
 
     for &diag in diagonal_killers {
-        fmt.println(diag)
+        log.debug(diag)
         if tile := get_tile(board, diag); tile != nil{
             if tile.piece_ref != nil && tile.piece_ref.team != self.team{
                 append(moves_buff, Move{ attack = true, target = diag, origin = self.position})
@@ -471,6 +484,7 @@ make_team :: proc(name: string, color: rl.Color, cemitery: [2]i32) -> Team {
 delete_team :: proc(team: ^Team) {
 
     rl.UnloadRenderTexture(team.piece_sprites)
+    delete(team.name)
 }
 
 promote :: proc(target: ^Piece, new_role: Class) {

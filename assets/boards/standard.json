@@ -1,0 +1,292 @@
+{
+		"pieces": [
+			{
+				"team": "White",
+				"position": [
+					0,
+					6
+				],
+				"class": 0
+			},
+			{
+				"team": "Black",
+				"position": [
+					0,
+					1
+				],
+				"class": 0
+			},
+			{
+				"team": "White",
+				"position": [
+					1,
+					6
+				],
+				"class": 0
+			},
+			{
+				"team": "Black",
+				"position": [
+					1,
+					1
+				],
+				"class": 0
+			},
+			{
+				"team": "White",
+				"position": [
+					2,
+					6
+				],
+				"class": 0
+			},
+			{
+				"team": "Black",
+				"position": [
+					2,
+					1
+				],
+				"class": 0
+			},
+			{
+				"team": "White",
+				"position": [
+					3,
+					6
+				],
+				"class": 0
+			},
+			{
+				"team": "Black",
+				"position": [
+					3,
+					1
+				],
+				"class": 0
+			},
+			{
+				"team": "White",
+				"position": [
+					4,
+					6
+				],
+				"class": 0
+			},
+			{
+				"team": "Black",
+				"position": [
+					4,
+					1
+				],
+				"class": 0
+			},
+			{
+				"team": "White",
+				"position": [
+					5,
+					6
+				],
+				"class": 0
+			},
+			{
+				"team": "Black",
+				"position": [
+					5,
+					1
+				],
+				"class": 0
+			},
+			{
+				"team": "White",
+				"position": [
+					6,
+					6
+				],
+				"class": 0
+			},
+			{
+				"team": "Black",
+				"position": [
+					6,
+					1
+				],
+				"class": 0
+			},
+			{
+				"team": "White",
+				"position": [
+					7,
+					6
+				],
+				"class": 0
+			},
+			{
+				"team": "Black",
+				"position": [
+					7,
+					1
+				],
+				"class": 0
+			},
+			{
+				"team": "White",
+				"position": [
+					0,
+					7
+				],
+				"class": 1
+			},
+			{
+				"team": "Black",
+				"position": [
+					0,
+					0
+				],
+				"class": 1
+			},
+			{
+				"team": "White",
+				"position": [
+					7,
+					7
+				],
+				"class": 1
+			},
+			{
+				"team": "Black",
+				"position": [
+					7,
+					0
+				],
+				"class": 1
+			},
+			{
+				"team": "White",
+				"position": [
+					1,
+					7
+				],
+				"class": 5
+			},
+			{
+				"team": "Black",
+				"position": [
+					1,
+					0
+				],
+				"class": 5
+			},
+			{
+				"team": "White",
+				"position": [
+					6,
+					7
+				],
+				"class": 5
+			},
+			{
+				"team": "Black",
+				"position": [
+					6,
+					0
+				],
+				"class": 5
+			},
+			{
+				"team": "White",
+				"position": [
+					2,
+					7
+				],
+				"class": 2
+			},
+			{
+				"team": "Black",
+				"position": [
+					2,
+					0
+				],
+				"class": 2
+			},
+			{
+				"team": "White",
+				"position": [
+					5,
+					7
+				],
+				"class": 2
+			},
+			{
+				"team": "Black",
+				"position": [
+					5,
+					0
+				],
+				"class": 2
+			},
+			{
+				"team": "White",
+				"position": [
+					4,
+					7
+				],
+				"class": 4
+			},
+			{
+				"team": "Black",
+				"position": [
+					4,
+					0
+				],
+				"class": 4
+			},
+			{
+				"team": "White",
+				"position": [
+					3,
+					7
+				],
+				"class": 3
+			},
+			{
+				"team": "Black",
+				"position": [
+					3,
+					0
+				],
+				"class": 3
+			}
+		],
+		"board_size": [
+			8,
+			8
+		],
+		"teams": [
+			{
+				"color": [
+					200,
+					200,
+					200,
+					255
+				],
+				"name": "White",
+				"march": [
+					0,
+					-1
+				]
+			},
+			{
+				"color": [
+					80,
+					80,
+					80,
+					255
+				],
+				"name": "Black",
+				"march": [
+					0,
+					1
+				]
+			}
+		]
+	}

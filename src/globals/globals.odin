@@ -1,5 +1,8 @@
 package globals
 import rl "vendor:raylib"
+import "core:log"
+
+log_level := log.Level.Fatal
 
 window_size := [2]i32{1200, 800}
 camera_speed :: 700

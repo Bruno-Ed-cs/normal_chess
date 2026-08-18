@@ -5,7 +5,8 @@ import gm "game"
 import ass "asset_man"
 import ui "ui"
 import g "globals"
-import "core:fmt"
+import "core:log"
+
 
 match_engine :: proc(game: ^gm.Match) {
 
@@ -59,6 +60,8 @@ match_engine :: proc(game: ^gm.Match) {
             zoom_factor := (f32(g.window_size.y) / f32(game.board.size.y * gm.tile_size))
             camera.zoom = zoom_factor - zoom_factor * 0.02
 
+            // log.debug(game.teams)
+            //its already fucked here
 
             camera_control(&camera, dt)
             if !g.pause do game_control(game, camera)

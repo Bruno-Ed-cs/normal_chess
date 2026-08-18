@@ -1,11 +1,12 @@
 #+feature using-stmt
 package ui
 import gm "../game"
-import fmt "core:fmt"
+import "core:fmt"
 import g "../globals"
 import rl "vendor:raylib"
 import hl "../helpers"
 import rf "core:reflect"
+import "core:log"
 
 DebugInfo :: struct {
     game: ^gm.Match,
@@ -47,7 +48,7 @@ debug_ui :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> Ui {
         },
 
         cleanup = proc(workspace: rawptr) {
-            fmt.println("freeing my debug")
+            log.debug("freeing my debug")
             free(workspace)
 
         }
@@ -65,12 +66,13 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
         callback = proc(workspace: rawptr, top: bool) -> UiSig {
 
             game := cast(^gm.Match)workspace
+            // log.debug("teams: ", game.teams)
 
             center := rl.Vector2{f32(g.window_size.x /2), f32(g.window_size.y /2)}
 
-            cur_team: cstring = fmt.ctprintf("Turn: %s", gm.get_team_turn(game).name)
+            cur_team: cstring = fmt.ctprintf("Turn: %s", gm.get_team_turn(game).name,)
 
-            scores: [dynamic]cstring
+            scores := make([dynamic]cstring, context.temp_allocator)
             defer delete(scores)
             reserve(&scores, len(game.teams))
 
@@ -223,7 +225,7 @@ promotion_ui :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
             if pressed {
 
                 gm.promote(piece, promotion)
-                fmt.println("pressed", work.piece_id, piece)
+                log.debug("pressed", work.piece_id, piece)
                 g.pause = false
                 return .pop
 
