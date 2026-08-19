@@ -9,6 +9,8 @@ camera_speed :: 700
 zoom_speed :: 1.0
 pause: bool = false
 
+ui_mem_size :: 50000
+
 max_pieces :: 1000
 max_moves :: 10000
 

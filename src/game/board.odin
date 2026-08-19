@@ -98,11 +98,11 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
 
     for &tile, index in board.tiles {
         tile = {
-            coordenate = { i32(index%8), i32(index/8) },
+            coordenate = { i32(index) % size.x, i32(index) / size.y },
             piece_ref = nil
         }
-        tile_pos, valid := board_to_world(&board, tile.coordenate)
 
+        tile_pos, valid := board_to_world(&board, tile.coordenate)
         if valid {
             tile.hitbox = {
                 x = tile_pos.x,
@@ -113,7 +113,7 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
 
 
         } else {
-            log.error("the coordenate is invalid", tile_pos)
+            log.error("the coordenate is invalid", tile.coordenate)
         }
     }
 

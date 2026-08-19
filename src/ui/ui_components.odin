@@ -1,10 +1,16 @@
 package ui
 import rl "vendor:raylib"
 import g "../globals"
-import st "core:strings"
+import str "core:strings"
 
 // Screen coordenate system 
 // 0 to 1 normalized space
+
+Justification :: enum {
+    center,
+    left,
+    right
+}
 
 scr_pos :: #force_inline proc(pos: [2]f32) -> [2]f32 {
 
@@ -56,7 +62,9 @@ draw_long_triangle :: proc(shape: LongTriangle, color: rl.Color, outline: rl.Col
     rl.DrawRectangleRec(rect, color)
 }
 
-center_button :: proc(title: string , width: f32, pos: [2]f32, padding: f32 = 10) -> bool {
+
+
+simple_button :: proc(title: string , width: f32, pos: [2]f32, padding: f32 = 10, justify: Justification = .center) -> bool {
 
     body := rl.Rectangle{ 
         x = pos.x,
@@ -65,12 +73,29 @@ center_button :: proc(title: string , width: f32, pos: [2]f32, padding: f32 = 10
         height = g.font_size + padding
     }
 
-    label := st.clone_to_cstring(title, context.temp_allocator)
+    label := str.clone_to_cstring(title, context.temp_allocator)
     text_wid := rl.MeasureText(label, g.font_size)
 
-    text_pos := [2]i32 {
-        i32(body.x) + (i32(body.width) - text_wid) / 2,
-        i32(body.y) + i32(padding / 2)
+    text_pos :[2]i32 
+
+    switch justify {
+        case .center:
+            text_pos = [2]i32 {
+                i32(body.x) + (i32(body.width) - text_wid) / 2,
+                i32(body.y) + i32(padding / 2)
+            }
+        case .left:
+
+            text_pos = [2]i32 {
+                i32(body.x + padding),
+                i32(body.y) + i32(padding / 2)
+            }
+        case .right:
+
+            text_pos = [2]i32 {
+                i32(body.x) + (i32(body.width) - text_wid) - i32(padding),
+                i32(body.y) + i32(padding / 2)
+            }
     }
 
     col1 := g.background_color

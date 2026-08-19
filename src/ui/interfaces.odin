@@ -6,6 +6,7 @@ import g "../globals"
 import rl "vendor:raylib"
 import hl "../helpers"
 import rf "core:reflect"
+import str "core:strings"
 import "core:log"
 
 DebugInfo :: struct {
@@ -213,7 +214,11 @@ promotion_ui :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
                 if piece.class == opt do continue
                 if opt == .king do continue
 
-                if center_button(rf.enum_string(opt), f32(width - margin), anchor, f32(padding)) {
+                source := rf.enum_string(opt)
+                first := str.to_upper(source[:1], context.temp_allocator)
+                label := str.join({first, source[1:]}, "", context.temp_allocator) 
+
+                if simple_button(label, f32(width - margin), anchor, f32(padding)) {
                     pressed = true if top else false
                     promotion = opt
                 }

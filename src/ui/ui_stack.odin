@@ -1,6 +1,10 @@
 package ui
 
 import "core:slice"
+import "core:mem"
+import g "../globals"
+
+ui_memory: [g.ui_mem_size]byte
 
 UiFunc :: proc(workspace: rawptr, top: bool) -> UiSig
 UiCleanup :: proc(workspace: rawptr)
@@ -80,11 +84,18 @@ clean_stack :: proc(stack: ^UiStack) {
 
 }
 
+
 execute_ui_stack :: proc(stack: ^UiStack) {
+
+    ui_arena: mem.Arena
+    mem.arena_init(&ui_arena, ui_memory[:])
+    context.temp_allocator = mem.arena_allocator(&ui_arena)
+    defer(free_all(context.temp_allocator))
 
     sig_buff := make([dynamic]SigIndex, context.temp_allocator)
     reserve(&sig_buff, len(stack.layers))
     defer delete(sig_buff)
+
 
     for index := 0; index < len(stack.layers); index += 1{
 

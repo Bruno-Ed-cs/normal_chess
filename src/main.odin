@@ -43,7 +43,9 @@ main :: proc() {
     rl.SetWindowState({.WINDOW_RESIZABLE})
     ass.init_asset_man()
 
-    game := gm.make_match_from_file("assets/boards/standard.json")
+    board_path: string = "assets/boards/standard.json" if len(os.args) < 2 else os.args[1]
+
+    game := gm.make_match_from_file(board_path)
     if game == nil do os.exit(0)
 
     // log.debug(game.teams)
