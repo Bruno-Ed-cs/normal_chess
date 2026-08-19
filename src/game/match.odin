@@ -11,6 +11,7 @@ import str "core:strings"
 Match :: struct {
     selected_piece: ^Piece,
     pieces: [dynamic; g.max_pieces]Piece,
+    original_formation: []PieceRecord,
     teams: []Team,
     curr_turn: int,
     movements: [dynamic; g.max_moves]Move,
@@ -124,11 +125,16 @@ make_match_from_file :: proc(filepath: string) -> ^Match {
 
     match.teams = teams[:]
 
-    for piece in match_data.pieces {
+    populate_formation(match_data.pieces, match.teams[:], &match.pieces)
 
-        for &team in teams {
+    match.original_formation = make([]PieceRecord, len(match_data.pieces))
+
+    copy(match.original_formation, match_data.pieces)
+    for &piece in match.original_formation {
+
+        for &team in match.teams {
             if piece.team == team.name {
-                append(&match.pieces, make_piece(piece.class, piece.position, &team))
+                piece.team = team.name
             }
 
         }
@@ -140,60 +146,76 @@ make_match_from_file :: proc(filepath: string) -> ^Match {
 
 }
 
-make_normal_match :: proc() -> (game: ^Match) {
+populate_formation :: proc(pieces: []PieceRecord, teams: []Team, dest: ^[dynamic; g.max_pieces]Piece) {
 
-    game = new(Match)
+    for piece in pieces {
 
-    game.board = make_board()
-    game.teams = make([]Team, 2)
-    game.selected_piece = nil
-    game.win_condition = last_king_standing_win
+        for &team in teams {
+            if piece.team == team.name {
+                append(dest, make_piece(piece.class, piece.position, &team))
+            }
 
-    game.teams[0] = make_team("White", rl.LIGHTGRAY, {0, -1})
-    game.teams[1] = make_team("Black", rl.DARKGRAY, {0, 1})
+        }
 
-    populate_normal_formation(&game.pieces, &game.teams[0], &game.teams[1])
-
-    return 
-}
-
-populate_normal_formation :: proc(pieces_bank: ^[dynamic; g.max_pieces]Piece, team1, team2: ^Team) {
-
-    for i in 0..<8 {
-        append(pieces_bank, make_piece(.pawn, {i32(i), 6}, team1))
-        append(pieces_bank, make_piece(.pawn, {i32(i), 1}, team2))
     }
-
-    for i in 0..<2{
-
-        append(pieces_bank, make_piece(.rook, {i32(i * 7), 7}, team1))
-        append(pieces_bank, make_piece(.rook, {i32(i * 7), 0}, team2))
-    }
-
-    for i in 0..<2{
-
-        append(pieces_bank, make_piece(.knight, {i32(1 + i * 5), 7}, team1))
-        append(pieces_bank, make_piece(.knight, {i32(1 + i * 5), 0}, team2))
-    }
-
-    for i in 0..<2{
-
-        append(pieces_bank, make_piece(.bishop, {i32(2 + i * 3), 7}, team1))
-        append(pieces_bank, make_piece(.bishop, {i32(2 + i * 3), 0}, team2))
-    }
-
-    append(pieces_bank, make_piece(.queen, {4, 7}, team1) )
-    append(pieces_bank, make_piece(.queen, {4, 0}, team2) )
-
-    append(pieces_bank, make_piece(.king, {3, 7}, team1))
-    append(pieces_bank, make_piece(.king, {3, 0}, team2))
 
 }
 
-reset_normal_match :: proc(self: ^Match) {
+// make_normal_match :: proc() -> (game: ^Match) {
+//
+//     game = new(Match)
+//
+//     game.board = make_board()
+//     game.teams = make([]Team, 2)
+//     game.selected_piece = nil
+//     game.win_condition = last_king_standing_win
+//
+//     game.teams[0] = make_team("White", rl.LIGHTGRAY, {0, -1})
+//     game.teams[1] = make_team("Black", rl.DARKGRAY, {0, 1})
+//
+//     populate_normal_formation(&game.pieces, &game.teams[0], &game.teams[1])
+//
+//     return 
+// }
+
+// populate_normal_formation :: proc(pieces_bank: ^[dynamic; g.max_pieces]Piece, team1, team2: ^Team) {
+//
+//     for i in 0..<8 {
+//         append(pieces_bank, make_piece(.pawn, {i32(i), 6}, team1))
+//         append(pieces_bank, make_piece(.pawn, {i32(i), 1}, team2))
+//     }
+//
+//     for i in 0..<2{
+//
+//         append(pieces_bank, make_piece(.rook, {i32(i * 7), 7}, team1))
+//         append(pieces_bank, make_piece(.rook, {i32(i * 7), 0}, team2))
+//     }
+//
+//     for i in 0..<2{
+//
+//         append(pieces_bank, make_piece(.knight, {i32(1 + i * 5), 7}, team1))
+//         append(pieces_bank, make_piece(.knight, {i32(1 + i * 5), 0}, team2))
+//     }
+//
+//     for i in 0..<2{
+//
+//         append(pieces_bank, make_piece(.bishop, {i32(2 + i * 3), 7}, team1))
+//         append(pieces_bank, make_piece(.bishop, {i32(2 + i * 3), 0}, team2))
+//     }
+//
+//     append(pieces_bank, make_piece(.queen, {4, 7}, team1) )
+//     append(pieces_bank, make_piece(.queen, {4, 0}, team2) )
+//
+//     append(pieces_bank, make_piece(.king, {3, 7}, team1))
+//     append(pieces_bank, make_piece(.king, {3, 0}, team2))
+//
+// }
+
+reset_match :: proc(self: ^Match) {
 
     clear(&self.pieces)
-    populate_normal_formation(&self.pieces, &self.teams[0], &self.teams[1])
+    populate_formation(self.original_formation, self.teams, &self.pieces)
+    log.debug(self.pieces)
     clear(&self.movements)
     self.selected_piece = nil
     self.curr_turn = 0
@@ -203,6 +225,7 @@ delete_match :: proc(match: ^Match) {
 
     delete(match.teams)
     delete_board(&match.board)
+    delete(match.original_formation)
     for &i in match.teams {
         delete_team(&i)
     }
@@ -217,7 +240,8 @@ update_match :: proc(self: ^Match) {
 
     if winner != nil {
         winner.score += 1
-        reset_normal_match(self)
+
+        reset_match(self)
     }
 
 }
