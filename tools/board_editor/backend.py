@@ -45,10 +45,20 @@ class Board:
     board_size: int[2]
     teams: List[Team]
 
-    def __init__(self, size: int[2]):
+    def __init__(self, size: int[2] = (0, 0)):
         self.board_size = size
         self.pieces = []
         self.teams = []
+
+    def load_from_json(self, json_data: dict):
+        self.board_size = json_data["board_size"]
+        print(self.board_size)
+        self.pieces = [Piece(p["position"], p["team"], Roles[p["class"]]) for p in json_data["pieces"]]
+        print(self.pieces)
+        self.teams = [Team(t.get("color"), t.get("name"), t.get("march")) for t in json_data.get("teams")]
+        print(self.teams)
+
+        return self
 
     def get_dict(self):
         return {
@@ -56,6 +66,15 @@ class Board:
             "board_size": self.board_size,
             "teams": [te.__dict__ for te in self.teams],
         }
+
+    def save_to_file(self, filepath):
+
+        try:
+            with open(filepath, "w") as file:
+                json.dump(self.get_dict(), file, indent= 2)
+                print("saved")
+        except Exception as err:
+            print(f"The error {err} has ocurred")
 
 if __name__ == "__main__":
 
@@ -65,6 +84,11 @@ if __name__ == "__main__":
 
     print(test_board.get_dict())
 
-    with open("mini.json", "w") as file:
-        json.dump(test_board.get_dict(), file, indent=2)
-        print("success")
+    test_board.save_to_file("smol.json")
+
+    with open("smol.json", "r") as file:
+        data = json.load(file)
+        # print(data)
+        smol_board = Board().load_from_json(data)
+        print(smol_board.get_dict())
+

@@ -61,7 +61,7 @@ record_normal_match :: proc(game: ^Match) {
 
     record.pieces = pieces[:]
 
-    json_data, jerr := json.marshal(record, {pretty = true, indentation = 1})
+    json_data, jerr := json.marshal(record, {pretty = true, indentation = 1, use_enum_names = true})
     if jerr != nil {
         log.error(jerr)
         return
@@ -72,6 +72,8 @@ record_normal_match :: proc(game: ^Match) {
 }
 
 last_king_standing_win :: proc(game: ^Match) -> ^Team {
+
+    if len(game.teams) < 2 do return nil
 
     king_count := 0
     kinger: ^Piece

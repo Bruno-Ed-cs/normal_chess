@@ -47,6 +47,7 @@ main :: proc() {
 
     game := gm.make_match_from_file(board_path)
     if game == nil do os.exit(0)
+    //gm.record_normal_match(game)
 
     // log.debug(game.teams)
 

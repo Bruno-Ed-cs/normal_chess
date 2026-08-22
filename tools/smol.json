@@ -1,0 +1,31 @@
+{
+  "pieces": [
+    {
+      "position": [
+        1,
+        1
+      ],
+      "team": "White",
+      "class": "king"
+    }
+  ],
+  "board_size": [
+    8,
+    8
+  ],
+  "teams": [
+    {
+      "color": [
+        1,
+        1,
+        1,
+        255
+      ],
+      "name": "White",
+      "march": [
+        0,
+        1
+      ]
+    }
+  ]
+}
