@@ -246,3 +246,17 @@ promotion_ui :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
     }
 
 }
+
+main_menu_ui :: proc(game: ^gm.Match) -> Ui {
+
+    return Ui {
+        workspace = game,
+        callback = proc(workspace: rawptr, top: bool) -> UiSig{
+
+
+
+            return .ok
+
+        }
+    }
+}
