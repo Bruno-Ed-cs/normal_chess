@@ -26,7 +26,7 @@ class Piece:
         return {
                 "position": self.position,
                 "team": self.team,
-                "class": self.role.value
+                "class": self.role.name
         }
 
 
