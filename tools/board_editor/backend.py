@@ -10,6 +10,12 @@ class Roles(Enum):
     king = 4
     queen = 5
     knight = 6
+    wizard = 7
+    cop = 8
+    archer = 9
+    clown = 10
+    devil = 11
+    angel = 12
 
 
 class Piece:

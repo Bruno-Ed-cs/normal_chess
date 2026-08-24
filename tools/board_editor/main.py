@@ -3,9 +3,23 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QKeySequence
 
-from backend import Board
+from backend import Board, Roles
 from board_editor import Ui_BoardEditor
 from new_board import Ui_NewBoard
+
+class PieceButton(QPushButton):
+
+    def __init__(self,piece_role: Roles, parent = None):
+        super().__init__(parent)
+        self.piece_role = piece_role
+        self.setMinimumHeight(50)
+        self.setFlat(True)
+        self.setCheckable(True)
+        self.setAutoExclusive(True)
+        self.setAutoFillBackground(True)
+
+        self.setText(piece_role.name.capitalize())
+
 
 class NewBoardDialog(Ui_NewBoard, QDialog):
 
@@ -26,6 +40,7 @@ class Window(QMainWindow):
         super().__init__()
 
         self.board = Board()
+        self.selected_role = Roles.pawn
 
         # Carregar interface
         self.main_ui = Ui_BoardEditor()
@@ -33,13 +48,30 @@ class Window(QMainWindow):
 
         self.new_board_ui = NewBoardDialog(self)
 
-        # Conectar as spin boxes principais 
+        # Conectar as spin boxes principais
         self.main_ui.spinBox_width.valueChanged.connect(self.change_width)
         self.main_ui.spinBox_height.valueChanged.connect(self.change_height)
 
         # Conectando as ações
         self.main_ui.actionNew.triggered.connect(self.make_board)
         self.main_ui.actionNew.setShortcut(QKeySequence.StandardKey.New)
+
+        # Botões de pecas
+        for role in Roles:
+            button = PieceButton(role)
+            button.toggled.connect(self.select_role)
+            if role == Roles.pawn:
+                button.setChecked(True)
+            self.main_ui.PiecesContainer.addWidget(button)
+
+
+    @Slot(bool)
+    def select_role(self, checked):
+        button = self.sender()
+
+        if checked and isinstance(button, PieceButton):
+            self.selected_role = button.piece_role
+            # print(self.selected_role)
 
 
     def sync_board(self):

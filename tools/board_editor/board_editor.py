@@ -17,10 +17,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QGraphicsView, QGridLayout,
-    QGroupBox, QHBoxLayout, QLabel, QMainWindow,
-    QMenu, QMenuBar, QPushButton, QScrollArea,
-    QSizePolicy, QSpinBox, QStatusBar, QVBoxLayout,
-    QWidget)
+    QGroupBox, QHBoxLayout, QLabel, QLayout,
+    QMainWindow, QMenu, QMenuBar, QPushButton,
+    QScrollArea, QSizePolicy, QSpinBox, QStatusBar,
+    QVBoxLayout, QWidget)
 
 class Ui_BoardEditor(object):
     def setupUi(self, BoardEditor):
@@ -55,30 +55,26 @@ class Ui_BoardEditor(object):
         self.scrollContent = QWidget()
         self.scrollContent.setObjectName(u"scrollContent")
         self.scrollContent.setGeometry(QRect(0, 0, 384, 840))
-        self.verticalLayoutWidget_3 = QWidget(self.scrollContent)
-        self.verticalLayoutWidget_3.setObjectName(u"verticalLayoutWidget_3")
-        self.verticalLayoutWidget_3.setGeometry(QRect(10, 10, 371, 958))
-        self.scrollBox = QVBoxLayout(self.verticalLayoutWidget_3)
+        self.verticalLayout_4 = QVBoxLayout(self.scrollContent)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.scrollBox = QVBoxLayout()
         self.scrollBox.setObjectName(u"scrollBox")
-        self.scrollBox.setContentsMargins(0, 0, 0, 0)
-        self.BoardSizeBox = QGroupBox(self.verticalLayoutWidget_3)
+        self.BoardSizeBox = QGroupBox(self.scrollContent)
         self.BoardSizeBox.setObjectName(u"BoardSizeBox")
         self.BoardSizeBox.setMinimumSize(QSize(0, 150))
         self.BoardSizeBox.setMaximumSize(QSize(16777215, 150))
-        self.verticalLayoutWidget = QWidget(self.BoardSizeBox)
-        self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(10, 30, 223, 101))
-        self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout_7 = QVBoxLayout(self.BoardSizeBox)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.WidthLayout = QHBoxLayout()
         self.WidthLayout.setObjectName(u"WidthLayout")
-        self.label_width = QLabel(self.verticalLayoutWidget)
+        self.label_width = QLabel(self.BoardSizeBox)
         self.label_width.setObjectName(u"label_width")
 
         self.WidthLayout.addWidget(self.label_width)
 
-        self.spinBox_width = QSpinBox(self.verticalLayoutWidget)
+        self.spinBox_width = QSpinBox(self.BoardSizeBox)
         self.spinBox_width.setObjectName(u"spinBox_width")
         self.spinBox_width.setMaximum(500)
 
@@ -89,12 +85,12 @@ class Ui_BoardEditor(object):
 
         self.HeightLayout = QHBoxLayout()
         self.HeightLayout.setObjectName(u"HeightLayout")
-        self.label_height = QLabel(self.verticalLayoutWidget)
+        self.label_height = QLabel(self.BoardSizeBox)
         self.label_height.setObjectName(u"label_height")
 
         self.HeightLayout.addWidget(self.label_height)
 
-        self.spinBox_height = QSpinBox(self.verticalLayoutWidget)
+        self.spinBox_height = QSpinBox(self.BoardSizeBox)
         self.spinBox_height.setObjectName(u"spinBox_height")
         self.spinBox_height.setMaximum(500)
 
@@ -104,64 +100,85 @@ class Ui_BoardEditor(object):
         self.verticalLayout_2.addLayout(self.HeightLayout)
 
 
+        self.verticalLayout_7.addLayout(self.verticalLayout_2)
+
+
         self.scrollBox.addWidget(self.BoardSizeBox)
 
-        self.PiecesBox = QGroupBox(self.verticalLayoutWidget_3)
+        self.PiecesBox = QGroupBox(self.scrollContent)
         self.PiecesBox.setObjectName(u"PiecesBox")
+        self.verticalLayout_5 = QVBoxLayout(self.PiecesBox)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.PiecesScroll = QScrollArea(self.PiecesBox)
         self.PiecesScroll.setObjectName(u"PiecesScroll")
-        self.PiecesScroll.setGeometry(QRect(10, 30, 351, 361))
+        self.PiecesScroll.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.PiecesScroll.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 349, 359))
-        self.verticalLayoutWidget_4 = QWidget(self.scrollAreaWidgetContents_2)
-        self.verticalLayoutWidget_4.setObjectName(u"verticalLayoutWidget_4")
-        self.verticalLayoutWidget_4.setGeometry(QRect(0, 0, 341, 351))
-        self.PiecesContainer = QVBoxLayout(self.verticalLayoutWidget_4)
+        self.scrollAreaWidgetContents_2.setEnabled(True)
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 338, 281))
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.scrollAreaWidgetContents_2.sizePolicy().hasHeightForWidth())
+        self.scrollAreaWidgetContents_2.setSizePolicy(sizePolicy)
+        self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.PiecesContainer = QVBoxLayout()
         self.PiecesContainer.setObjectName(u"PiecesContainer")
-        self.PiecesContainer.setContentsMargins(0, 0, 0, 0)
+        self.PiecesContainer.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
+        self.PiecesContainer.setContentsMargins(5, 5, 5, 10)
+
+        self.verticalLayout_3.addLayout(self.PiecesContainer)
+
         self.PiecesScroll.setWidget(self.scrollAreaWidgetContents_2)
+
+        self.verticalLayout_5.addWidget(self.PiecesScroll)
+
 
         self.scrollBox.addWidget(self.PiecesBox)
 
-        self.TeamsBox = QGroupBox(self.verticalLayoutWidget_3)
+        self.TeamsBox = QGroupBox(self.scrollContent)
         self.TeamsBox.setObjectName(u"TeamsBox")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.TeamsBox.sizePolicy().hasHeightForWidth())
-        self.TeamsBox.setSizePolicy(sizePolicy)
-        self.TeamsBox.setMinimumSize(QSize(0, 300))
-        self.verticalLayoutWidget_2 = QWidget(self.TeamsBox)
-        self.verticalLayoutWidget_2.setObjectName(u"verticalLayoutWidget_2")
-        self.verticalLayoutWidget_2.setGeometry(QRect(10, 30, 351, 232))
-        self.TeamsLayout = QVBoxLayout(self.verticalLayoutWidget_2)
-        self.TeamsLayout.setObjectName(u"TeamsLayout")
-        self.TeamsLayout.setContentsMargins(0, 0, 0, 0)
-        self.TeamsScrollArea = QScrollArea(self.verticalLayoutWidget_2)
-        self.TeamsScrollArea.setObjectName(u"TeamsScrollArea")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.TeamsScrollArea.sizePolicy().hasHeightForWidth())
-        self.TeamsScrollArea.setSizePolicy(sizePolicy1)
+        sizePolicy1.setHeightForWidth(self.TeamsBox.sizePolicy().hasHeightForWidth())
+        self.TeamsBox.setSizePolicy(sizePolicy1)
+        self.TeamsBox.setMinimumSize(QSize(0, 300))
+        self.verticalLayout_6 = QVBoxLayout(self.TeamsBox)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.TeamsLayout = QVBoxLayout()
+        self.TeamsLayout.setObjectName(u"TeamsLayout")
+        self.TeamsScrollArea = QScrollArea(self.TeamsBox)
+        self.TeamsScrollArea.setObjectName(u"TeamsScrollArea")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Expanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.TeamsScrollArea.sizePolicy().hasHeightForWidth())
+        self.TeamsScrollArea.setSizePolicy(sizePolicy2)
         self.TeamsScrollArea.setMinimumSize(QSize(0, 150))
         self.TeamsScrollArea.setWidgetResizable(True)
         self.TeamsContainer = QWidget()
         self.TeamsContainer.setObjectName(u"TeamsContainer")
-        self.TeamsContainer.setGeometry(QRect(0, 0, 347, 148))
+        self.TeamsContainer.setGeometry(QRect(0, 0, 336, 246))
         self.TeamsScrollArea.setWidget(self.TeamsContainer)
 
         self.TeamsLayout.addWidget(self.TeamsScrollArea)
 
-        self.pushButton = QPushButton(self.verticalLayoutWidget_2)
+        self.pushButton = QPushButton(self.TeamsBox)
         self.pushButton.setObjectName(u"pushButton")
 
         self.TeamsLayout.addWidget(self.pushButton)
 
 
+        self.verticalLayout_6.addLayout(self.TeamsLayout)
+
+
         self.scrollBox.addWidget(self.TeamsBox)
+
+
+        self.verticalLayout_4.addLayout(self.scrollBox)
 
         self.scrollArea.setWidget(self.scrollContent)
 

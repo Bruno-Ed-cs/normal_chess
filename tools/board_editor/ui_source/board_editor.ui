@@ -55,193 +55,193 @@
            <height>840</height>
           </rect>
          </property>
-         <widget class="QWidget" name="verticalLayoutWidget_3">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>10</y>
-            <width>371</width>
-            <height>958</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="scrollBox">
-           <item>
-            <widget class="QGroupBox" name="BoardSizeBox">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>150</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>150</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>Board size:</string>
-             </property>
-             <widget class="QWidget" name="verticalLayoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>30</y>
-                <width>223</width>
-                <height>101</height>
-               </rect>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QVBoxLayout" name="scrollBox">
+            <item>
+             <widget class="QGroupBox" name="BoardSizeBox">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>150</height>
+               </size>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_2">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>150</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>Board size:</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_7">
                <item>
-                <layout class="QHBoxLayout" name="WidthLayout">
+                <layout class="QVBoxLayout" name="verticalLayout_2">
                  <item>
-                  <widget class="QLabel" name="label_width">
-                   <property name="text">
-                    <string>Width</string>
-                   </property>
-                  </widget>
+                  <layout class="QHBoxLayout" name="WidthLayout">
+                   <item>
+                    <widget class="QLabel" name="label_width">
+                     <property name="text">
+                      <string>Width</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="spinBox_width">
+                     <property name="maximum">
+                      <number>500</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_width">
-                   <property name="maximum">
-                    <number>500</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="HeightLayout">
-                 <item>
-                  <widget class="QLabel" name="label_height">
-                   <property name="text">
-                    <string>Height</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="spinBox_height">
-                   <property name="maximum">
-                    <number>500</number>
-                   </property>
-                  </widget>
+                  <layout class="QHBoxLayout" name="HeightLayout">
+                   <item>
+                    <widget class="QLabel" name="label_height">
+                     <property name="text">
+                      <string>Height</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="spinBox_height">
+                     <property name="maximum">
+                      <number>500</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                 </layout>
                </item>
               </layout>
              </widget>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="PiecesBox">
-             <property name="title">
-              <string>Pieces</string>
-             </property>
-             <widget class="QScrollArea" name="PiecesScroll">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>30</y>
-                <width>351</width>
-                <height>361</height>
-               </rect>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="PiecesBox">
+              <property name="title">
+               <string>Pieces</string>
               </property>
-              <property name="widgetResizable">
-               <bool>true</bool>
-              </property>
-              <widget class="QWidget" name="scrollAreaWidgetContents_2">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>349</width>
-                 <height>359</height>
-                </rect>
-               </property>
-               <widget class="QWidget" name="verticalLayoutWidget_4">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>341</width>
-                  <height>351</height>
-                 </rect>
-                </property>
-                <layout class="QVBoxLayout" name="PiecesContainer"/>
-               </widget>
-              </widget>
-             </widget>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="TeamsBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>300</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>Teams</string>
-             </property>
-             <widget class="QWidget" name="verticalLayoutWidget_2">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>30</y>
-                <width>351</width>
-                <height>232</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="TeamsLayout">
+              <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
-                <widget class="QScrollArea" name="TeamsScrollArea">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>150</height>
-                  </size>
+                <widget class="QScrollArea" name="PiecesScroll">
+                 <property name="sizeAdjustPolicy">
+                  <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
                  </property>
                  <property name="widgetResizable">
                   <bool>true</bool>
                  </property>
-                 <widget class="QWidget" name="TeamsContainer">
+                 <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
                   <property name="geometry">
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>347</width>
-                    <height>148</height>
+                    <width>338</width>
+                    <height>281</height>
                    </rect>
                   </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_3">
+                   <item>
+                    <layout class="QVBoxLayout" name="PiecesContainer">
+                     <property name="sizeConstraint">
+                      <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
+                     </property>
+                     <property name="leftMargin">
+                      <number>5</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>5</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>5</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>10</number>
+                     </property>
+                    </layout>
+                   </item>
+                  </layout>
                  </widget>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton">
-                 <property name="text">
-                  <string>New team</string>
-                 </property>
                 </widget>
                </item>
               </layout>
              </widget>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="TeamsBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>300</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>Teams</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_6">
+               <item>
+                <layout class="QVBoxLayout" name="TeamsLayout">
+                 <item>
+                  <widget class="QScrollArea" name="TeamsScrollArea">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>150</height>
+                    </size>
+                   </property>
+                   <property name="widgetResizable">
+                    <bool>true</bool>
+                   </property>
+                   <widget class="QWidget" name="TeamsContainer">
+                    <property name="geometry">
+                     <rect>
+                      <x>0</x>
+                      <y>0</y>
+                      <width>336</width>
+                      <height>246</height>
+                     </rect>
+                    </property>
+                   </widget>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton">
+                   <property name="text">
+                    <string>New team</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>
