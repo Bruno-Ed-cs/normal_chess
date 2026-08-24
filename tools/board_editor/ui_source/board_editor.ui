@@ -102,7 +102,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_width"/>
+                  <widget class="QSpinBox" name="spinBox_width">
+                   <property name="maximum">
+                    <number>500</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -116,7 +120,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_height"/>
+                  <widget class="QSpinBox" name="spinBox_height">
+                   <property name="maximum">
+                    <number>500</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>

@@ -1,6 +1,7 @@
 import sys
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Slot
+from PySide6.QtGui import QKeySequence
 
 from backend import Board
 from board_editor import Ui_BoardEditor
@@ -32,18 +33,20 @@ class Window(QMainWindow):
 
         self.new_board_ui = NewBoardDialog(self)
 
-
-
         # Conectar as spin boxes principais 
         self.main_ui.spinBox_width.valueChanged.connect(self.change_width)
         self.main_ui.spinBox_height.valueChanged.connect(self.change_height)
 
-        # Conectar as spin boxes da interface de fazer o tabuleiro
+        # Conectando as ações
+        self.main_ui.actionNew.triggered.connect(self.make_board)
+        self.main_ui.actionNew.setShortcut(QKeySequence.StandardKey.New)
+
 
     def sync_board(self):
         self.main_ui.spinBox_width.setValue(self.board.size[0])
         self.main_ui.spinBox_height.setValue(self.board.size[1])
 
+    @Slot()
     def make_board(self):
 
         if main_window.new_board_ui.exec() == QDialog.DialogCode.Accepted:

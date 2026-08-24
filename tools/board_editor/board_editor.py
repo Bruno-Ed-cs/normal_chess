@@ -80,6 +80,7 @@ class Ui_BoardEditor(object):
 
         self.spinBox_width = QSpinBox(self.verticalLayoutWidget)
         self.spinBox_width.setObjectName(u"spinBox_width")
+        self.spinBox_width.setMaximum(500)
 
         self.WidthLayout.addWidget(self.spinBox_width)
 
@@ -95,6 +96,7 @@ class Ui_BoardEditor(object):
 
         self.spinBox_height = QSpinBox(self.verticalLayoutWidget)
         self.spinBox_height.setObjectName(u"spinBox_height")
+        self.spinBox_height.setMaximum(500)
 
         self.HeightLayout.addWidget(self.spinBox_height)
 
