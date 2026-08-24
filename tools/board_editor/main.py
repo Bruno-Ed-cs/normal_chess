@@ -1,117 +1,66 @@
 import sys
 from PySide6.QtWidgets import *
+from PySide6.QtCore import Slot
 
-import main_menu as mm
+from backend import Board
+from board_editor import Ui_BoardEditor
+from new_board import Ui_NewBoard
+
+class NewBoardDialog(Ui_NewBoard, QDialog):
+
+    def __init__(self, parent = None):
+        super().__init__(parent)
+
+        self.setupUi(self)
+
+    def get_size(self):
+        return [
+            self.spinBox_width.value(),
+            self.spinBox_height.value()
+        ]
 
 class Window(QMainWindow):
 
     def __init__(self):
         super().__init__()
 
-        # 1. Load the UI
-        self.ui = mm.MainMenu()
-        self.ui.setupUi(self)
+        self.board = Board()
 
-        # 2. Fix all scroll areas
-        self.fix_main_scroll_area()
-        self.fix_pieces_scroll_area()
-        self.fix_teams_scroll_area()
+        # Carregar interface
+        self.main_ui = Ui_BoardEditor()
+        self.main_ui.setupUi(self)
 
-        # 3. Add sample content to make them scroll
-        self.populate_pieces()
-        self.populate_teams()
+        self.new_board_ui = NewBoardDialog(self)
 
-    def fix_main_scroll_area(self):
-        """Make the main left panel scroll vertically."""
-        # Get the content widget of the main scroll area
-        content = self.ui.scrollContent  # this is the widget inside scrollArea
 
-        # Clear any existing children (we'll reparent them)
-        # Remove the old verticalLayoutWidget_3 which used absolute geometry
-        old_widget = self.ui.verticalLayoutWidget_3
-        # We'll take its children (the group boxes) and put them directly into content
-        group_boxes = []
-        for child in old_widget.children():
-            if isinstance(child, QGroupBox):
-                group_boxes.append(child)
 
-        # Create a new layout for content
-        layout = QVBoxLayout(content)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(10)
+        # Conectar as spin boxes principais 
+        self.main_ui.spinBox_width.valueChanged.connect(self.change_width)
+        self.main_ui.spinBox_height.valueChanged.connect(self.change_height)
 
-        # Add the group boxes to the layout
-        for gb in group_boxes:
-            # Reparent to content (the layout will take ownership)
-            layout.addWidget(gb)
+        # Conectar as spin boxes da interface de fazer o tabuleiro
 
-        # Remove the old container widget (it's now empty)
-        old_widget.deleteLater()
+    def sync_board(self):
+        self.main_ui.spinBox_width.setValue(self.board.size[0])
+        self.main_ui.spinBox_height.setValue(self.board.size[1])
 
-        # Ensure the scroll area resizes the content appropriately
-        self.ui.scrollArea.setWidgetResizable(True)
+    def make_board(self):
 
-        # Store the layout for future additions
-        self.main_layout = layout
+        if main_window.new_board_ui.exec() == QDialog.DialogCode.Accepted:
+            main_window.board = Board(main_window.new_board_ui.get_size())
+            main_window.sync_board()
+            print(main_window.board.get_dict())
 
-    def fix_pieces_scroll_area(self):
-        """Make the Pieces scroll area (scrollArea_3) work."""
-        # Get the container widget inside scrollArea_3
-        container = self.ui.scrollAreaWidgetContents_3
+    @Slot(int)
+    def change_width(self, value: int):
+        self.board.size[0] = value
+        print(self.board.size)
 
-        # It might have an old absolute-positioned widget (verticalLayoutWidget_4)
-        old_widget = self.ui.verticalLayoutWidget_4
-        # We'll take its layout items? Actually it has a layout but it's empty.
-        # We'll just create a new layout on the container and add items directly.
-        # Delete the old widget
-        old_widget.deleteLater()
+    @Slot(int)
+    def change_height(self, value: int):
+        self.board.size[1] = value
+        print(self.board.size)
 
-        # Create a layout on the container
-        layout = QVBoxLayout(container)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(5)
-
-        # Store for later population
-        self.pieces_layout = layout
-
-        # Ensure resizable
-        self.ui.scrollArea_3.setWidgetResizable(True)
-
-    def fix_teams_scroll_area(self):
-        """Make the Teams scroll area (scrollArea_2) work."""
-        container = self.ui.scrollAreaWidgetContents_2
-        # It has no children yet, just create a layout
-        layout = QVBoxLayout(container)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(5)
-
-        self.teams_layout = layout
-        self.ui.scrollArea_2.setWidgetResizable(True)
-
-    def populate_pieces(self):
-        """Add 30 sample piece entries to the Pieces scroll area."""
-        for i in range(30):
-            # Create a row: piece name + button
-            row = QWidget()
-            row_layout = QHBoxLayout(row)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-            label = QLabel(f"Piece {i+1}")
-            btn = QPushButton("Select")
-            row_layout.addWidget(label)
-            row_layout.addWidget(btn)
-            self.pieces_layout.addWidget(row)
-
-    def populate_teams(self):
-        """Add 20 sample team entries to the Teams scroll area."""
-        for i in range(20):
-            row = QWidget()
-            row_layout = QHBoxLayout(row)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-            name_edit = QLineEdit(f"Team {i+1}")
-            color_btn = QPushButton("Pick Color")
-            row_layout.addWidget(name_edit)
-            row_layout.addWidget(color_btn)
-            self.teams_layout.addWidget(row)
 
 
 if __name__ == '__main__':
@@ -120,5 +69,7 @@ if __name__ == '__main__':
     # Create and show the form
     main_window = Window()
     main_window.show()
+    main_window.make_board()
+
     # Run the main Qt loop
     sys.exit(app.exec())

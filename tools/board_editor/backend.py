@@ -42,11 +42,11 @@ class Team:
 
 class Board:
     pieces: List[Piece]
-    board_size: int[2]
+    size: List[int]
     teams: List[Team]
 
-    def __init__(self, size: int[2] = (0, 0)):
-        self.board_size = size
+    def __init__(self, size = [0, 0]):
+        self.size = size
         self.pieces = []
         self.teams = []
 
@@ -63,7 +63,7 @@ class Board:
     def get_dict(self):
         return {
             "pieces": [pi.get_dict() for pi in self.pieces],
-            "board_size": self.board_size,
+            "board_size": self.size,
             "teams": [te.__dict__ for te in self.teams],
         }
 

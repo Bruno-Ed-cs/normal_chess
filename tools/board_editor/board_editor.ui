@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>BoardEditor</class>
+ <widget class="QMainWindow" name="BoardEditor">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>906</width>
-    <height>857</height>
+    <height>910</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <layout class="QGridLayout" name="gridLayout">
       <item row="1" column="1">
-       <widget class="QGraphicsView" name="graphicsView"/>
+       <widget class="QGraphicsView" name="BoardCanva"/>
       </item>
       <item row="1" column="0">
        <widget class="QScrollArea" name="scrollArea">
@@ -52,7 +52,7 @@
            <x>0</x>
            <y>0</y>
            <width>384</width>
-           <height>787</height>
+           <height>840</height>
           </rect>
          </property>
          <widget class="QWidget" name="verticalLayoutWidget_3">
@@ -66,7 +66,7 @@
           </property>
           <layout class="QVBoxLayout" name="scrollBox">
            <item>
-            <widget class="QGroupBox" name="groupBox">
+            <widget class="QGroupBox" name="BoardSizeBox">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -93,30 +93,30 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <layout class="QHBoxLayout" name="WidthLayout">
                  <item>
-                  <widget class="QLabel" name="label_2">
+                  <widget class="QLabel" name="label_width">
                    <property name="text">
                     <string>Width</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_2"/>
+                  <widget class="QSpinBox" name="spinBox_width"/>
                  </item>
                 </layout>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout">
+                <layout class="QHBoxLayout" name="HeightLayout">
                  <item>
-                  <widget class="QLabel" name="label">
+                  <widget class="QLabel" name="label_height">
                    <property name="text">
                     <string>Height</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox"/>
+                  <widget class="QSpinBox" name="spinBox_height"/>
                  </item>
                 </layout>
                </item>
@@ -125,54 +125,48 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_3">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>300</height>
-              </size>
-             </property>
+            <widget class="QGroupBox" name="PiecesBox">
              <property name="title">
               <string>Pieces</string>
              </property>
-             <widget class="QScrollArea" name="scrollArea_3">
+             <widget class="QScrollArea" name="PiecesScroll">
               <property name="geometry">
                <rect>
                 <x>10</x>
                 <y>30</y>
                 <width>351</width>
-                <height>351</height>
+                <height>361</height>
                </rect>
               </property>
               <property name="widgetResizable">
                <bool>true</bool>
               </property>
-              <widget class="QWidget" name="scrollAreaWidgetContents_3">
+              <widget class="QWidget" name="scrollAreaWidgetContents_2">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
                  <width>349</width>
-                 <height>349</height>
+                 <height>359</height>
                 </rect>
                </property>
                <widget class="QWidget" name="verticalLayoutWidget_4">
                 <property name="geometry">
                  <rect>
-                  <x>10</x>
-                  <y>10</y>
-                  <width>331</width>
-                  <height>331</height>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>341</width>
+                  <height>351</height>
                  </rect>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_6"/>
+                <layout class="QVBoxLayout" name="PiecesContainer"/>
                </widget>
               </widget>
              </widget>
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_2">
+            <widget class="QGroupBox" name="TeamsBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -197,9 +191,9 @@
                 <height>232</height>
                </rect>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_3">
+              <layout class="QVBoxLayout" name="TeamsLayout">
                <item>
-                <widget class="QScrollArea" name="scrollArea_2">
+                <widget class="QScrollArea" name="TeamsScrollArea">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -215,7 +209,7 @@
                  <property name="widgetResizable">
                   <bool>true</bool>
                  </property>
-                 <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                 <widget class="QWidget" name="TeamsContainer">
                   <property name="geometry">
                    <rect>
                     <x>0</x>
@@ -262,6 +256,7 @@
     </property>
     <addaction name="actionSave"/>
     <addaction name="actionLoad"/>
+    <addaction name="actionNew"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -274,6 +269,11 @@
   <action name="actionLoad">
    <property name="text">
     <string>Load</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
    </property>
   </action>
  </widget>
