@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MakeTeamDialog</class>
- <widget class="QDialog" name="MakeTeamDialog">
+ <class>MakeTeam</class>
+ <widget class="QDialog" name="MakeTeam">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -47,7 +47,7 @@
     <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -65,11 +65,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="lineEdit"/>
+     <widget class="QLineEdit" name="nameEdit"/>
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -80,10 +80,24 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="3" column="1">
-     <widget class="QSpinBox" name="spinBox"/>
+     <widget class="QSpinBox" name="marchSpinX">
+      <property name="minimum">
+       <number>-1</number>
+      </property>
+      <property name="maximum">
+       <number>1</number>
+      </property>
+     </widget>
     </item>
     <item row="5" column="1">
-     <widget class="QSpinBox" name="spinBox_2"/>
+     <widget class="QSpinBox" name="marchSpinY">
+      <property name="minimum">
+       <number>-1</number>
+      </property>
+      <property name="maximum">
+       <number>1</number>
+      </property>
+     </widget>
     </item>
     <item row="3" column="0">
      <widget class="QLabel" name="label_5">
@@ -108,7 +122,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>250</x>
@@ -126,7 +140,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_6">
+     <widget class="QLabel" name="colorDisplay">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -154,7 +168,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="colorButton">
       <property name="text">
        <string>Pick Color</string>
       </property>
@@ -168,7 +182,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>MakeTeamDialog</receiver>
+   <receiver>MakeTeam</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -184,7 +198,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>MakeTeamDialog</receiver>
+   <receiver>MakeTeam</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

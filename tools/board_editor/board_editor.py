@@ -18,9 +18,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QGraphicsView, QGridLayout,
     QGroupBox, QHBoxLayout, QLabel, QLayout,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QScrollArea, QSizePolicy, QSpinBox, QStatusBar,
-    QVBoxLayout, QWidget)
+    QListWidget, QListWidgetItem, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QScrollArea, QSizePolicy,
+    QSpinBox, QStatusBar, QVBoxLayout, QWidget)
 
 class Ui_BoardEditor(object):
     def setupUi(self, BoardEditor):
@@ -148,30 +148,28 @@ class Ui_BoardEditor(object):
         sizePolicy1.setHeightForWidth(self.TeamsBox.sizePolicy().hasHeightForWidth())
         self.TeamsBox.setSizePolicy(sizePolicy1)
         self.TeamsBox.setMinimumSize(QSize(0, 0))
+        self.TeamsBox.setFlat(False)
+        self.TeamsBox.setCheckable(False)
         self.verticalLayout_6 = QVBoxLayout(self.TeamsBox)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.TeamsList = QListWidget(self.TeamsBox)
+        self.TeamsList.setObjectName(u"TeamsList")
+        self.TeamsList.setSpacing(10)
+        self.TeamsList.setWordWrap(True)
+
+        self.verticalLayout_6.addWidget(self.TeamsList)
+
         self.TeamsLayout = QVBoxLayout()
         self.TeamsLayout.setObjectName(u"TeamsLayout")
-        self.TeamsScrollArea = QScrollArea(self.TeamsBox)
-        self.TeamsScrollArea.setObjectName(u"TeamsScrollArea")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.TeamsScrollArea.sizePolicy().hasHeightForWidth())
-        self.TeamsScrollArea.setSizePolicy(sizePolicy2)
-        self.TeamsScrollArea.setMinimumSize(QSize(0, 0))
-        self.TeamsScrollArea.setWidgetResizable(True)
-        self.TeamsContainer = QWidget()
-        self.TeamsContainer.setObjectName(u"TeamsContainer")
-        self.TeamsContainer.setGeometry(QRect(0, 0, 350, 246))
-        self.TeamsScrollArea.setWidget(self.TeamsContainer)
+        self.newTeamButton = QPushButton(self.TeamsBox)
+        self.newTeamButton.setObjectName(u"newTeamButton")
 
-        self.TeamsLayout.addWidget(self.TeamsScrollArea)
+        self.TeamsLayout.addWidget(self.newTeamButton)
 
-        self.pushButton = QPushButton(self.TeamsBox)
-        self.pushButton.setObjectName(u"pushButton")
+        self.removeTeamButton = QPushButton(self.TeamsBox)
+        self.removeTeamButton.setObjectName(u"removeTeamButton")
 
-        self.TeamsLayout.addWidget(self.pushButton)
+        self.TeamsLayout.addWidget(self.removeTeamButton)
 
 
         self.verticalLayout_6.addLayout(self.TeamsLayout)
@@ -220,7 +218,8 @@ class Ui_BoardEditor(object):
         self.label_height.setText(QCoreApplication.translate("BoardEditor", u"Height", None))
         self.PiecesBox.setTitle(QCoreApplication.translate("BoardEditor", u"Pieces", None))
         self.TeamsBox.setTitle(QCoreApplication.translate("BoardEditor", u"Teams", None))
-        self.pushButton.setText(QCoreApplication.translate("BoardEditor", u"New team", None))
+        self.newTeamButton.setText(QCoreApplication.translate("BoardEditor", u"New team", None))
+        self.removeTeamButton.setText(QCoreApplication.translate("BoardEditor", u"Remove team", None))
         self.menuFile.setTitle(QCoreApplication.translate("BoardEditor", u"File", None))
     # retranslateUi
 

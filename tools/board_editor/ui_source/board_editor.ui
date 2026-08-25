@@ -201,42 +201,36 @@
               <property name="title">
                <string>Teams</string>
               </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
+               <item>
+                <widget class="QListWidget" name="TeamsList">
+                 <property name="spacing">
+                  <number>10</number>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <layout class="QVBoxLayout" name="TeamsLayout">
                  <item>
-                  <widget class="QScrollArea" name="TeamsScrollArea">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
+                  <widget class="QPushButton" name="newTeamButton">
+                   <property name="text">
+                    <string>New team</string>
                    </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="widgetResizable">
-                    <bool>true</bool>
-                   </property>
-                   <widget class="QWidget" name="TeamsContainer">
-                    <property name="geometry">
-                     <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>350</width>
-                      <height>246</height>
-                     </rect>
-                    </property>
-                   </widget>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton">
+                  <widget class="QPushButton" name="removeTeamButton">
                    <property name="text">
-                    <string>New team</string>
+                    <string>Remove team</string>
                    </property>
                   </widget>
                  </item>

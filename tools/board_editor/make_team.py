@@ -20,113 +20,117 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogBu
     QPushButton, QSizePolicy, QSpinBox, QVBoxLayout,
     QWidget)
 
-class Ui_MakeTeamDialog(object):
-    def setupUi(self, MakeTeamDialog):
-        if not MakeTeamDialog.objectName():
-            MakeTeamDialog.setObjectName(u"MakeTeamDialog")
-        MakeTeamDialog.resize(400, 300)
+class Ui_MakeTeam(object):
+    def setupUi(self, MakeTeam):
+        if not MakeTeam.objectName():
+            MakeTeam.setObjectName(u"MakeTeam")
+        MakeTeam.resize(400, 300)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(MakeTeamDialog.sizePolicy().hasHeightForWidth())
-        MakeTeamDialog.setSizePolicy(sizePolicy)
-        MakeTeamDialog.setMinimumSize(QSize(400, 300))
-        MakeTeamDialog.setMaximumSize(QSize(400, 300))
-        self.buttonBox = QDialogButtonBox(MakeTeamDialog)
+        sizePolicy.setHeightForWidth(MakeTeam.sizePolicy().hasHeightForWidth())
+        MakeTeam.setSizePolicy(sizePolicy)
+        MakeTeam.setMinimumSize(QSize(400, 300))
+        MakeTeam.setMaximumSize(QSize(400, 300))
+        self.buttonBox = QDialogButtonBox(MakeTeam)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setGeometry(QRect(50, 250, 341, 32))
         self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
-        self.widget = QWidget(MakeTeamDialog)
-        self.widget.setObjectName(u"widget")
-        self.widget.setGeometry(QRect(30, 20, 341, 54))
-        self.verticalLayout = QVBoxLayout(self.widget)
+        self.layoutWidget = QWidget(MakeTeam)
+        self.layoutWidget.setObjectName(u"layoutWidget")
+        self.layoutWidget.setGeometry(QRect(30, 20, 341, 54))
+        self.verticalLayout = QVBoxLayout(self.layoutWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.label_2 = QLabel(self.widget)
+        self.label_2 = QLabel(self.layoutWidget)
         self.label_2.setObjectName(u"label_2")
 
         self.verticalLayout.addWidget(self.label_2)
 
-        self.lineEdit = QLineEdit(self.widget)
-        self.lineEdit.setObjectName(u"lineEdit")
+        self.nameEdit = QLineEdit(self.layoutWidget)
+        self.nameEdit.setObjectName(u"nameEdit")
 
-        self.verticalLayout.addWidget(self.lineEdit)
+        self.verticalLayout.addWidget(self.nameEdit)
 
-        self.widget1 = QWidget(MakeTeamDialog)
-        self.widget1.setObjectName(u"widget1")
-        self.widget1.setGeometry(QRect(30, 80, 151, 91))
-        self.gridLayout = QGridLayout(self.widget1)
+        self.layoutWidget1 = QWidget(MakeTeam)
+        self.layoutWidget1.setObjectName(u"layoutWidget1")
+        self.layoutWidget1.setGeometry(QRect(30, 80, 151, 91))
+        self.gridLayout = QGridLayout(self.layoutWidget1)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.spinBox = QSpinBox(self.widget1)
-        self.spinBox.setObjectName(u"spinBox")
+        self.marchSpinX = QSpinBox(self.layoutWidget1)
+        self.marchSpinX.setObjectName(u"marchSpinX")
+        self.marchSpinX.setMinimum(-1)
+        self.marchSpinX.setMaximum(1)
 
-        self.gridLayout.addWidget(self.spinBox, 3, 1, 1, 1)
+        self.gridLayout.addWidget(self.marchSpinX, 3, 1, 1, 1)
 
-        self.spinBox_2 = QSpinBox(self.widget1)
-        self.spinBox_2.setObjectName(u"spinBox_2")
+        self.marchSpinY = QSpinBox(self.layoutWidget1)
+        self.marchSpinY.setObjectName(u"marchSpinY")
+        self.marchSpinY.setMinimum(-1)
+        self.marchSpinY.setMaximum(1)
 
-        self.gridLayout.addWidget(self.spinBox_2, 5, 1, 1, 1)
+        self.gridLayout.addWidget(self.marchSpinY, 5, 1, 1, 1)
 
-        self.label_5 = QLabel(self.widget1)
+        self.label_5 = QLabel(self.layoutWidget1)
         self.label_5.setObjectName(u"label_5")
 
         self.gridLayout.addWidget(self.label_5, 3, 0, 1, 1)
 
-        self.label_3 = QLabel(self.widget1)
+        self.label_3 = QLabel(self.layoutWidget1)
         self.label_3.setObjectName(u"label_3")
 
         self.gridLayout.addWidget(self.label_3, 2, 0, 1, 1)
 
-        self.label_4 = QLabel(self.widget1)
+        self.label_4 = QLabel(self.layoutWidget1)
         self.label_4.setObjectName(u"label_4")
 
         self.gridLayout.addWidget(self.label_4, 5, 0, 1, 1)
 
-        self.widget2 = QWidget(MakeTeamDialog)
-        self.widget2.setObjectName(u"widget2")
-        self.widget2.setGeometry(QRect(250, 80, 102, 160))
-        self.verticalLayout_2 = QVBoxLayout(self.widget2)
+        self.layoutWidget2 = QWidget(MakeTeam)
+        self.layoutWidget2.setObjectName(u"layoutWidget2")
+        self.layoutWidget2.setGeometry(QRect(250, 80, 102, 160))
+        self.verticalLayout_2 = QVBoxLayout(self.layoutWidget2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.label = QLabel(self.widget2)
+        self.label = QLabel(self.layoutWidget2)
         self.label.setObjectName(u"label")
 
         self.verticalLayout_2.addWidget(self.label)
 
-        self.label_6 = QLabel(self.widget2)
-        self.label_6.setObjectName(u"label_6")
-        sizePolicy.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
-        self.label_6.setSizePolicy(sizePolicy)
-        self.label_6.setMinimumSize(QSize(80, 80))
-        self.label_6.setAutoFillBackground(True)
-        self.label_6.setFrameShape(QFrame.Shape.Box)
-        self.label_6.setFrameShadow(QFrame.Shadow.Raised)
+        self.colorDisplay = QLabel(self.layoutWidget2)
+        self.colorDisplay.setObjectName(u"colorDisplay")
+        sizePolicy.setHeightForWidth(self.colorDisplay.sizePolicy().hasHeightForWidth())
+        self.colorDisplay.setSizePolicy(sizePolicy)
+        self.colorDisplay.setMinimumSize(QSize(80, 80))
+        self.colorDisplay.setAutoFillBackground(True)
+        self.colorDisplay.setFrameShape(QFrame.Shape.Box)
+        self.colorDisplay.setFrameShadow(QFrame.Shadow.Raised)
 
-        self.verticalLayout_2.addWidget(self.label_6)
+        self.verticalLayout_2.addWidget(self.colorDisplay)
 
-        self.pushButton = QPushButton(self.widget2)
-        self.pushButton.setObjectName(u"pushButton")
+        self.colorButton = QPushButton(self.layoutWidget2)
+        self.colorButton.setObjectName(u"colorButton")
 
-        self.verticalLayout_2.addWidget(self.pushButton)
+        self.verticalLayout_2.addWidget(self.colorButton)
 
 
-        self.retranslateUi(MakeTeamDialog)
-        self.buttonBox.accepted.connect(MakeTeamDialog.accept)
-        self.buttonBox.rejected.connect(MakeTeamDialog.reject)
+        self.retranslateUi(MakeTeam)
+        self.buttonBox.accepted.connect(MakeTeam.accept)
+        self.buttonBox.rejected.connect(MakeTeam.reject)
 
-        QMetaObject.connectSlotsByName(MakeTeamDialog)
+        QMetaObject.connectSlotsByName(MakeTeam)
     # setupUi
 
-    def retranslateUi(self, MakeTeamDialog):
-        MakeTeamDialog.setWindowTitle(QCoreApplication.translate("MakeTeamDialog", u"Make team", None))
-        self.label_2.setText(QCoreApplication.translate("MakeTeamDialog", u"Name:", None))
-        self.label_5.setText(QCoreApplication.translate("MakeTeamDialog", u"X:", None))
-        self.label_3.setText(QCoreApplication.translate("MakeTeamDialog", u"March", None))
-        self.label_4.setText(QCoreApplication.translate("MakeTeamDialog", u"Y:", None))
-        self.label.setText(QCoreApplication.translate("MakeTeamDialog", u"Color:", None))
-        self.label_6.setText("")
-        self.pushButton.setText(QCoreApplication.translate("MakeTeamDialog", u"Pick Color", None))
+    def retranslateUi(self, MakeTeam):
+        MakeTeam.setWindowTitle(QCoreApplication.translate("MakeTeam", u"Make team", None))
+        self.label_2.setText(QCoreApplication.translate("MakeTeam", u"Name:", None))
+        self.label_5.setText(QCoreApplication.translate("MakeTeam", u"X:", None))
+        self.label_3.setText(QCoreApplication.translate("MakeTeam", u"March", None))
+        self.label_4.setText(QCoreApplication.translate("MakeTeam", u"Y:", None))
+        self.label.setText(QCoreApplication.translate("MakeTeam", u"Color:", None))
+        self.colorDisplay.setText("")
+        self.colorButton.setText(QCoreApplication.translate("MakeTeam", u"Pick Color", None))
     # retranslateUi
 
