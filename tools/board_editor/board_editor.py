@@ -44,17 +44,17 @@ class Ui_BoardEditor(object):
 
         self.gridLayout.addWidget(self.BoardCanva, 1, 1, 1, 1)
 
-        self.scrollArea = QScrollArea(self.centralwidget)
-        self.scrollArea.setObjectName(u"scrollArea")
-        self.scrollArea.setMinimumSize(QSize(400, 0))
-        self.scrollArea.setMaximumSize(QSize(400, 16777215))
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.scrollArea.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContentsOnFirstShow)
-        self.scrollArea.setWidgetResizable(True)
+        self.ControlsScroll = QScrollArea(self.centralwidget)
+        self.ControlsScroll.setObjectName(u"ControlsScroll")
+        self.ControlsScroll.setMinimumSize(QSize(400, 0))
+        self.ControlsScroll.setMaximumSize(QSize(400, 16777215))
+        self.ControlsScroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.ControlsScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.ControlsScroll.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContentsOnFirstShow)
+        self.ControlsScroll.setWidgetResizable(True)
         self.scrollContent = QWidget()
         self.scrollContent.setObjectName(u"scrollContent")
-        self.scrollContent.setGeometry(QRect(0, 0, 384, 840))
+        self.scrollContent.setGeometry(QRect(0, 0, 398, 840))
         self.verticalLayout_4 = QVBoxLayout(self.scrollContent)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.scrollBox = QVBoxLayout()
@@ -76,6 +76,7 @@ class Ui_BoardEditor(object):
 
         self.spinBox_width = QSpinBox(self.BoardSizeBox)
         self.spinBox_width.setObjectName(u"spinBox_width")
+        self.spinBox_width.setMinimum(1)
         self.spinBox_width.setMaximum(500)
 
         self.WidthLayout.addWidget(self.spinBox_width)
@@ -92,6 +93,7 @@ class Ui_BoardEditor(object):
 
         self.spinBox_height = QSpinBox(self.BoardSizeBox)
         self.spinBox_height.setObjectName(u"spinBox_height")
+        self.spinBox_height.setMinimum(1)
         self.spinBox_height.setMaximum(500)
 
         self.HeightLayout.addWidget(self.spinBox_height)
@@ -116,7 +118,7 @@ class Ui_BoardEditor(object):
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
         self.scrollAreaWidgetContents_2.setEnabled(True)
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 338, 281))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 352, 281))
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -145,7 +147,7 @@ class Ui_BoardEditor(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.TeamsBox.sizePolicy().hasHeightForWidth())
         self.TeamsBox.setSizePolicy(sizePolicy1)
-        self.TeamsBox.setMinimumSize(QSize(0, 300))
+        self.TeamsBox.setMinimumSize(QSize(0, 0))
         self.verticalLayout_6 = QVBoxLayout(self.TeamsBox)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.TeamsLayout = QVBoxLayout()
@@ -157,11 +159,11 @@ class Ui_BoardEditor(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.TeamsScrollArea.sizePolicy().hasHeightForWidth())
         self.TeamsScrollArea.setSizePolicy(sizePolicy2)
-        self.TeamsScrollArea.setMinimumSize(QSize(0, 150))
+        self.TeamsScrollArea.setMinimumSize(QSize(0, 0))
         self.TeamsScrollArea.setWidgetResizable(True)
         self.TeamsContainer = QWidget()
         self.TeamsContainer.setObjectName(u"TeamsContainer")
-        self.TeamsContainer.setGeometry(QRect(0, 0, 336, 246))
+        self.TeamsContainer.setGeometry(QRect(0, 0, 350, 246))
         self.TeamsScrollArea.setWidget(self.TeamsContainer)
 
         self.TeamsLayout.addWidget(self.TeamsScrollArea)
@@ -180,9 +182,9 @@ class Ui_BoardEditor(object):
 
         self.verticalLayout_4.addLayout(self.scrollBox)
 
-        self.scrollArea.setWidget(self.scrollContent)
+        self.ControlsScroll.setWidget(self.scrollContent)
 
-        self.gridLayout.addWidget(self.scrollArea, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.ControlsScroll, 1, 0, 1, 1)
 
 
         self.verticalLayout.addLayout(self.gridLayout)

@@ -1,4 +1,5 @@
 import sys
+import json
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QKeySequence
@@ -49,12 +50,22 @@ class Window(QMainWindow):
         self.new_board_ui = NewBoardDialog(self)
 
         # Conectar as spin boxes principais
+
         self.main_ui.spinBox_width.valueChanged.connect(self.change_width)
         self.main_ui.spinBox_height.valueChanged.connect(self.change_height)
 
         # Conectando as ações
-        self.main_ui.actionNew.triggered.connect(self.make_board)
-        self.main_ui.actionNew.setShortcut(QKeySequence.StandardKey.New)
+        action_new = self.main_ui.actionNew
+        action_new.triggered.connect(self.make_board)
+        action_new.setShortcut(QKeySequence.StandardKey.New)
+
+        action_load = self.main_ui.actionLoad
+        action_load.triggered.connect(self.load_board)
+        action_load.setShortcut(QKeySequence.StandardKey.Open)
+
+        action_save = self.main_ui.actionSave
+        action_save.triggered.connect(self.save_board)
+        action_save.setShortcut(QKeySequence.StandardKey.Save)
 
         # Botões de pecas
         for role in Roles:
@@ -63,6 +74,34 @@ class Window(QMainWindow):
             if role == Roles.pawn:
                 button.setChecked(True)
             self.main_ui.PiecesContainer.addWidget(button)
+
+    @Slot()
+    def save_board(self):
+        filepath, _ = QFileDialog.getSaveFileName(
+                self,
+                "Save Board",
+                "",
+                "Board files (*.json)"
+        )
+
+        if filepath:
+            self.board.save_to_file(filepath)
+            self.sync_board()
+
+    @Slot()
+    def load_board(self):
+        filepath, _ = QFileDialog.getOpenFileName(
+                self,
+                "Select board file",
+                "",
+                "Board files (*.json)"
+        )
+
+        if filepath:
+            with open(filepath, "r") as file:
+                data = json.load(file)
+                self.board.load_from_json(data)
+            self.sync_board()
 
 
     @Slot(bool)

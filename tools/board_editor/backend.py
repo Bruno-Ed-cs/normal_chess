@@ -57,12 +57,12 @@ class Board:
         self.teams = []
 
     def load_from_json(self, json_data: dict):
-        self.board_size = json_data["board_size"]
-        print(self.board_size)
+        self.size = json_data["board_size"]
+        # print(self.size)
         self.pieces = [Piece(p["position"], p["team"], Roles[p["class"]]) for p in json_data["pieces"]]
-        print(self.pieces)
+        # print(self.pieces)
         self.teams = [Team(t.get("color"), t.get("name"), t.get("march")) for t in json_data.get("teams")]
-        print(self.teams)
+        # print(self.teams)
 
         return self
 

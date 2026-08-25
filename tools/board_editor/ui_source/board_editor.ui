@@ -21,7 +21,7 @@
        <widget class="QGraphicsView" name="BoardCanva"/>
       </item>
       <item row="1" column="0">
-       <widget class="QScrollArea" name="scrollArea">
+       <widget class="QScrollArea" name="ControlsScroll">
         <property name="minimumSize">
          <size>
           <width>400</width>
@@ -35,7 +35,7 @@
          </size>
         </property>
         <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
+         <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
         </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
@@ -51,7 +51,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>384</width>
+           <width>398</width>
            <height>840</height>
           </rect>
          </property>
@@ -89,6 +89,9 @@
                    </item>
                    <item>
                     <widget class="QSpinBox" name="spinBox_width">
+                     <property name="minimum">
+                      <number>1</number>
+                     </property>
                      <property name="maximum">
                       <number>500</number>
                      </property>
@@ -107,6 +110,9 @@
                    </item>
                    <item>
                     <widget class="QSpinBox" name="spinBox_height">
+                     <property name="minimum">
+                      <number>1</number>
+                     </property>
                      <property name="maximum">
                       <number>500</number>
                      </property>
@@ -141,7 +147,7 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>338</width>
+                    <width>352</width>
                     <height>281</height>
                    </rect>
                   </property>
@@ -189,7 +195,7 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>300</height>
+                <height>0</height>
                </size>
               </property>
               <property name="title">
@@ -209,7 +215,7 @@
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>150</height>
+                     <height>0</height>
                     </size>
                    </property>
                    <property name="widgetResizable">
@@ -220,7 +226,7 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>336</width>
+                      <width>350</width>
                       <height>246</height>
                      </rect>
                     </property>
