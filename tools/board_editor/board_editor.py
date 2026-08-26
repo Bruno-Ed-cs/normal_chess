@@ -20,13 +20,14 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QGraphicsView,
     QGroupBox, QHBoxLayout, QLabel, QLayout,
     QListWidget, QListWidgetItem, QMainWindow, QMenu,
     QMenuBar, QPushButton, QScrollArea, QSizePolicy,
-    QSpinBox, QStatusBar, QVBoxLayout, QWidget)
+    QSlider, QSpacerItem, QSpinBox, QStatusBar,
+    QToolButton, QVBoxLayout, QWidget)
 
 class Ui_BoardEditor(object):
     def setupUi(self, BoardEditor):
         if not BoardEditor.objectName():
             BoardEditor.setObjectName(u"BoardEditor")
-        BoardEditor.resize(906, 910)
+        BoardEditor.resize(1034, 942)
         self.actionSave = QAction(BoardEditor)
         self.actionSave.setObjectName(u"actionSave")
         self.actionLoad = QAction(BoardEditor)
@@ -35,15 +36,10 @@ class Ui_BoardEditor(object):
         self.actionNew.setObjectName(u"actionNew")
         self.centralwidget = QWidget(BoardEditor)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.verticalLayout = QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.horizontalLayout_2 = QHBoxLayout(self.centralwidget)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
-        self.BoardCanva = QGraphicsView(self.centralwidget)
-        self.BoardCanva.setObjectName(u"BoardCanva")
-
-        self.gridLayout.addWidget(self.BoardCanva, 1, 1, 1, 1)
-
         self.ControlsScroll = QScrollArea(self.centralwidget)
         self.ControlsScroll.setObjectName(u"ControlsScroll")
         self.ControlsScroll.setMinimumSize(QSize(400, 0))
@@ -54,7 +50,7 @@ class Ui_BoardEditor(object):
         self.ControlsScroll.setWidgetResizable(True)
         self.scrollContent = QWidget()
         self.scrollContent.setObjectName(u"scrollContent")
-        self.scrollContent.setGeometry(QRect(0, 0, 398, 840))
+        self.scrollContent.setGeometry(QRect(0, 0, 398, 872))
         self.verticalLayout_4 = QVBoxLayout(self.scrollContent)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.scrollBox = QVBoxLayout()
@@ -109,6 +105,7 @@ class Ui_BoardEditor(object):
 
         self.PiecesBox = QGroupBox(self.scrollContent)
         self.PiecesBox.setObjectName(u"PiecesBox")
+        self.PiecesBox.setMinimumSize(QSize(0, 250))
         self.verticalLayout_5 = QVBoxLayout(self.PiecesBox)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.PiecesScroll = QScrollArea(self.PiecesBox)
@@ -118,7 +115,7 @@ class Ui_BoardEditor(object):
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
         self.scrollAreaWidgetContents_2.setEnabled(True)
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 352, 281))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 352, 297))
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -184,13 +181,75 @@ class Ui_BoardEditor(object):
 
         self.gridLayout.addWidget(self.ControlsScroll, 1, 0, 1, 1)
 
+        self.verticalLayout_8 = QVBoxLayout()
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.boardCanva = QGraphicsView(self.centralwidget)
+        self.boardCanva.setObjectName(u"boardCanva")
+        self.boardCanva.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
+        self.boardCanva.setTransformationAnchor(QGraphicsView.ViewportAnchor.NoAnchor)
+        self.boardCanva.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorViewCenter)
 
-        self.verticalLayout.addLayout(self.gridLayout)
+        self.verticalLayout_8.addWidget(self.boardCanva)
+
+        self.groupBox = QGroupBox(self.centralwidget)
+        self.groupBox.setObjectName(u"groupBox")
+        self.groupBox.setMinimumSize(QSize(0, 80))
+        self.groupBox.setFlat(True)
+        self.horizontalLayout_4 = QHBoxLayout(self.groupBox)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.zoomOut = QToolButton(self.groupBox)
+        self.zoomOut.setObjectName(u"zoomOut")
+        self.zoomOut.setText(u"")
+        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.ZoomOut))
+        self.zoomOut.setIcon(icon)
+        self.zoomOut.setAutoRepeat(True)
+
+        self.horizontalLayout_3.addWidget(self.zoomOut)
+
+        self.zoomIn = QToolButton(self.groupBox)
+        self.zoomIn.setObjectName(u"zoomIn")
+        icon1 = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.ZoomIn))
+        self.zoomIn.setIcon(icon1)
+        self.zoomIn.setAutoRepeat(True)
+
+        self.horizontalLayout_3.addWidget(self.zoomIn)
+
+        self.zoomSlider = QSlider(self.groupBox)
+        self.zoomSlider.setObjectName(u"zoomSlider")
+        self.zoomSlider.setMinimum(1)
+        self.zoomSlider.setMaximum(100)
+        self.zoomSlider.setValue(1)
+        self.zoomSlider.setOrientation(Qt.Orientation.Horizontal)
+
+        self.horizontalLayout_3.addWidget(self.zoomSlider)
+
+        self.zoomPercent = QLabel(self.groupBox)
+        self.zoomPercent.setObjectName(u"zoomPercent")
+
+        self.horizontalLayout_3.addWidget(self.zoomPercent)
+
+
+        self.horizontalLayout_4.addLayout(self.horizontalLayout_3)
+
+
+        self.verticalLayout_8.addWidget(self.groupBox)
+
+
+        self.gridLayout.addLayout(self.verticalLayout_8, 1, 1, 1, 1)
+
+
+        self.horizontalLayout_2.addLayout(self.gridLayout)
 
         BoardEditor.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(BoardEditor)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 906, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1034, 24))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         BoardEditor.setMenuBar(self.menubar)
@@ -220,6 +279,8 @@ class Ui_BoardEditor(object):
         self.TeamsBox.setTitle(QCoreApplication.translate("BoardEditor", u"Teams", None))
         self.newTeamButton.setText(QCoreApplication.translate("BoardEditor", u"New team", None))
         self.removeTeamButton.setText(QCoreApplication.translate("BoardEditor", u"Remove team", None))
+        self.zoomIn.setText("")
+        self.zoomPercent.setText(QCoreApplication.translate("BoardEditor", u"0%", None))
         self.menuFile.setTitle(QCoreApplication.translate("BoardEditor", u"File", None))
     # retranslateUi
 

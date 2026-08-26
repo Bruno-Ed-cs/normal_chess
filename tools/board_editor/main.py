@@ -1,13 +1,22 @@
 import sys
+import math
 import json
 from PySide6.QtWidgets import *
-from PySide6.QtCore import Slot
-from PySide6.QtGui import QKeySequence, QColor, QPixmap
+from PySide6.QtCore import Slot, Qt
+from PySide6.QtGui import QKeySequence, QColor, QPixmap, QPen, QBrush
 
 from backend import Board, Roles, Team
 from board_editor import Ui_BoardEditor
 from new_board import Ui_NewBoard
 from make_team import Ui_MakeTeam
+
+def clamp(n, min, max):
+    if n < min:
+        return min
+    elif n > max:
+        return max
+    else:
+        return n
 
 class MakeTeamDialog(QDialog, Ui_MakeTeam):
 
@@ -97,6 +106,7 @@ class Window(QMainWindow):
         self.board = Board()
         self.selected_role = Roles.pawn
         self.board.teams.append(Team([23, 44, 55, 1], "White", [0, 1]))
+
         print(self.board.teams)
 
         # Carregar interface
@@ -104,6 +114,7 @@ class Window(QMainWindow):
         self.main_ui.setupUi(self)
 
         self.new_board_ui = NewBoardDialog(self)
+
 
         # Conectar as spin boxes principais
 
@@ -133,7 +144,42 @@ class Window(QMainWindow):
 
         self.main_ui.removeTeamButton.clicked.connect(self.remove_team)
         self.main_ui.newTeamButton.clicked.connect(self.new_team)
+
+        #setando a cena de renderização
+        self.scene = QGraphicsScene()
+        self.scene.setBackgroundBrush((QBrush(Qt.GlobalColor.gray)))
+
+        self.main_ui.boardCanva.setScene(self.scene)
+
+        #controles do canva
+        self.max_zoom = 3.5
+        self.main_ui.zoomIn.clicked.connect(self.zoom_in)
+        self.main_ui.zoomOut.clicked.connect(self.zoom_out)
+        self.main_ui.zoomSlider.valueChanged.connect(self.change_zoom)
+        self.main_ui.zoomSlider.valueChanged.connect(self.update_percent)
+        self.main_ui.zoomSlider.setValue(10)
+
         self.sync_board()
+
+    @Slot(int)
+    def update_percent(self, val: int):
+        self.main_ui.zoomPercent.setText(f"{val}%")
+
+    @Slot()
+    def zoom_in(self):
+        value = self.main_ui.zoomSlider.value()
+        self.main_ui.zoomSlider.setValue(value + 5)
+
+    @Slot()
+    def zoom_out(self):
+        value = self.main_ui.zoomSlider.value()
+        self.main_ui.zoomSlider.setValue(value - 5)
+
+    @Slot(int)
+    def change_zoom(self, val):
+        self.main_ui.boardCanva.resetTransform()
+        zoom = (val / 100) * self.max_zoom
+        self.main_ui.boardCanva.scale(zoom, zoom)
 
     @Slot()
     def new_team(self):
@@ -206,6 +252,29 @@ class Window(QMainWindow):
 
             if not exists:
                 team_list.addItem(item)
+
+        black = True
+        self.scene.clear()
+
+        for y in range(self.board.size[1]):
+
+            if self.board.size[0] % 2 == 0:
+                black = not black
+
+            for x in range(self.board.size[0]):
+
+                if black:
+                    self.scene.addRect(x * 50, y * 50, 50, 50, QPen(Qt.GlobalColor.black), QBrush(Qt.GlobalColor.black))
+                else:
+                    self.scene.addRect(x * 50, y * 50, 50, 50, QPen(Qt.GlobalColor.white), QBrush(Qt.GlobalColor.white))
+
+                black = not black
+
+        board_wid = self.board.size[0] * 50
+        board_hei = self.board.size[1] * 50
+
+        self.main_ui.boardCanva.centerOn(0, 0)
+        self.main_ui.boardCanva.resetTransform()
 
     @Slot()
     def make_board(self):
