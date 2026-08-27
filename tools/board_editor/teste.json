@@ -1,21 +1,59 @@
 {
-  "pieces": [],
+  "pieces": [
+    {
+      "position": [
+        0,
+        4
+      ],
+      "team": "white",
+      "class": "bishop"
+    },
+    {
+      "position": [
+        0,
+        1
+      ],
+      "team": "white",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        0,
+        0
+      ],
+      "team": "white",
+      "class": "rook"
+    }
+  ],
   "board_size": [
-    0,
-    0
+    8,
+    8
   ],
   "teams": [
     {
       "color": [
-        23,
-        44,
-        55,
-        1
+        255,
+        255,
+        255,
+        255
       ],
-      "name": "White",
+      "name": "white",
       "march": [
         0,
-        1
+        0
+      ]
+    },
+    {
+      "color": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "name": "black",
+      "march": [
+        0,
+        0
       ]
     }
   ]

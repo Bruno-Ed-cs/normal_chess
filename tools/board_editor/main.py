@@ -9,6 +9,7 @@ from backend import Board, Roles, Team, BoardPos, Piece
 from board_editor import Ui_BoardEditor
 from new_board import Ui_NewBoard
 from make_team import Ui_MakeTeam
+import sprites
 
 class Tile(QGraphicsRectItem, QObject):
 
@@ -16,10 +17,8 @@ class Tile(QGraphicsRectItem, QObject):
     piece: Piece
     team: Team
     default_color: QColor
-    cur_color: QColor
     sprite: QPixmap
 
-    right_click = Signal()
     left_click = Signal()
 
     def __init__(self, coordenate: BoardPos, default_color: QColor, parent = None):
@@ -28,19 +27,22 @@ class Tile(QGraphicsRectItem, QObject):
         self.coordenate = coordenate
         self.team = None
         self.piece = None
-        self.defaut_color = default_color
-        self.cur_color = default_color
+        self.default_color = default_color
         self.sprite = None
 
-    # def get_piece(self):
-    #     print(self)
-    #
-    # def set_team(self, team):
-    #     print(self)
-    # def set_piece(self, piece):
-    #     print(self)
-    # def clean(self):
-    #     print(self)
+    def get_piece(self):
+        return self.piece
+
+    def set_team(self, team):
+        self.team = team
+
+    def set_piece(self, piece):
+        self.piece = piece
+
+    def clean(self):
+        self.team = None
+        self.piece = None
+        self.cur_color = self.default_color
 
     def mousePressEvent(self, event: QMouseEvent):
 
@@ -48,8 +50,8 @@ class Tile(QGraphicsRectItem, QObject):
             self.left_click.emit()
 
         if event.button() == Qt.MouseButton.RightButton:
-            self.right_click.emit()
             print(self.coordenate.x, self.coordenate.y)
+            self.clean()
 
     # def paint(self, painter, option, widget=None):
 
@@ -243,6 +245,8 @@ class Window(QMainWindow):
         )
 
         if filepath:
+            self.board.pieces = [tile.get_piece() for tile in self.scene.items() if isinstance(tile, Tile) and tile.get_piece()]
+            print(self.board.get_dict())
             self.board.save_to_file(filepath)
             self.sync_board()
 
@@ -270,6 +274,42 @@ class Window(QMainWindow):
             self.selected_role = button.piece_role
             # print(self.selected_role)
 
+    @Slot()
+    def put_piece(self):
+        tile = self.sender()
+        if isinstance(tile, Tile):
+            team = self.main_ui.TeamsList.currentItem()
+            if isinstance(team, TeamListItem) and team:
+                team = team.get_team()
+                tile.set_piece(Piece([tile.coordenate.x, tile.coordenate.y], team.name, self.selected_role))
+
+    def create_board_interface(self):
+        black = True
+        self.scene.clear()
+
+        for y in range(self.board.size[1]):
+
+            if self.board.size[0] % 2 == 0:
+                black = not black
+
+            for x in range(self.board.size[0]):
+
+                color = Qt.GlobalColor.white
+                if black:
+                    color = Qt.GlobalColor.black
+
+                tile = Tile(BoardPos(x, y), color)
+                tile.left_click.connect(self.put_piece)
+                self.scene.addItem(tile)
+
+                black = not black
+
+        board_wid = self.board.size[0] * 50
+        board_hei = self.board.size[1] * 50
+
+        self.main_ui.boardCanva.centerOn(0, 0)
+        self.main_ui.boardCanva.resetTransform()
+
 
     def sync_board(self):
         self.main_ui.spinBox_width.setValue(self.board.size[0])
@@ -289,28 +329,6 @@ class Window(QMainWindow):
             if not exists:
                 team_list.addItem(item)
 
-        black = True
-        self.scene.clear()
-
-        for y in range(self.board.size[1]):
-
-            if self.board.size[0] % 2 == 0:
-                black = not black
-
-            for x in range(self.board.size[0]):
-
-                if black:
-                    self.scene.addItem(Tile(BoardPos(x, y), Qt.GlobalColor.black))
-                else:
-                    self.scene.addItem(Tile(BoardPos(x, y), Qt.GlobalColor.white))
-
-                black = not black
-
-        board_wid = self.board.size[0] * 50
-        board_hei = self.board.size[1] * 50
-
-        self.main_ui.boardCanva.centerOn(0, 0)
-        self.main_ui.boardCanva.resetTransform()
 
     @Slot()
     def make_board(self):
@@ -318,6 +336,7 @@ class Window(QMainWindow):
         if main_window.new_board_ui.exec() == QDialog.DialogCode.Accepted:
             main_window.board = Board(main_window.new_board_ui.get_size())
             main_window.sync_board()
+            main_window.create_board_interface()
             print(main_window.board.get_dict())
 
     @Slot(int)
@@ -325,12 +344,14 @@ class Window(QMainWindow):
         self.board.size[0] = value
         # print(self.board.size)
         self.sync_board()
+        self.create_board_interface()
 
     @Slot(int)
     def change_height(self, value: int):
         self.board.size[1] = value
         # print(self.board.size)
         self.sync_board()
+        self.create_board_interface()
 
 
 
