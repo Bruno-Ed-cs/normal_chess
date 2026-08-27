@@ -189,11 +189,7 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.board = Board()
         self.selected_role = Roles.pawn
-        self.board.teams.append(Team([23, 44, 55, 1], "White", [0, 1]))
-
-        print(self.board.teams)
 
         # Carregar interface
         self.main_ui = Ui_BoardEditor()
@@ -243,9 +239,8 @@ class Window(QMainWindow):
         self.main_ui.zoomOut.clicked.connect(self.zoom_out)
         self.main_ui.zoomSlider.valueChanged.connect(self.change_zoom)
         self.main_ui.zoomSlider.valueChanged.connect(self.update_percent)
-        self.main_ui.zoomSlider.setValue(10)
+        self.change_zoom(10)
 
-        self.sync_board()
 
     @Slot(int)
     def update_percent(self, val: int):
@@ -271,17 +266,13 @@ class Window(QMainWindow):
     def new_team(self):
         team = MakeTeamDialog.make_team(self)
         if team:
-            self.board.teams.append(team)
-            self.sync_board()
+            self.main_ui.TeamsList.addItem(TeamListItem(team))
 
     @Slot()
     def remove_team(self):
-        item = self.main_ui.TeamsList.currentItem()
-        if item:
-            team = item.get_team()
-            self.board.teams.remove(team)
-            self.sync_board()
-        print(self.board.get_dict())
+        item = self.main_ui.TeamsList.currentRow()
+        if item > -1:
+            self.main_ui.TeamsList.takeItem(item)
 
     @Slot()
     def save_board(self):
@@ -362,7 +353,9 @@ class Window(QMainWindow):
                 self.main_ui.boardCanva.centerOn(0, 0)
                 self.main_ui.boardCanva.resetTransform()
 
+    # def resize_scene(self, new_size: BoardPos):
 
+    # def cleanp_team(self, team: Team):
 
     @Slot(bool)
     def select_role(self, checked):
@@ -382,16 +375,16 @@ class Window(QMainWindow):
                 tile.set_piece(Piece([tile.coordenate.x, tile.coordenate.y], team.name, self.selected_role))
                 tile.set_team(team)
 
-    def create_board_interface(self):
+    def create_board_interface(self, size: BoardPos):
         black = True
         self.scene.clear()
 
-        for y in range(self.board.size[1]):
+        for y in range(size.y):
 
-            if self.board.size[0] % 2 == 0:
+            if size.x % 2 == 0:
                 black = not black
 
-            for x in range(self.board.size[0]):
+            for x in range(size.x):
 
                 color = Qt.GlobalColor.white
                 if black:
@@ -403,54 +396,35 @@ class Window(QMainWindow):
 
                 black = not black
 
-        board_wid = self.board.size[0] * 50
-        board_hei = self.board.size[1] * 50
+        board_wid = size.x * 50
+        board_hei = size.y * 50
 
         self.main_ui.boardCanva.centerOn(0, 0)
         self.main_ui.boardCanva.resetTransform()
 
 
-    def sync_board(self):
-        self.main_ui.spinBox_width.setValue(self.board.size[0])
-        self.main_ui.spinBox_height.setValue(self.board.size[1])
-
-        team_list = self.main_ui.TeamsList
-        team_list.clear()
-        for team in self.board.teams:
-            item = TeamListItem(team, team_list)
-            exists = False
-
-            for i in range(team_list.count()):
-                if team_list.item(i).text() == item.text():
-                    exists = True
-                    break
-
-            if not exists:
-                team_list.addItem(item)
-
-
     @Slot()
     def make_board(self):
 
-        if main_window.new_board_ui.exec() == QDialog.DialogCode.Accepted:
-            main_window.board = Board(main_window.new_board_ui.get_size())
-            main_window.sync_board()
-            main_window.create_board_interface()
-            print(main_window.board.get_dict())
+        if self.new_board_ui.exec() == QDialog.DialogCode.Accepted:
+            self.create_board_interface(BoardPos(*self.new_board_ui.get_size()))
 
     @Slot(int)
     def change_width(self, value: int):
         self.board.size[0] = value
+        self.resize_scene(BoardPos(
+            value,
+            self.spinBox_height.value()
+            ))
         # print(self.board.size)
-        self.sync_board()
-        self.create_board_interface()
 
     @Slot(int)
     def change_height(self, value: int):
-        self.board.size[1] = value
+        self.resize_scene(BoardPos(
+            self.spinBox_width.value(),
+            value
+            ))
         # print(self.board.size)
-        self.sync_board()
-        self.create_board_interface()
 
 
 
