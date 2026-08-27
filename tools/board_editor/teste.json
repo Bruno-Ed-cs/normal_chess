@@ -30,7 +30,7 @@
         7
       ],
       "team": "White",
-      "class": "king"
+      "class": "queen"
     },
     {
       "position": [
@@ -38,7 +38,7 @@
         7
       ],
       "team": "White",
-      "class": "queen"
+      "class": "king"
     },
     {
       "position": [
@@ -133,7 +133,7 @@
         7,
         4
       ],
-      "team": "Black",
+      "team": "White",
       "class": "queen"
     },
     {
@@ -141,7 +141,7 @@
         0,
         3
       ],
-      "team": "White",
+      "team": "Black",
       "class": "queen"
     },
     {
@@ -280,28 +280,28 @@
   "teams": [
     {
       "color": [
-        255,
-        255,
-        255,
+        200,
+        200,
+        200,
         255
       ],
       "name": "White",
       "march": [
         0,
-        0
+        -1
       ]
     },
     {
       "color": [
-        0,
-        0,
-        0,
+        80,
+        80,
+        80,
         255
       ],
       "name": "Black",
       "march": [
         0,
-        0
+        1
       ]
     }
   ]

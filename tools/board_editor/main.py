@@ -293,10 +293,14 @@ class Window(QMainWindow):
         )
 
         if filepath:
-            self.board.pieces = [tile.get_piece() for tile in self.scene.items() if isinstance(tile, Tile) and tile.get_piece()]
-            print(self.board.get_dict())
-            self.board.save_to_file(filepath)
-            self.sync_board()
+            width = self.main_ui.spinBox_width.value()
+            height = self.main_ui.spinBox_height.value()
+
+            board = Board([width, height])
+            board.pieces = [tile.get_piece() for tile in self.scene.items() if isinstance(tile, Tile) and tile.get_piece()]
+            board.teams = [self.main_ui.TeamsList.item(i).get_team() for i in range(self.main_ui.TeamsList.count()) if isinstance(self.main_ui.TeamsList.item(i), TeamListItem)]
+            print(board.get_dict())
+            board.save_to_file(filepath)
 
     @Slot()
     def load_board(self):
@@ -310,8 +314,54 @@ class Window(QMainWindow):
         if filepath:
             with open(filepath, "r") as file:
                 data = json.load(file)
-                self.board.load_from_json(data)
-            self.sync_board()
+                board = Board()
+                board.load_from_json(data)
+
+                spinBox_width = self.main_ui.spinBox_width
+                spinBox_height = self.main_ui.spinBox_height
+
+                TeamsList = self.main_ui.TeamsList
+
+                board_scene = self.scene
+
+                spinBox_width.setValue(board.size[0])
+                spinBox_height.setValue(board.size[1])
+
+                TeamsList.clear()
+                for team in board.teams:
+                    TeamsList.addItem(TeamListItem(team))
+
+                black = True
+                board_scene.clear()
+
+                for y in range(board.size[1]):
+
+                    if board.size[0] % 2 == 0:
+                        black = not black
+
+                    for x in range(board.size[0]):
+
+                        color = Qt.GlobalColor.white
+                        if black:
+                            color = Qt.GlobalColor.black
+
+                        tile = Tile(BoardPos(x, y), color)
+                        tile.left_click.connect(self.put_piece)
+
+                        piece = next((p for p in board.pieces if p.position == [x, y]), None)
+                        if piece:
+                            team = next((t for t in board.teams if piece.team == t.name), None)
+                            if team:
+                                tile.set_team(team)
+                                tile.set_piece(piece)
+
+                        board_scene.addItem(tile)
+
+                        black = not black
+
+                self.main_ui.boardCanva.centerOn(0, 0)
+                self.main_ui.boardCanva.resetTransform()
+
 
 
     @Slot(bool)
