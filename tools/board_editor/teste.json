@@ -2,26 +2,274 @@
   "pieces": [
     {
       "position": [
+        7,
+        7
+      ],
+      "team": "White",
+      "class": "rook"
+    },
+    {
+      "position": [
+        6,
+        7
+      ],
+      "team": "White",
+      "class": "knight"
+    },
+    {
+      "position": [
+        5,
+        7
+      ],
+      "team": "White",
+      "class": "bishop"
+    },
+    {
+      "position": [
+        4,
+        7
+      ],
+      "team": "White",
+      "class": "king"
+    },
+    {
+      "position": [
+        3,
+        7
+      ],
+      "team": "White",
+      "class": "queen"
+    },
+    {
+      "position": [
+        2,
+        7
+      ],
+      "team": "White",
+      "class": "bishop"
+    },
+    {
+      "position": [
+        1,
+        7
+      ],
+      "team": "White",
+      "class": "knight"
+    },
+    {
+      "position": [
         0,
+        7
+      ],
+      "team": "White",
+      "class": "rook"
+    },
+    {
+      "position": [
+        7,
+        6
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        6,
+        6
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        5,
+        6
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        4,
+        6
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        3,
+        6
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        2,
+        6
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        6
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        0,
+        6
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        7,
         4
       ],
-      "team": "white",
-      "class": "bishop"
+      "team": "Black",
+      "class": "queen"
+    },
+    {
+      "position": [
+        0,
+        3
+      ],
+      "team": "White",
+      "class": "queen"
+    },
+    {
+      "position": [
+        7,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        6,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        5,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        4,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        3,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        2,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
     },
     {
       "position": [
         0,
         1
       ],
-      "team": "white",
+      "team": "Black",
       "class": "pawn"
+    },
+    {
+      "position": [
+        7,
+        0
+      ],
+      "team": "Black",
+      "class": "rook"
+    },
+    {
+      "position": [
+        6,
+        0
+      ],
+      "team": "Black",
+      "class": "knight"
+    },
+    {
+      "position": [
+        5,
+        0
+      ],
+      "team": "Black",
+      "class": "bishop"
+    },
+    {
+      "position": [
+        4,
+        0
+      ],
+      "team": "Black",
+      "class": "queen"
+    },
+    {
+      "position": [
+        3,
+        0
+      ],
+      "team": "Black",
+      "class": "king"
+    },
+    {
+      "position": [
+        2,
+        0
+      ],
+      "team": "Black",
+      "class": "bishop"
+    },
+    {
+      "position": [
+        1,
+        0
+      ],
+      "team": "Black",
+      "class": "knight"
     },
     {
       "position": [
         0,
         0
       ],
-      "team": "white",
+      "team": "Black",
       "class": "rook"
     }
   ],
@@ -37,7 +285,7 @@
         255,
         255
       ],
-      "name": "white",
+      "name": "White",
       "march": [
         0,
         0
@@ -45,12 +293,12 @@
     },
     {
       "color": [
-        255,
-        255,
-        255,
+        0,
+        0,
+        0,
         255
       ],
-      "name": "black",
+      "name": "Black",
       "march": [
         0,
         0

@@ -38,11 +38,36 @@ class Tile(QGraphicsRectItem, QObject):
 
     def set_piece(self, piece):
         self.piece = piece
+        
+        match self.piece.role:
+            case Roles.pawn:
+                self.sprite = QPixmap(":/sprites/white_pawn.png")
+
+            case Roles.rook:
+                self.sprite = QPixmap(":/sprites/white_rook.png")
+
+            case Roles.bishop:
+                self.sprite = QPixmap(":/sprites/white_bishop.png")
+
+            case Roles.king:
+                self.sprite = QPixmap(":/sprites/white_king.png")
+
+            case Roles.queen:
+                self.sprite = QPixmap(":/sprites/white_queen.png")
+
+            case Roles.knight:
+                self.sprite = QPixmap(":/sprites/white_knight.png")
+
+            case _:
+                self.sprite = None
+
+        self.update()
 
     def clean(self):
         self.team = None
         self.piece = None
-        self.cur_color = self.default_color
+        self.sprite = None
+        self.update()
 
     def mousePressEvent(self, event: QMouseEvent):
 
@@ -53,7 +78,30 @@ class Tile(QGraphicsRectItem, QObject):
             print(self.coordenate.x, self.coordenate.y)
             self.clean()
 
-    # def paint(self, painter, option, widget=None):
+    def paint(self, painter, option, widget=None):
+
+        brush = QBrush(self.default_color)
+
+        print(self.team)
+        if self.team:
+            # print(QColor(*self.team.color))
+            brush = QBrush(QColor(*self.team.color))
+
+        pen = QPen(brush.color())
+
+        # if option.state == QStyle.State_Selected:
+        #     pen = QPen(Qt.GlobalColor.green)
+
+        painter.setBrush(brush)
+        painter.setPen(pen)
+        painter.drawRect(self.rect())
+
+        if self.sprite:
+            print("i have a sprite")
+            painter.drawPixmap(self.rect().topLeft(), self.sprite)
+        else:
+            print("i dont have a sprite")
+
 
 
 class MakeTeamDialog(QDialog, Ui_MakeTeam):
@@ -282,6 +330,7 @@ class Window(QMainWindow):
             if isinstance(team, TeamListItem) and team:
                 team = team.get_team()
                 tile.set_piece(Piece([tile.coordenate.x, tile.coordenate.y], team.name, self.selected_role))
+                tile.set_team(team)
 
     def create_board_interface(self):
         black = True
