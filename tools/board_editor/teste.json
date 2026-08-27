@@ -2,146 +2,74 @@
   "pieces": [
     {
       "position": [
-        6,
+        7,
         6
       ],
-      "team": "Blacn",
-      "class": "king"
+      "team": "Seasoned",
+      "class": "pawn"
     },
     {
       "position": [
-        4,
+        6,
         6
       ],
-      "team": "Blacn",
-      "class": "king"
+      "team": "Seasoned",
+      "class": "pawn"
     },
     {
       "position": [
         5,
-        5
+        6
       ],
-      "team": "Blacn",
-      "class": "king"
+      "team": "Seasoned",
+      "class": "pawn"
     },
     {
       "position": [
         3,
-        5
+        6
       ],
-      "team": "Blacn",
-      "class": "king"
+      "team": "Seasoned",
+      "class": "bishop"
     },
     {
       "position": [
-        2,
-        5
+        5,
+        4
       ],
-      "team": "Blacn",
-      "class": "king"
+      "team": "Wicked",
+      "class": "rook"
+    },
+    {
+      "position": [
+        1,
+        4
+      ],
+      "team": "Wicked",
+      "class": "rook"
     },
     {
       "position": [
         4,
-        4
+        3
       ],
-      "team": "Blacn",
-      "class": "king"
-    },
-    {
-      "position": [
-        3,
-        4
-      ],
-      "team": "Blacn",
-      "class": "king"
-    },
-    {
-      "position": [
-        2,
-        4
-      ],
-      "team": "Mech",
+      "team": "Seasoned",
       "class": "bishop"
     },
     {
       "position": [
         1,
-        4
-      ],
-      "team": "Mech",
-      "class": "bishop"
-    },
-    {
-      "position": [
-        7,
         3
       ],
-      "team": "Blacn",
-      "class": "king"
+      "team": "Seasoned",
+      "class": "bishop"
     },
     {
       "position": [
         6,
-        3
-      ],
-      "team": "Blacn",
-      "class": "king"
-    },
-    {
-      "position": [
-        3,
-        3
-      ],
-      "team": "Mech",
-      "class": "bishop"
-    },
-    {
-      "position": [
-        2,
-        3
-      ],
-      "team": "Mech",
-      "class": "bishop"
-    },
-    {
-      "position": [
-        1,
-        3
-      ],
-      "team": "Mech",
-      "class": "bishop"
-    },
-    {
-      "position": [
-        3,
         2
       ],
-      "team": "Mech",
-      "class": "rook"
-    },
-    {
-      "position": [
-        2,
-        2
-      ],
-      "team": "Mech",
-      "class": "rook"
-    },
-    {
-      "position": [
-        1,
-        2
-      ],
-      "team": "Mech",
-      "class": "rook"
-    },
-    {
-      "position": [
-        3,
-        1
-      ],
-      "team": "Mech",
+      "team": "Wicked",
       "class": "rook"
     },
     {
@@ -149,47 +77,55 @@
         2,
         1
       ],
-      "team": "Mech",
-      "class": "rook"
+      "team": "Wicked",
+      "class": "pawn"
     },
     {
       "position": [
         1,
         1
       ],
-      "team": "Mech",
-      "class": "rook"
+      "team": "Wicked",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        0,
+        1
+      ],
+      "team": "Wicked",
+      "class": "pawn"
     }
   ],
   "board_size": [
-    8,
-    8
+    10,
+    11
   ],
   "teams": [
     {
       "color": [
-        255,
-        255,
-        255,
+        85,
+        0,
+        127,
         255
       ],
-      "name": "Mech",
+      "name": "Wicked",
       "march": [
         0,
-        0
+        1
       ]
     },
     {
       "color": [
-        170,
-        0,
+        255,
+        255,
         0,
         255
       ],
-      "name": "Blacn",
+      "name": "Seasoned",
       "march": [
-        0,
-        0
+        1,
+        1
       ]
     }
   ]

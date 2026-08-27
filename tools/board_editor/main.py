@@ -33,6 +33,9 @@ class Tile(QGraphicsRectItem, QObject):
     def get_piece(self):
         return self.piece
 
+    def get_team(self):
+        return self.team
+
     def set_team(self, team):
         self.team = team
 
@@ -272,7 +275,9 @@ class Window(QMainWindow):
     def remove_team(self):
         item = self.main_ui.TeamsList.currentRow()
         if item > -1:
-            self.main_ui.TeamsList.takeItem(item)
+            team = self.main_ui.TeamsList.takeItem(item)
+            if isinstance(team, TeamListItem):
+                self.cleanup_team(team.get_team())
 
     @Slot()
     def save_board(self):
@@ -353,9 +358,12 @@ class Window(QMainWindow):
                 self.main_ui.boardCanva.centerOn(0, 0)
                 self.main_ui.boardCanva.resetTransform()
 
-    # def resize_scene(self, new_size: BoardPos):
+    def cleanup_team(self, team: Team):
 
-    # def cleanp_team(self, team: Team):
+        for tile in self.scene.items():
+            if isinstance(tile, Tile):
+                if tile.get_team() == team:
+                    tile.clean()
 
     @Slot(bool)
     def select_role(self, checked):
@@ -376,6 +384,15 @@ class Window(QMainWindow):
                 tile.set_team(team)
 
     def create_board_interface(self, size: BoardPos):
+
+        pieces = []
+
+        for tile in self.scene.items():
+            if isinstance(tile, Tile):
+                if tile.get_piece():
+                    pieces.append(tile.get_piece())
+
+
         black = True
         self.scene.clear()
 
@@ -392,6 +409,19 @@ class Window(QMainWindow):
 
                 tile = Tile(BoardPos(x, y), color)
                 tile.left_click.connect(self.put_piece)
+
+                last_piece = next((p for p in pieces if p.position == [x, y]), None)
+
+                if last_piece:
+                    team_list = self.main_ui.TeamsList
+                    team = next((team_list.item(i).get_team() 
+                                 for i in range(team_list.count()) 
+                                 if isinstance(team_list.item(i), TeamListItem) and team_list.item(i).get_team().name == last_piece.team),
+                                None)
+                    if team:
+                        tile.set_piece(last_piece)
+                        tile.set_team(team)
+
                 self.scene.addItem(tile)
 
                 black = not black
@@ -411,17 +441,16 @@ class Window(QMainWindow):
 
     @Slot(int)
     def change_width(self, value: int):
-        self.board.size[0] = value
-        self.resize_scene(BoardPos(
+        self.create_board_interface(BoardPos(
             value,
-            self.spinBox_height.value()
+            self.main_ui.spinBox_height.value()
             ))
         # print(self.board.size)
 
     @Slot(int)
     def change_height(self, value: int):
-        self.resize_scene(BoardPos(
-            self.spinBox_width.value(),
+        self.create_board_interface(BoardPos(
+            self.main_ui.spinBox_width.value(),
             value
             ))
         # print(self.board.size)
