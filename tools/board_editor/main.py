@@ -2,25 +2,61 @@ import sys
 import math
 import json
 from PySide6.QtWidgets import *
-from PySide6.QtCore import Slot, Qt
-from PySide6.QtGui import QKeySequence, QColor, QPixmap, QPen, QBrush
+from PySide6.QtCore import QObject, Slot, Qt, Signal
+from PySide6.QtGui import QKeySequence, QColor, QPixmap, QPen, QBrush, QMouseEvent
 
-from backend import Board, Roles, Team
+from backend import Board, Roles, Team, BoardPos, Piece
 from board_editor import Ui_BoardEditor
 from new_board import Ui_NewBoard
 from make_team import Ui_MakeTeam
 
-def clamp(n, min, max):
-    if n < min:
-        return min
-    elif n > max:
-        return max
-    else:
-        return n
+class Tile(QGraphicsRectItem, QObject):
+
+    coordenate: BoardPos
+    piece: Piece
+    team: Team
+    default_color: QColor
+    cur_color: QColor
+    sprite: QPixmap
+
+    right_click = Signal()
+    left_click = Signal()
+
+    def __init__(self, coordenate: BoardPos, default_color: QColor, parent = None):
+        QGraphicsRectItem.__init__(self, coordenate.x * 32, coordenate.y * 32, 32, 32, parent)
+        QObject.__init__(self)
+        self.coordenate = coordenate
+        self.team = None
+        self.piece = None
+        self.defaut_color = default_color
+        self.cur_color = default_color
+        self.sprite = None
+
+    # def get_piece(self):
+    #     print(self)
+    #
+    # def set_team(self, team):
+    #     print(self)
+    # def set_piece(self, piece):
+    #     print(self)
+    # def clean(self):
+    #     print(self)
+
+    def mousePressEvent(self, event: QMouseEvent):
+
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.left_click.emit()
+
+        if event.button() == Qt.MouseButton.RightButton:
+            self.right_click.emit()
+            print(self.coordenate.x, self.coordenate.y)
+
+    # def paint(self, painter, option, widget=None):
+
 
 class MakeTeamDialog(QDialog, Ui_MakeTeam):
 
-    def __init__(self, parent):
+    def __init__(self, parent = None):
         super().__init__(parent)
         self.setupUi(self)
         self.team = Team([0, 0, 0, 0], "White", [0, 0])
@@ -264,9 +300,9 @@ class Window(QMainWindow):
             for x in range(self.board.size[0]):
 
                 if black:
-                    self.scene.addRect(x * 50, y * 50, 50, 50, QPen(Qt.GlobalColor.black), QBrush(Qt.GlobalColor.black))
+                    self.scene.addItem(Tile(BoardPos(x, y), Qt.GlobalColor.black))
                 else:
-                    self.scene.addRect(x * 50, y * 50, 50, 50, QPen(Qt.GlobalColor.white), QBrush(Qt.GlobalColor.white))
+                    self.scene.addItem(Tile(BoardPos(x, y), Qt.GlobalColor.white))
 
                 black = not black
 

@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="sprite">
+    <file>sprites/white_rook.png</file>
+    <file>sprites/white_queen.png</file>
+    <file>sprites/white_pawn.png</file>
+    <file>sprites/white_knight.png</file>
+    <file>sprites/white_king.png</file>
+    <file>sprites/white_bishop.png</file>
+  </qresource>
+</RCC>

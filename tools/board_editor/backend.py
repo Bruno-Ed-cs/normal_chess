@@ -17,6 +17,13 @@ class Roles(Enum):
     devil = 11
     angel = 12
 
+class BoardPos:
+    x: int
+    y: int
+
+    def __init__(self, x = 0, y = 0):
+        self.x = x
+        self.y = y
 
 class Piece:
     position: Tuple[int, int]
