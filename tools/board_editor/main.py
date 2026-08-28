@@ -9,7 +9,7 @@ from backend import Board, Roles, Team, BoardPos, Piece
 from board_editor import Ui_BoardEditor
 from new_board import Ui_NewBoard
 from make_team import Ui_MakeTeam
-import sprites
+import sprites_rc
 
 class Tile(QGraphicsRectItem, QObject):
 
@@ -181,8 +181,8 @@ class NewBoardDialog(Ui_NewBoard, QDialog):
 
     def get_size(self):
         return [
-            self.spinBox_width.value(),
-            self.spinBox_height.value()
+            self.spinbox_width.value(),
+            self.spinbox_height.value()
         ]
 
 class Window(QMainWindow):
@@ -201,19 +201,19 @@ class Window(QMainWindow):
 
         # Conectar as spin boxes principais
 
-        self.main_ui.spinBox_width.valueChanged.connect(self.change_width)
-        self.main_ui.spinBox_height.valueChanged.connect(self.change_height)
+        self.main_ui.spinbox_width.valueChanged.connect(self.change_width)
+        self.main_ui.spinbox_height.valueChanged.connect(self.change_height)
 
         # Conectando as ações
-        action_new = self.main_ui.actionNew
+        action_new = self.main_ui.action_new
         action_new.triggered.connect(self.make_board)
         action_new.setShortcut(QKeySequence.StandardKey.New)
 
-        action_load = self.main_ui.actionLoad
+        action_load = self.main_ui.action_load
         action_load.triggered.connect(self.load_board)
         action_load.setShortcut(QKeySequence.StandardKey.Open)
 
-        action_save = self.main_ui.actionSave
+        action_save = self.main_ui.action_save
         action_save.triggered.connect(self.save_board)
         action_save.setShortcut(QKeySequence.StandardKey.Save)
 
@@ -223,57 +223,57 @@ class Window(QMainWindow):
             button.toggled.connect(self.select_role)
             if role == Roles.pawn:
                 button.setChecked(True)
-            self.main_ui.PiecesContainer.addWidget(button)
+            self.main_ui.pieces_container.addWidget(button)
 
-        self.main_ui.removeTeamButton.clicked.connect(self.remove_team)
-        self.main_ui.newTeamButton.clicked.connect(self.new_team)
+        self.main_ui.remove_team_button.clicked.connect(self.remove_team)
+        self.main_ui.new_team_button.clicked.connect(self.new_team)
 
         #setando a cena de renderização
         self.scene = QGraphicsScene()
         self.scene.setBackgroundBrush((QBrush(Qt.GlobalColor.gray)))
 
-        self.main_ui.boardCanva.setScene(self.scene)
+        self.main_ui.board_canva.setScene(self.scene)
 
         #controles do canva
         self.max_zoom = 3.5
-        self.main_ui.zoomIn.clicked.connect(self.zoom_in)
-        self.main_ui.zoomOut.clicked.connect(self.zoom_out)
-        self.main_ui.zoomSlider.valueChanged.connect(self.change_zoom)
-        self.main_ui.zoomSlider.valueChanged.connect(self.update_percent)
+        self.main_ui.zoom_in.clicked.connect(self.zoom_in)
+        self.main_ui.zoom_out.clicked.connect(self.zoom_out)
+        self.main_ui.zoom_slider.valueChanged.connect(self.change_zoom)
+        self.main_ui.zoom_slider.valueChanged.connect(self.update_percent)
         self.change_zoom(10)
 
 
     @Slot(int)
     def update_percent(self, val: int):
-        self.main_ui.zoomPercent.setText(f"{val}%")
+        self.main_ui.zoom_percent.setText(f"{val}%")
 
     @Slot()
     def zoom_in(self):
-        value = self.main_ui.zoomSlider.value()
-        self.main_ui.zoomSlider.setValue(value + 5)
+        value = self.main_ui.zoom_slider.value()
+        self.main_ui.zoom_slider.setValue(value + 5)
 
     @Slot()
     def zoom_out(self):
-        value = self.main_ui.zoomSlider.value()
-        self.main_ui.zoomSlider.setValue(value - 5)
+        value = self.main_ui.zoom_slider.value()
+        self.main_ui.zoom_slider.setValue(value - 5)
 
     @Slot(int)
     def change_zoom(self, val):
-        self.main_ui.boardCanva.resetTransform()
+        self.main_ui.board_canva.resetTransform()
         zoom = (val / 100) * self.max_zoom
-        self.main_ui.boardCanva.scale(zoom, zoom)
+        self.main_ui.board_canva.scale(zoom, zoom)
 
     @Slot()
     def new_team(self):
         team = MakeTeamDialog.make_team(self)
         if team:
-            self.main_ui.TeamsList.addItem(TeamListItem(team))
+            self.main_ui.teams_list.addItem(TeamListItem(team))
 
     @Slot()
     def remove_team(self):
-        item = self.main_ui.TeamsList.currentRow()
+        item = self.main_ui.teams_list.currentRow()
         if item > -1:
-            team = self.main_ui.TeamsList.takeItem(item)
+            team = self.main_ui.teams_list.takeItem(item)
             if isinstance(team, TeamListItem):
                 self.cleanup_team(team.get_team())
 
@@ -287,12 +287,12 @@ class Window(QMainWindow):
         )
 
         if filepath:
-            width = self.main_ui.spinBox_width.value()
-            height = self.main_ui.spinBox_height.value()
+            width = self.main_ui.spinbox_width.value()
+            height = self.main_ui.spinbox_height.value()
 
             board = Board([width, height])
             board.pieces = [tile.get_piece() for tile in self.scene.items() if isinstance(tile, Tile) and tile.get_piece()]
-            board.teams = [self.main_ui.TeamsList.item(i).get_team() for i in range(self.main_ui.TeamsList.count()) if isinstance(self.main_ui.TeamsList.item(i), TeamListItem)]
+            board.teams = [self.main_ui.teams_list.item(i).get_team() for i in range(self.main_ui.teams_list.count()) if isinstance(self.main_ui.teams_list.item(i), TeamListItem)]
             print(board.get_dict())
             board.save_to_file(filepath)
 
@@ -311,19 +311,19 @@ class Window(QMainWindow):
                 board = Board()
                 board.load_from_json(data)
 
-                spinBox_width = self.main_ui.spinBox_width
-                spinBox_height = self.main_ui.spinBox_height
+                spinbox_width = self.main_ui.spinbox_width
+                spinbox_height = self.main_ui.spinbox_height
 
-                TeamsList = self.main_ui.TeamsList
+                teams_list = self.main_ui.teams_list
 
                 board_scene = self.scene
 
-                spinBox_width.setValue(board.size[0])
-                spinBox_height.setValue(board.size[1])
+                spinbox_width.setValue(board.size[0])
+                spinbox_height.setValue(board.size[1])
 
-                TeamsList.clear()
+                teams_list.clear()
                 for team in board.teams:
-                    TeamsList.addItem(TeamListItem(team))
+                    teams_list.addItem(TeamListItem(team))
 
                 black = True
                 board_scene.clear()
@@ -353,8 +353,8 @@ class Window(QMainWindow):
 
                         black = not black
 
-                self.main_ui.boardCanva.centerOn(0, 0)
-                self.main_ui.boardCanva.resetTransform()
+                self.main_ui.board_canva.centerOn(0, 0)
+                self.main_ui.board_canva.resetTransform()
 
     def cleanup_team(self, team: Team):
 
@@ -375,13 +375,14 @@ class Window(QMainWindow):
     def put_piece(self):
         tile = self.sender()
         if isinstance(tile, Tile):
-            team = self.main_ui.TeamsList.currentItem()
+            team = self.main_ui.teams_list.currentItem()
             if isinstance(team, TeamListItem) and team:
                 team = team.get_team()
                 tile.set_piece(Piece([tile.coordenate.x, tile.coordenate.y], team.name, self.selected_role))
                 tile.set_team(team)
 
     def create_board_interface(self, size: BoardPos, keep_pieces: bool = True):
+
 
         pieces = []
 
@@ -413,7 +414,7 @@ class Window(QMainWindow):
                     last_piece = next((p for p in pieces if p.position == [x, y]), None)
 
                     if last_piece:
-                        team_list = self.main_ui.TeamsList
+                        team_list = self.main_ui.teams_list
                         team = next((team_list.item(i).get_team() 
                                      for i in range(team_list.count()) 
                                      if isinstance(team_list.item(i), TeamListItem) and team_list.item(i).get_team().name == last_piece.team),
@@ -429,29 +430,32 @@ class Window(QMainWindow):
         board_wid = size.x * 50
         board_hei = size.y * 50
 
-        self.main_ui.boardCanva.centerOn(0, 0)
-        self.main_ui.boardCanva.resetTransform()
+        self.main_ui.board_canva.centerOn(0, 0)
+        self.main_ui.board_canva.resetTransform()
 
 
     @Slot()
     def make_board(self):
 
         if self.new_board_ui.exec() == QDialog.DialogCode.Accepted:
-            self.create_board_interface(BoardPos(*self.new_board_ui.get_size()), False)
-            self.main_ui.TeamsList.clear()
+            size = BoardPos(*self.new_board_ui.get_size())
+            self.create_board_interface(size, False)
+            self.main_ui.teams_list.clear()
+            self.main_ui.spinbox_width.setValue(size.x)
+            self.main_ui.spinbox_height.setValue(size.y)
 
     @Slot(int)
     def change_width(self, value: int):
         self.create_board_interface(BoardPos(
             value,
-            self.main_ui.spinBox_height.value()
+            self.main_ui.spinbox_height.value()
             ))
         # print(self.board.size)
 
     @Slot(int)
     def change_height(self, value: int):
         self.create_board_interface(BoardPos(
-            self.main_ui.spinBox_width.value(),
+            self.main_ui.spinbox_width.value(),
             value
             ))
         # print(self.board.size)

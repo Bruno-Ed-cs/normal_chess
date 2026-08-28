@@ -49,13 +49,13 @@ class Ui_NewBoard(object):
 
         self.WidthLayout.addWidget(self.label_width)
 
-        self.spinBox_width = QSpinBox(self.verticalLayoutWidget)
-        self.spinBox_width.setObjectName(u"spinBox_width")
-        self.spinBox_width.setMinimum(1)
-        self.spinBox_width.setMaximum(500)
-        self.spinBox_width.setValue(8)
+        self.spinbox_width = QSpinBox(self.verticalLayoutWidget)
+        self.spinbox_width.setObjectName(u"spinbox_width")
+        self.spinbox_width.setMinimum(1)
+        self.spinbox_width.setMaximum(500)
+        self.spinbox_width.setValue(8)
 
-        self.WidthLayout.addWidget(self.spinBox_width)
+        self.WidthLayout.addWidget(self.spinbox_width)
 
 
         self.verticalLayout_2.addLayout(self.WidthLayout)
@@ -67,13 +67,13 @@ class Ui_NewBoard(object):
 
         self.HeightLayout.addWidget(self.label_height)
 
-        self.spinBox_height = QSpinBox(self.verticalLayoutWidget)
-        self.spinBox_height.setObjectName(u"spinBox_height")
-        self.spinBox_height.setMinimum(1)
-        self.spinBox_height.setMaximum(500)
-        self.spinBox_height.setValue(8)
+        self.spinbox_height = QSpinBox(self.verticalLayoutWidget)
+        self.spinbox_height.setObjectName(u"spinbox_height")
+        self.spinbox_height.setMinimum(1)
+        self.spinbox_height.setMaximum(500)
+        self.spinbox_height.setValue(8)
 
-        self.HeightLayout.addWidget(self.spinBox_height)
+        self.HeightLayout.addWidget(self.spinbox_height)
 
 
         self.verticalLayout_2.addLayout(self.HeightLayout)

@@ -22,18 +22,19 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QGraphicsView,
     QMenuBar, QPushButton, QScrollArea, QSizePolicy,
     QSlider, QSpacerItem, QSpinBox, QStatusBar,
     QToolButton, QVBoxLayout, QWidget)
+import sprites_rc
 
 class Ui_BoardEditor(object):
     def setupUi(self, BoardEditor):
         if not BoardEditor.objectName():
             BoardEditor.setObjectName(u"BoardEditor")
         BoardEditor.resize(1034, 942)
-        self.actionSave = QAction(BoardEditor)
-        self.actionSave.setObjectName(u"actionSave")
-        self.actionLoad = QAction(BoardEditor)
-        self.actionLoad.setObjectName(u"actionLoad")
-        self.actionNew = QAction(BoardEditor)
-        self.actionNew.setObjectName(u"actionNew")
+        self.action_save = QAction(BoardEditor)
+        self.action_save.setObjectName(u"action_save")
+        self.action_load = QAction(BoardEditor)
+        self.action_load.setObjectName(u"action_load")
+        self.action_new = QAction(BoardEditor)
+        self.action_new.setObjectName(u"action_new")
         self.centralwidget = QWidget(BoardEditor)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_2 = QHBoxLayout(self.centralwidget)
@@ -70,13 +71,13 @@ class Ui_BoardEditor(object):
 
         self.WidthLayout.addWidget(self.label_width)
 
-        self.spinBox_width = QSpinBox(self.BoardSizeBox)
-        self.spinBox_width.setObjectName(u"spinBox_width")
-        self.spinBox_width.setMinimum(1)
-        self.spinBox_width.setMaximum(500)
-        self.spinBox_width.setValue(8)
+        self.spinbox_width = QSpinBox(self.BoardSizeBox)
+        self.spinbox_width.setObjectName(u"spinbox_width")
+        self.spinbox_width.setMinimum(1)
+        self.spinbox_width.setMaximum(500)
+        self.spinbox_width.setValue(8)
 
-        self.WidthLayout.addWidget(self.spinBox_width)
+        self.WidthLayout.addWidget(self.spinbox_width)
 
 
         self.verticalLayout_2.addLayout(self.WidthLayout)
@@ -88,13 +89,13 @@ class Ui_BoardEditor(object):
 
         self.HeightLayout.addWidget(self.label_height)
 
-        self.spinBox_height = QSpinBox(self.BoardSizeBox)
-        self.spinBox_height.setObjectName(u"spinBox_height")
-        self.spinBox_height.setMinimum(1)
-        self.spinBox_height.setMaximum(500)
-        self.spinBox_height.setValue(8)
+        self.spinbox_height = QSpinBox(self.BoardSizeBox)
+        self.spinbox_height.setObjectName(u"spinbox_height")
+        self.spinbox_height.setMinimum(1)
+        self.spinbox_height.setMaximum(500)
+        self.spinbox_height.setValue(8)
 
-        self.HeightLayout.addWidget(self.spinBox_height)
+        self.HeightLayout.addWidget(self.spinbox_height)
 
 
         self.verticalLayout_2.addLayout(self.HeightLayout)
@@ -110,10 +111,10 @@ class Ui_BoardEditor(object):
         self.PiecesBox.setMinimumSize(QSize(0, 250))
         self.verticalLayout_5 = QVBoxLayout(self.PiecesBox)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.PiecesScroll = QScrollArea(self.PiecesBox)
-        self.PiecesScroll.setObjectName(u"PiecesScroll")
-        self.PiecesScroll.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
-        self.PiecesScroll.setWidgetResizable(True)
+        self.pieces_scroll = QScrollArea(self.PiecesBox)
+        self.pieces_scroll.setObjectName(u"pieces_scroll")
+        self.pieces_scroll.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+        self.pieces_scroll.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
         self.scrollAreaWidgetContents_2.setEnabled(True)
@@ -125,16 +126,16 @@ class Ui_BoardEditor(object):
         self.scrollAreaWidgetContents_2.setSizePolicy(sizePolicy)
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.PiecesContainer = QVBoxLayout()
-        self.PiecesContainer.setObjectName(u"PiecesContainer")
-        self.PiecesContainer.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
-        self.PiecesContainer.setContentsMargins(5, 5, 5, 10)
+        self.pieces_container = QVBoxLayout()
+        self.pieces_container.setObjectName(u"pieces_container")
+        self.pieces_container.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
+        self.pieces_container.setContentsMargins(5, 5, 5, 10)
 
-        self.verticalLayout_3.addLayout(self.PiecesContainer)
+        self.verticalLayout_3.addLayout(self.pieces_container)
 
-        self.PiecesScroll.setWidget(self.scrollAreaWidgetContents_2)
+        self.pieces_scroll.setWidget(self.scrollAreaWidgetContents_2)
 
-        self.verticalLayout_5.addWidget(self.PiecesScroll)
+        self.verticalLayout_5.addWidget(self.pieces_scroll)
 
 
         self.scrollBox.addWidget(self.PiecesBox)
@@ -151,24 +152,24 @@ class Ui_BoardEditor(object):
         self.TeamsBox.setCheckable(False)
         self.verticalLayout_6 = QVBoxLayout(self.TeamsBox)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.TeamsList = QListWidget(self.TeamsBox)
-        self.TeamsList.setObjectName(u"TeamsList")
-        self.TeamsList.setSpacing(10)
-        self.TeamsList.setWordWrap(True)
+        self.teams_list = QListWidget(self.TeamsBox)
+        self.teams_list.setObjectName(u"teams_list")
+        self.teams_list.setSpacing(10)
+        self.teams_list.setWordWrap(True)
 
-        self.verticalLayout_6.addWidget(self.TeamsList)
+        self.verticalLayout_6.addWidget(self.teams_list)
 
         self.TeamsLayout = QVBoxLayout()
         self.TeamsLayout.setObjectName(u"TeamsLayout")
-        self.newTeamButton = QPushButton(self.TeamsBox)
-        self.newTeamButton.setObjectName(u"newTeamButton")
+        self.new_team_button = QPushButton(self.TeamsBox)
+        self.new_team_button.setObjectName(u"new_team_button")
 
-        self.TeamsLayout.addWidget(self.newTeamButton)
+        self.TeamsLayout.addWidget(self.new_team_button)
 
-        self.removeTeamButton = QPushButton(self.TeamsBox)
-        self.removeTeamButton.setObjectName(u"removeTeamButton")
+        self.remove_team_button = QPushButton(self.TeamsBox)
+        self.remove_team_button.setObjectName(u"remove_team_button")
 
-        self.TeamsLayout.addWidget(self.removeTeamButton)
+        self.TeamsLayout.addWidget(self.remove_team_button)
 
 
         self.verticalLayout_6.addLayout(self.TeamsLayout)
@@ -185,13 +186,13 @@ class Ui_BoardEditor(object):
 
         self.verticalLayout_8 = QVBoxLayout()
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
-        self.boardCanva = QGraphicsView(self.centralwidget)
-        self.boardCanva.setObjectName(u"boardCanva")
-        self.boardCanva.setDragMode(QGraphicsView.DragMode.NoDrag)
-        self.boardCanva.setTransformationAnchor(QGraphicsView.ViewportAnchor.NoAnchor)
-        self.boardCanva.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorViewCenter)
+        self.board_canva = QGraphicsView(self.centralwidget)
+        self.board_canva.setObjectName(u"board_canva")
+        self.board_canva.setDragMode(QGraphicsView.DragMode.NoDrag)
+        self.board_canva.setTransformationAnchor(QGraphicsView.ViewportAnchor.NoAnchor)
+        self.board_canva.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorViewCenter)
 
-        self.verticalLayout_8.addWidget(self.boardCanva)
+        self.verticalLayout_8.addWidget(self.board_canva)
 
         self.groupBox = QGroupBox(self.centralwidget)
         self.groupBox.setObjectName(u"groupBox")
@@ -205,36 +206,36 @@ class Ui_BoardEditor(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.zoomOut = QToolButton(self.groupBox)
-        self.zoomOut.setObjectName(u"zoomOut")
-        self.zoomOut.setText(u"")
+        self.zoom_out = QToolButton(self.groupBox)
+        self.zoom_out.setObjectName(u"zoom_out")
+        self.zoom_out.setText(u"")
         icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.ZoomOut))
-        self.zoomOut.setIcon(icon)
-        self.zoomOut.setAutoRepeat(True)
+        self.zoom_out.setIcon(icon)
+        self.zoom_out.setAutoRepeat(True)
 
-        self.horizontalLayout_3.addWidget(self.zoomOut)
+        self.horizontalLayout_3.addWidget(self.zoom_out)
 
-        self.zoomIn = QToolButton(self.groupBox)
-        self.zoomIn.setObjectName(u"zoomIn")
+        self.zoom_in = QToolButton(self.groupBox)
+        self.zoom_in.setObjectName(u"zoom_in")
         icon1 = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.ZoomIn))
-        self.zoomIn.setIcon(icon1)
-        self.zoomIn.setAutoRepeat(True)
+        self.zoom_in.setIcon(icon1)
+        self.zoom_in.setAutoRepeat(True)
 
-        self.horizontalLayout_3.addWidget(self.zoomIn)
+        self.horizontalLayout_3.addWidget(self.zoom_in)
 
-        self.zoomSlider = QSlider(self.groupBox)
-        self.zoomSlider.setObjectName(u"zoomSlider")
-        self.zoomSlider.setMinimum(1)
-        self.zoomSlider.setMaximum(100)
-        self.zoomSlider.setValue(1)
-        self.zoomSlider.setOrientation(Qt.Orientation.Horizontal)
+        self.zoom_slider = QSlider(self.groupBox)
+        self.zoom_slider.setObjectName(u"zoom_slider")
+        self.zoom_slider.setMinimum(1)
+        self.zoom_slider.setMaximum(100)
+        self.zoom_slider.setValue(1)
+        self.zoom_slider.setOrientation(Qt.Orientation.Horizontal)
 
-        self.horizontalLayout_3.addWidget(self.zoomSlider)
+        self.horizontalLayout_3.addWidget(self.zoom_slider)
 
-        self.zoomPercent = QLabel(self.groupBox)
-        self.zoomPercent.setObjectName(u"zoomPercent")
+        self.zoom_percent = QLabel(self.groupBox)
+        self.zoom_percent.setObjectName(u"zoom_percent")
 
-        self.horizontalLayout_3.addWidget(self.zoomPercent)
+        self.horizontalLayout_3.addWidget(self.zoom_percent)
 
 
         self.horizontalLayout_4.addLayout(self.horizontalLayout_3)
@@ -260,9 +261,9 @@ class Ui_BoardEditor(object):
         BoardEditor.setStatusBar(self.statusbar)
 
         self.menubar.addAction(self.menuFile.menuAction())
-        self.menuFile.addAction(self.actionSave)
-        self.menuFile.addAction(self.actionLoad)
-        self.menuFile.addAction(self.actionNew)
+        self.menuFile.addAction(self.action_save)
+        self.menuFile.addAction(self.action_load)
+        self.menuFile.addAction(self.action_new)
 
         self.retranslateUi(BoardEditor)
 
@@ -271,18 +272,18 @@ class Ui_BoardEditor(object):
 
     def retranslateUi(self, BoardEditor):
         BoardEditor.setWindowTitle(QCoreApplication.translate("BoardEditor", u"Board Editor", None))
-        self.actionSave.setText(QCoreApplication.translate("BoardEditor", u"Save", None))
-        self.actionLoad.setText(QCoreApplication.translate("BoardEditor", u"Load", None))
-        self.actionNew.setText(QCoreApplication.translate("BoardEditor", u"New", None))
+        self.action_save.setText(QCoreApplication.translate("BoardEditor", u"Save", None))
+        self.action_load.setText(QCoreApplication.translate("BoardEditor", u"Load", None))
+        self.action_new.setText(QCoreApplication.translate("BoardEditor", u"New", None))
         self.BoardSizeBox.setTitle(QCoreApplication.translate("BoardEditor", u"Board size:", None))
         self.label_width.setText(QCoreApplication.translate("BoardEditor", u"Width", None))
         self.label_height.setText(QCoreApplication.translate("BoardEditor", u"Height", None))
         self.PiecesBox.setTitle(QCoreApplication.translate("BoardEditor", u"Pieces", None))
         self.TeamsBox.setTitle(QCoreApplication.translate("BoardEditor", u"Teams", None))
-        self.newTeamButton.setText(QCoreApplication.translate("BoardEditor", u"New team", None))
-        self.removeTeamButton.setText(QCoreApplication.translate("BoardEditor", u"Remove team", None))
-        self.zoomIn.setText("")
-        self.zoomPercent.setText(QCoreApplication.translate("BoardEditor", u"0%", None))
+        self.new_team_button.setText(QCoreApplication.translate("BoardEditor", u"New team", None))
+        self.remove_team_button.setText(QCoreApplication.translate("BoardEditor", u"Remove team", None))
+        self.zoom_in.setText("")
+        self.zoom_percent.setText(QCoreApplication.translate("BoardEditor", u"0%", None))
         self.menuFile.setTitle(QCoreApplication.translate("BoardEditor", u"File", None))
     # retranslateUi
 

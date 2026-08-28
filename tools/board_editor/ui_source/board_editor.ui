@@ -85,7 +85,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QSpinBox" name="spinBox_width">
+                    <widget class="QSpinBox" name="spinbox_width">
                      <property name="minimum">
                       <number>1</number>
                      </property>
@@ -109,7 +109,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QSpinBox" name="spinBox_height">
+                    <widget class="QSpinBox" name="spinbox_height">
                      <property name="minimum">
                       <number>1</number>
                      </property>
@@ -141,7 +141,7 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
-                <widget class="QScrollArea" name="PiecesScroll">
+                <widget class="QScrollArea" name="pieces_scroll">
                  <property name="sizeAdjustPolicy">
                   <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
                  </property>
@@ -168,7 +168,7 @@
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_3">
                    <item>
-                    <layout class="QVBoxLayout" name="PiecesContainer">
+                    <layout class="QVBoxLayout" name="pieces_container">
                      <property name="sizeConstraint">
                       <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
                      </property>
@@ -218,7 +218,7 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
                <item>
-                <widget class="QListWidget" name="TeamsList">
+                <widget class="QListWidget" name="teams_list">
                  <property name="spacing">
                   <number>10</number>
                  </property>
@@ -230,14 +230,14 @@
                <item>
                 <layout class="QVBoxLayout" name="TeamsLayout">
                  <item>
-                  <widget class="QPushButton" name="newTeamButton">
+                  <widget class="QPushButton" name="new_team_button">
                    <property name="text">
                     <string>New team</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="removeTeamButton">
+                  <widget class="QPushButton" name="remove_team_button">
                    <property name="text">
                     <string>Remove team</string>
                    </property>
@@ -257,7 +257,7 @@
       <item row="1" column="1">
        <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
-         <widget class="QGraphicsView" name="boardCanva">
+         <widget class="QGraphicsView" name="board_canva">
           <property name="dragMode">
            <enum>QGraphicsView::DragMode::NoDrag</enum>
           </property>
@@ -297,7 +297,7 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="QToolButton" name="zoomOut">
+              <widget class="QToolButton" name="zoom_out">
                <property name="text">
                 <string notr="true"/>
                </property>
@@ -310,7 +310,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="zoomIn">
+              <widget class="QToolButton" name="zoom_in">
                <property name="text">
                 <string/>
                </property>
@@ -323,7 +323,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSlider" name="zoomSlider">
+              <widget class="QSlider" name="zoom_slider">
                <property name="minimum">
                 <number>1</number>
                </property>
@@ -339,7 +339,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="zoomPercent">
+              <widget class="QLabel" name="zoom_percent">
                <property name="text">
                 <string>0%</string>
                </property>
@@ -369,24 +369,24 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionSave"/>
-    <addaction name="actionLoad"/>
-    <addaction name="actionNew"/>
+    <addaction name="action_save"/>
+    <addaction name="action_load"/>
+    <addaction name="action_new"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionSave">
+  <action name="action_save">
    <property name="text">
     <string>Save</string>
    </property>
   </action>
-  <action name="actionLoad">
+  <action name="action_load">
    <property name="text">
     <string>Load</string>
    </property>
   </action>
-  <action name="actionNew">
+  <action name="action_new">
    <property name="text">
     <string>New</string>
    </property>
