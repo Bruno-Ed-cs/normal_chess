@@ -14,10 +14,10 @@ import sprites
 class Tile(QGraphicsRectItem, QObject):
 
     coordenate: BoardPos
-    piece: Piece
-    team: Team
+    piece: Piece | None
+    team: Team | None
     default_color: QColor
-    sprite: QPixmap
+    sprite: QPixmap | None
 
     left_click = Signal()
 
@@ -78,14 +78,14 @@ class Tile(QGraphicsRectItem, QObject):
             self.left_click.emit()
 
         if event.button() == Qt.MouseButton.RightButton:
-            print(self.coordenate.x, self.coordenate.y)
+            # print(self.coordenate.x, self.coordenate.y)
             self.clean()
 
     def paint(self, painter, option, widget=None):
 
         brush = QBrush(self.default_color)
 
-        print(self.team)
+        # print(self.team)
         if self.team:
             # print(QColor(*self.team.color))
             brush = QBrush(QColor(*self.team.color))
@@ -100,10 +100,8 @@ class Tile(QGraphicsRectItem, QObject):
         painter.drawRect(self.rect())
 
         if self.sprite:
-            print("i have a sprite")
+            # print("i have a sprite")
             painter.drawPixmap(self.rect().topLeft(), self.sprite)
-        else:
-            print("i dont have a sprite")
 
 
 
@@ -139,7 +137,7 @@ class MakeTeamDialog(QDialog, Ui_MakeTeam):
             color = dialog.color.getRgb()
             name = dialog.nameEdit.text()
             team = Team(color, name, march)
-            print(team.__dict__)
+            # print(team.__dict__)
             return team
 
         return None
@@ -383,14 +381,15 @@ class Window(QMainWindow):
                 tile.set_piece(Piece([tile.coordenate.x, tile.coordenate.y], team.name, self.selected_role))
                 tile.set_team(team)
 
-    def create_board_interface(self, size: BoardPos):
+    def create_board_interface(self, size: BoardPos, keep_pieces: bool = True):
 
         pieces = []
 
-        for tile in self.scene.items():
-            if isinstance(tile, Tile):
-                if tile.get_piece():
-                    pieces.append(tile.get_piece())
+        if keep_pieces:
+            for tile in self.scene.items():
+                if isinstance(tile, Tile):
+                    if tile.get_piece():
+                        pieces.append(tile.get_piece())
 
 
         black = True
@@ -410,17 +409,18 @@ class Window(QMainWindow):
                 tile = Tile(BoardPos(x, y), color)
                 tile.left_click.connect(self.put_piece)
 
-                last_piece = next((p for p in pieces if p.position == [x, y]), None)
+                if keep_pieces:
+                    last_piece = next((p for p in pieces if p.position == [x, y]), None)
 
-                if last_piece:
-                    team_list = self.main_ui.TeamsList
-                    team = next((team_list.item(i).get_team() 
-                                 for i in range(team_list.count()) 
-                                 if isinstance(team_list.item(i), TeamListItem) and team_list.item(i).get_team().name == last_piece.team),
-                                None)
-                    if team:
-                        tile.set_piece(last_piece)
-                        tile.set_team(team)
+                    if last_piece:
+                        team_list = self.main_ui.TeamsList
+                        team = next((team_list.item(i).get_team() 
+                                     for i in range(team_list.count()) 
+                                     if isinstance(team_list.item(i), TeamListItem) and team_list.item(i).get_team().name == last_piece.team),
+                                    None)
+                        if team:
+                            tile.set_piece(last_piece)
+                            tile.set_team(team)
 
                 self.scene.addItem(tile)
 
@@ -437,7 +437,8 @@ class Window(QMainWindow):
     def make_board(self):
 
         if self.new_board_ui.exec() == QDialog.DialogCode.Accepted:
-            self.create_board_interface(BoardPos(*self.new_board_ui.get_size()))
+            self.create_board_interface(BoardPos(*self.new_board_ui.get_size()), False)
+            self.main_ui.TeamsList.clear()
 
     @Slot(int)
     def change_width(self, value: int):
