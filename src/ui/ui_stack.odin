@@ -4,7 +4,7 @@ import "core:slice"
 import "core:mem"
 import g "../globals"
 
-ui_memory: [g.ui_mem_size]byte
+ui_memory: [g.UI_MEM_SIZE]byte
 
 UiFunc :: proc(workspace: rawptr, top: bool) -> UiSig
 UiCleanup :: proc(workspace: rawptr)
@@ -36,7 +36,7 @@ Ui :: struct {
     id: int,
 }
 
-init_ui_stack :: proc() -> ^UiStack {
+ui_stack_make :: proc() -> ^UiStack {
 
     stack := new(UiStack)
     stack.layers = make([dynamic]Ui, 0, 5)
@@ -46,7 +46,7 @@ init_ui_stack :: proc() -> ^UiStack {
 }
 
 
-delete_ui_stack :: proc(stack: ^UiStack) {
+ui_stack_delete :: proc(stack: ^UiStack) {
 
     for ui in stack.layers {
 
@@ -58,7 +58,7 @@ delete_ui_stack :: proc(stack: ^UiStack) {
     free(stack)
 }
 
-push_ui :: proc(stack: ^UiStack, ui: Ui) -> int {
+ui_stack_push_ui :: proc(stack: ^UiStack, ui: Ui) -> int {
 
     ui := ui
     id := stack.next_id
@@ -72,7 +72,7 @@ push_ui :: proc(stack: ^UiStack, ui: Ui) -> int {
 
 }
 
-clean_stack :: proc(stack: ^UiStack) {
+ui_stack_clean :: proc(stack: ^UiStack) {
 
     for ui in stack.layers {
 
@@ -85,7 +85,7 @@ clean_stack :: proc(stack: ^UiStack) {
 }
 
 
-execute_ui_stack :: proc(stack: ^UiStack) {
+ui_stack_execute :: proc(stack: ^UiStack) {
 
     ui_arena: mem.Arena
     mem.arena_init(&ui_arena, ui_memory[:])
@@ -154,7 +154,7 @@ execute_ui_stack :: proc(stack: ^UiStack) {
 
 }
 
-is_ui_type_active :: proc(stack: ^UiStack, interface: UiFunc) -> bool {
+ui_stack_is_type_active :: proc(stack: ^UiStack, interface: UiFunc) -> bool {
 
     for ui in stack.layers {
 
@@ -166,7 +166,7 @@ is_ui_type_active :: proc(stack: ^UiStack, interface: UiFunc) -> bool {
 
 }
 
-is_ui_id_active :: proc(stack: ^UiStack, id: int) -> bool {
+ui_stack_is_id_active :: proc(stack: ^UiStack, id: int) -> bool {
 
     for ui in stack.layers {
 
@@ -177,12 +177,12 @@ is_ui_id_active :: proc(stack: ^UiStack, id: int) -> bool {
     return false
 }
 
-is_ui_active :: proc{
-    is_ui_id_active,
-    is_ui_type_active,
+ui_stack_is_interface_active :: proc{
+    ui_stack_is_id_active,
+    ui_stack_is_type_active,
 }
 
-remove_ui :: proc(stack: ^UiStack, ui_id: int) {
+ui_stack_remove_ui :: proc(stack: ^UiStack, ui_id: int) {
 
     target: int = -1
 

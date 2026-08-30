@@ -26,33 +26,33 @@ main :: proc() {
             mem.tracking_allocator_destroy(&track)
         }
 
-        g.log_level = .Debug
+        g.LOG_LEVEL = .Debug
         rl.SetTraceLogLevel(.ALL)
     }
 
-    context.logger = log.create_console_logger(g.log_level)
+    context.logger = log.create_console_logger(g.LOG_LEVEL)
     defer log.destroy_console_logger(context.logger)
 
     // log_allocator: log.Log_Allocator
     // log.log_allocator_init(&log_allocator, .Debug)
     // context.allocator = log.log_allocator(&log_allocator)
 
-    rl.InitWindow(g.window_size.x, g.window_size.y, "Normal Chess")
+    rl.InitWindow(g.WINDOW_SIZE.x, g.WINDOW_SIZE.y, "Normal Chess")
     defer rl.CloseWindow()
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
-    ass.init_asset_man()
+    ass.asset_man_init()
 
     board_path: string = "assets/boards/standard.json" if len(os.args) < 2 else os.args[1]
 
-    game := gm.make_match_from_file(board_path)
+    game := gm.match_make_from_file(board_path)
     if game == nil do os.exit(0)
     //gm.record_normal_match(game)
 
     // log.debug(game.teams)
 
-    match_engine(game)
+    match_engine_run(game)
 
-    gm.delete_match(game)
+    gm.match_delete(game)
 
 }

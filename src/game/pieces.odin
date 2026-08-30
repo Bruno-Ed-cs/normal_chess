@@ -43,7 +43,7 @@ Team :: struct {
     piece_sprites: rl.RenderTexture2D
 }
 
-TeamRecord :: struct {
+Team_Record :: struct {
     color: rl.Color,
     name: string,
     march: [2]i32,
@@ -51,8 +51,8 @@ TeamRecord :: struct {
 
 Move :: struct {
     attack: bool,
-    target: BoardPos,
-    origin: BoardPos,
+    target: Board_Pos,
+    origin: Board_Pos,
     side_effect: proc(game: ^Match, caller: i32),
 }
 
@@ -62,34 +62,34 @@ Piece :: struct {
     has_moved: bool,
     team: ^Team,
     id: i32,
-    position: BoardPos,
+    position: Board_Pos,
     class: Class,
-    movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int
+    movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int
 }
 
-PieceRecord :: struct {
+Piece_Record :: struct {
     team: string,
-    position: BoardPos,
+    position: Board_Pos,
     class: Class
 }
 
-Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
-    .pawn = pawn_movement,
-    .rook = rook_movement,
-    .bishop = bishop_movement,
-    .king = king_movement,
-    .queen = queen_movement,
-    .knight = knight_movement
+Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+    .pawn = movement_pawn,
+    .rook = movement_rook,
+    .bishop = movement_bishop,
+    .king = movement_king,
+    .queen = movement_queen,
+    .knight = movement_knight
 }
 
-king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
+movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
 
     move_count: int
 
     #unroll for dir in Directions {
 
             pos := self.position + dir
-            tile := get_tile(board, pos)
+            tile := board_get_tile(board, pos)
 
             if tile == nil {
 
@@ -106,7 +106,7 @@ king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
         #unroll for diag in Diagonals {
 
             pos := self.position + diag
-            tile := get_tile(board, pos)
+            tile := board_get_tile(board, pos)
 
             if tile == nil {
 
@@ -123,20 +123,20 @@ king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
             for x in self.position.x + 1..<board.size.x {
                 // fmt.println(x)
 
-                pos := get_tile(board, {x, self.position.y})
+                pos := board_get_tile(board, {x, self.position.y})
                 if pos != nil && pos.piece_ref != nil {
                     if pos.piece_ref.class != .rook {
                         break
                     } else {
                         if !pos.piece_ref.has_moved {
-                            target := BoardPos{self.position.x + 2, self.position.y}
-                            if get_tile(board, target) == nil do break
+                            target := Board_Pos{self.position.x + 2, self.position.y}
+                            if board_get_tile(board, target) == nil do break
                             
                             append(moves_buff, Move{
                                 attack = false, 
                                 target = target,
                                 origin = self.position,
-                                side_effect = castleling
+                                side_effect = side_effect_castleling
                             })
                             move_count += 1
 
@@ -149,20 +149,20 @@ king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
 
             for x := self.position.x -1; x >= 0; x -= 1 {
                 // fmt.println(x)
-                pos := get_tile(board, {x, self.position.y})
+                pos := board_get_tile(board, {x, self.position.y})
                 if pos != nil && pos.piece_ref != nil {
                     if pos.piece_ref.class != .rook {
                         break
                     } else {
                         if !pos.piece_ref.has_moved {
-                            target := BoardPos{self.position.x - 2, self.position.y}
-                            if get_tile(board, target) == nil do break
+                            target := Board_Pos{self.position.x - 2, self.position.y}
+                            if board_get_tile(board, target) == nil do break
                             
                             append(moves_buff, Move{
                                 attack = false, 
                                 target = target,
                                 origin = self.position,
-                                side_effect = castleling
+                                side_effect = side_effect_castleling
                             })
                             move_count += 1
 
@@ -180,15 +180,15 @@ king_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
 
 }
 
-castleling :: proc(game: ^Match, caller: i32) {
+side_effect_castleling :: proc(game: ^Match, caller: i32) {
 
-    piece := get_piece(game, caller)
+    piece := match_get_piece(game, caller)
     distance :f32 = f32(game.board.size.x) * 10
     closest_tower: ^Piece
 
     for row in 0..<game.board.size.x{
 
-        tile := get_tile(&game.board, {row, piece.position.y})
+        tile := board_get_tile(&game.board, {row, piece.position.y})
         if tile != nil && tile.piece_ref != nil{
             if target := tile.piece_ref; target.class == .rook && target.team == piece.team{
                 
@@ -217,13 +217,13 @@ castleling :: proc(game: ^Match, caller: i32) {
 
 }
 
-queen_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
+movement_queen :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
 
-    return bishop_movement(self, board, moves_buff) + rook_movement(self, board, moves_buff)
+    return movement_bishop(self, board, moves_buff) + movement_rook(self, board, moves_buff)
 
 }
 
-bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
+movement_bishop :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
 
     moves_count: int
 
@@ -232,7 +232,7 @@ bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.ma
         for multipliyer: i32 = 1;; multipliyer += 1 {
 
             log.debug(self.position + multipliyer * diag)
-            tile := get_tile(board, self.position + multipliyer * diag)
+            tile := board_get_tile(board, self.position + multipliyer * diag)
 
             if tile == nil do break 
 
@@ -255,7 +255,7 @@ bishop_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.ma
 
 }
 
-knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
+movement_knight :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
 
     moves_count :int
 
@@ -266,7 +266,7 @@ knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.ma
         move1 := middle + swizzle(dir, 1, 0)
         move2 := middle - swizzle(dir, 1, 0)
 
-        if tile := get_tile(board, move1); tile != nil {
+        if tile := board_get_tile(board, move1); tile != nil {
 
             if tile.piece_ref == nil {
                 append(moves_buff, Move{attack = false, target = move1, origin = self.position})
@@ -278,7 +278,7 @@ knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.ma
 
         }
 
-        if tile := get_tile(board, move2); tile != nil {
+        if tile := board_get_tile(board, move2); tile != nil {
 
             if tile.piece_ref == nil {
                 append(moves_buff, Move{attack = false, target = move2, origin = self.position})
@@ -294,7 +294,7 @@ knight_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.ma
     return moves_count
 }
 
-rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
+movement_rook :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
 
     moves_count :int
 
@@ -306,7 +306,7 @@ rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
         for ;;walked += 1{
 
             move += dir
-            tile := get_tile(board, move)
+            tile := board_get_tile(board, move)
 
             if tile == nil do break
 
@@ -331,11 +331,11 @@ rook_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
 }
 
 
-pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_moves]Move) -> int {
+movement_pawn :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
 
     moves_count: int
 
-    diagonal_killers : [2]BoardPos
+    diagonal_killers : [2]Board_Pos
 
     switch self.team.march_direction {
 
@@ -356,7 +356,7 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
 
     for &diag in diagonal_killers {
         log.debug(diag)
-        if tile := get_tile(board, diag); tile != nil{
+        if tile := board_get_tile(board, diag); tile != nil{
             if tile.piece_ref != nil && tile.piece_ref.team != self.team{
                 append(moves_buff, Move{ attack = true, target = diag, origin = self.position})
                 moves_count += 1
@@ -370,7 +370,7 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
 
         move := last_move + self.team.march_direction
 
-        tile := get_tile(board, move)
+        tile := board_get_tile(board, move)
         if tile == nil do continue
         if tile.piece_ref != nil do continue
 
@@ -384,7 +384,7 @@ pawn_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.max_
 
 }
 
-make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Piece) {
+make_piece :: proc(class: Class, position: Board_Pos, team: ^Team) -> (piece: Piece) {
 
     @(static) next_id: i32 = 1
 
@@ -401,25 +401,26 @@ make_piece :: proc(class: Class, position: BoardPos, team: ^Team) -> (piece: Pie
     switch class {
     
     case .pawn:
-        piece.movement = pawn_movement
+        piece.movement = movement_pawn
     case .rook:
-        piece.movement = rook_movement
+        piece.movement = movement_rook
     case .bishop:
-        piece.movement = bishop_movement
+        piece.movement = movement_bishop
     case .king:
-        piece.movement = king_movement
+        piece.movement = movement_king
     case .queen:
-        piece.movement = queen_movement
+        piece.movement = movement_queen
     case .knight:
-        piece.movement = knight_movement
+        piece.movement = movement_knight
 
     }
 
     return
 }
-move :: proc(piece: ^Piece, board: ^Board, target: BoardPos) {
 
-    tile := get_tile(board, target)
+piece_move :: proc(piece: ^Piece, board: ^Board, target: Board_Pos) {
+
+    tile := board_get_tile(board, target)
 
     if tile == nil do return
 
@@ -427,21 +428,21 @@ move :: proc(piece: ^Piece, board: ^Board, target: BoardPos) {
     piece.position = target
 
     if tile.piece_ref != nil {
-        kill(tile.piece_ref)
+        piece_kill(tile.piece_ref)
         tile.piece_ref = piece
     }
 
 }
 
-kill :: proc(piece: ^Piece) {
+piece_kill :: proc(piece: ^Piece) {
 
     piece.alive = false
 
 }
 
-make_team :: proc(name: string, color: rl.Color, cemitery: [2]i32) -> Team {
+team_make :: proc(name: string, color: rl.Color, cemitery: [2]i32) -> Team {
 
-    base_spritesheet := ass.get_asset("sprite_sheet.png").(rl.Texture2D)
+    base_spritesheet := ass.asset_man_get_asset("sprite_sheet.png").(rl.Texture2D)
     sprite_image := rl.LoadImageFromTexture(base_spritesheet)
     defer rl.UnloadImage(sprite_image)
 
@@ -481,13 +482,13 @@ make_team :: proc(name: string, color: rl.Color, cemitery: [2]i32) -> Team {
 
 }
 
-delete_team :: proc(team: ^Team) {
+team_delete :: proc(team: ^Team) {
 
     rl.UnloadRenderTexture(team.piece_sprites)
     delete(team.name)
 }
 
-promote :: proc(target: ^Piece, new_role: Class) {
+piece_promote :: proc(target: ^Piece, new_role: Class) {
 
     moves := Movements
 
@@ -496,7 +497,7 @@ promote :: proc(target: ^Piece, new_role: Class) {
 
 }
 
-get_piece :: proc(game: ^Match, id: i32) -> ^Piece {
+match_get_piece :: proc(game: ^Match, id: i32) -> ^Piece {
 
     for &piece in game.pieces {
         if piece.id == id do return &piece

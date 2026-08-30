@@ -23,7 +23,7 @@ Asset_types :: enum {
 asset_bank: map[string]Asset
 error_sprite: rl.Texture2D
 
-init_asset_man :: proc() {
+asset_man_init :: proc() {
 
     spritesheet := #load("../../assets/sprites/sprite_sheet.png")
 
@@ -42,7 +42,7 @@ init_asset_man :: proc() {
 
 }
 
-get_asset :: proc(asset_name: string) -> Asset {
+asset_man_get_asset :: proc(asset_name: string) -> Asset {
 
     asset, ok := asset_bank[asset_name]
     log.debug(asset_bank)
@@ -117,11 +117,11 @@ get_asset :: proc(asset_name: string) -> Asset {
 
 }
 
-delete_asset :: proc(asset_name: string) {
+asset_man_delete_asset :: proc(asset_name: string) {
     delete_key(&asset_bank, asset_name)
 }
 
-clear_assets :: proc() {
+asset_man_clear :: proc() {
 
     for key, asset in asset_bank {
         switch v in asset {

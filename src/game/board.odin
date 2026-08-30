@@ -5,12 +5,12 @@ import g "../globals"
 import "core:log"
 import "core:fmt"
 
-BoardPos :: [2]i32
-tile_size :: 32
+Board_Pos :: [2]i32
+TILE_SIZE :: 32
 
 Tile :: struct {
 
-    coordenate: BoardPos,
+    coordenate: Board_Pos,
     hitbox: rl.Rectangle,
     piece_ref: ^Piece
 }
@@ -27,7 +27,7 @@ Board :: struct {
 }
 
 // the coordenate given is the top left corner of the tile
-board_to_world :: proc(board: ^Board, position: BoardPos) -> (world_pos: Vec2, valid: bool) {
+board_to_world :: proc(board: ^Board, position: Board_Pos) -> (world_pos: Vec2, valid: bool) {
 
     if position.y >= board.size.y || position.x >= board.size.x ||
        position.y < 0 || position.x < 0 {
@@ -35,15 +35,15 @@ board_to_world :: proc(board: ^Board, position: BoardPos) -> (world_pos: Vec2, v
            return Vec2{0, 0}, false
     }
 
-    world_pos.x = f32(i32(board.position.x) + position.x * tile_size)
-    world_pos.y = f32(i32(board.position.y) + position.y * tile_size)
+    world_pos.x = f32(i32(board.position.x) + position.x * TILE_SIZE)
+    world_pos.y = f32(i32(board.position.y) + position.y * TILE_SIZE)
     valid = true
 
     return
 }
 
 // returns nil when the position is invalid
-get_tile :: proc(board: ^Board, position: BoardPos) -> ^Tile {
+board_get_tile :: proc(board: ^Board, position: Board_Pos) -> ^Tile {
 
     if position.y >= board.size.y || position.x >= board.size.x ||
        position.y < 0 || position.x < 0 {
@@ -54,13 +54,13 @@ get_tile :: proc(board: ^Board, position: BoardPos) -> ^Tile {
     return &board.tiles[position.x + position.y * board.size.y]
 }
 
-world_to_board :: proc(board: ^Board, position: Vec2) -> (board_pos: BoardPos, in_bounds: bool) {
+world_to_board :: proc(board: ^Board, position: Vec2) -> (board_pos: Board_Pos, in_bounds: bool) {
 
     board_bounds := rl.Rectangle {
         x = board.position.x,
         y = board.position.y,
-        width = f32(board.size.x * tile_size),
-        height = f32(board.size.y * tile_size)
+        width = f32(board.size.x * TILE_SIZE),
+        height = f32(board.size.y * TILE_SIZE)
     }
 
     if !rl.CheckCollisionPointRec(position, board_bounds) {
@@ -86,13 +86,13 @@ world_to_board :: proc(board: ^Board, position: Vec2) -> (board_pos: BoardPos, i
 
 }
 
-make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) -> Board {
+board_make :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) -> Board {
 
     board := Board{
         position = {0, 0},
         size = size,
         tiles = make([]Tile, size.x * size.y),
-        render = rl.LoadRenderTexture(size.x * tile_size, size.y * tile_size),
+        render = rl.LoadRenderTexture(size.x * TILE_SIZE, size.y * TILE_SIZE),
     }
     board.sprite = board.render.texture
 
@@ -107,8 +107,8 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
             tile.hitbox = {
                 x = tile_pos.x,
                 y = tile_pos.y,
-                width = tile_size,
-                height = tile_size
+                width = TILE_SIZE,
+                height = TILE_SIZE
             }
 
 
@@ -125,10 +125,10 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
 
         for row in 0..<size.x {
             rec := rl.Rectangle{
-                x = f32(row * tile_size),
-                y = f32(col * tile_size),
-                width = tile_size,
-                height = tile_size
+                x = f32(row * TILE_SIZE),
+                y = f32(col * TILE_SIZE),
+                width = TILE_SIZE,
+                height = TILE_SIZE
             }
 
             color := col2 if set_color else col1
@@ -144,7 +144,7 @@ make_board :: proc(size: [2]i32 = {8, 8}, col1 := rl.WHITE, col2 := rl.BLACK) ->
 
 }
 
-update_board :: proc(board: ^Board, pieces: []Piece) {
+board_update :: proc(board: ^Board, pieces: []Piece) {
 
     for &tile in board.tiles {
         for &piece in pieces {
@@ -164,7 +164,7 @@ update_board :: proc(board: ^Board, pieces: []Piece) {
 
 }
 
-delete_board :: proc(board: ^Board) {
+board_delete :: proc(board: ^Board) {
 
     delete(board.tiles)
     rl.UnloadRenderTexture(board.render)

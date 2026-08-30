@@ -2,23 +2,23 @@ package globals
 import rl "vendor:raylib"
 import "core:log"
 
-log_level := log.Level.Fatal
+LOG_LEVEL := log.Level.Fatal
 
-window_size := [2]i32{1200, 800}
-camera_speed :: 700
-zoom_speed :: 1.0
-pause: bool = false
+WINDOW_SIZE := [2]i32{1200, 800}
+CAMERA_SPEED :: 700
+ZOOM_SPEED :: 1.0
+PAUSE: bool = false
 
-ui_mem_size :: 50000
+UI_MEM_SIZE :: 50000
 
-max_pieces :: 1000
-max_moves :: 10000
+MAX_PIECES :: 1000
+MAX_MOVES :: 10000
 
-font_size :: 32
-roundness :: 0.16
-segments :: 2
-background_color :: rl.Color{10, 10, 10, 200}
-text_color:: rl.WHITE
-background_hover:: rl.Color{100, 100, 100, 255}
-text_hover:: rl.YELLOW
+FONT_SIZE :: 32
+ROUNDNESS :: 0.16
+SEGMENTS :: 2
+BACKGROUND_COLOR :: rl.Color{10, 10, 10, 200}
+TEXT_COLOR:: rl.WHITE
+BACKGROUND_HOVER:: rl.Color{100, 100, 100, 255}
+TEXT_HOVER:: rl.YELLOW
 

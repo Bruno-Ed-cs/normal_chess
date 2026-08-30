@@ -8,14 +8,14 @@ import g "globals"
 import "core:log"
 
 
-match_engine :: proc(game: ^gm.Match) {
+match_engine_run :: proc(game: ^gm.Match) {
 
     //fmt.println(game.pieces)
-    interfaces := ui.init_ui_stack()
-    defer ui.delete_ui_stack(interfaces)
+    interfaces := ui.ui_stack_make()
+    defer ui.ui_stack_delete(interfaces)
 
     camera := rl.Camera2D{
-        offset = {f32(g.window_size.x /2), f32(g.window_size.y /2)},
+        offset = {f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)},
         rotation = 0.0,
         target = {0, 0},
         zoom = 2.6
@@ -25,10 +25,10 @@ match_engine :: proc(game: ^gm.Match) {
 
     board_center := [2]f32{f32(game.board.sprite.width/2), f32(game.board.sprite.height/2)}
     camera.target = board_center
-    camera.zoom = f32(g.window_size.y) / f32(game.board.sprite.height)
+    camera.zoom = f32(g.WINDOW_SIZE.y) / f32(game.board.sprite.height)
 
     debug_id: int
-    ui.push_ui(interfaces, ui.match_ui(game))
+    ui.ui_stack_push_ui(interfaces, ui.match_ui(game))
     // ui.push_ui(interfaces, ui.promotion_ui(game, 1))
     promotion_ui := 0
 
@@ -40,59 +40,59 @@ match_engine :: proc(game: ^gm.Match) {
 
         if rl.IsKeyReleased(.F3) {
 
-            if !ui.is_ui_active(interfaces, debug_id) {
-                debug_id = ui.push_ui(interfaces, ui.debug_ui(game, &camera))
+            if !ui.ui_stack_is_interface_active(interfaces, debug_id) {
+                debug_id = ui.ui_stack_push_ui(interfaces, ui.ui_debug(game, &camera))
             } else {
-                ui.remove_ui(interfaces, debug_id) 
+                ui.ui_stack_remove_ui(interfaces, debug_id) 
             }
         }
 
         if rl.IsKeyReleased(.P) {
-            g.pause = !g.pause
+            g.PAUSE = !g.PAUSE
         }
 
         update: {
 
             dt = rl.GetFrameTime()
-            g.window_size.x = rl.GetScreenWidth()
-            g.window_size.y = rl.GetScreenHeight()
-            camera.offset = {f32(g.window_size.x /2), f32(g.window_size.y /2)}
-            zoom_factor := (f32(g.window_size.y) / f32(game.board.size.y * gm.tile_size))
+            g.WINDOW_SIZE.x = rl.GetScreenWidth()
+            g.WINDOW_SIZE.y = rl.GetScreenHeight()
+            camera.offset = {f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)}
+            zoom_factor := (f32(g.WINDOW_SIZE.y) / f32(game.board.size.y * gm.TILE_SIZE))
             camera.zoom = zoom_factor - zoom_factor * 0.02
 
             // log.debug(game.teams)
             //its already fucked here
 
-            camera_control(&camera, dt)
-            if !g.pause do game_control(game, camera)
-            gm.update_board(&game.board, game.pieces[:])
-            gm.update_match(game)
+            match_engine_camera_control(&camera, dt)
+            if !g.PAUSE do match_engine_gameplay_control(game, camera)
+            gm.board_update(&game.board, game.pieces[:])
+            gm.match_update(game)
 
 
             for &piece in game.pieces {
 
-                if ui.is_ui_active(interfaces, promotion_ui) do break
+                if ui.ui_stack_is_interface_active(interfaces, promotion_ui) do break
 
                 if piece.class == .pawn {
 
                     if piece.team.march_direction.x != 0 {
                         if piece.team.march_direction.x == 1 {
-                            if piece.position.x == game.board.size.x -1 do promotion_ui = ui.push_ui(interfaces, ui.promotion_ui(game, piece.id))
+                            if piece.position.x == game.board.size.x -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
                         }
 
                         if piece.team.march_direction.x == -1 {
-                            if piece.position.x == 0 do promotion_ui = ui.push_ui(interfaces, ui.promotion_ui(game, piece.id))
+                            if piece.position.x == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
                         }
                     }
 
                     if piece.team.march_direction.y != 0 {
 
                         if piece.team.march_direction.y == 1 {
-                            if piece.position.y == game.board.size.y -1 do promotion_ui = ui.push_ui(interfaces, ui.promotion_ui(game, piece.id))
+                            if piece.position.y == game.board.size.y -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
                         }
 
                         if piece.team.march_direction.y == -1 {
-                            if piece.position.y == 0 do promotion_ui = ui.push_ui(interfaces, ui.promotion_ui(game, piece.id))
+                            if piece.position.y == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
                         }
                     }
                 }
@@ -127,7 +127,7 @@ match_engine :: proc(game: ^gm.Match) {
             if game.selected_piece != nil {
 
                 pos, valid := gm.board_to_world(&game.board, game.selected_piece.position)
-                rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, gm.tile_size, gm.tile_size}, rl.BLUE)
+                rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, gm.TILE_SIZE, gm.TILE_SIZE}, rl.BLUE)
             }
 
 
@@ -143,8 +143,8 @@ match_engine :: proc(game: ^gm.Match) {
                     rec := rl.Rectangle {
                         x = draw_pos.x,
                         y = draw_pos.y,
-                        width = gm.tile_size,
-                        height = gm.tile_size
+                        width = gm.TILE_SIZE,
+                        height = gm.TILE_SIZE
                     }
 
                     rl.DrawRectangleLinesEx(rec, 2.0, color)
@@ -182,7 +182,7 @@ match_engine :: proc(game: ^gm.Match) {
 
             rl.EndMode2D()
 
-            ui.execute_ui_stack(interfaces)
+            ui.ui_stack_execute(interfaces)
 
             rl.EndDrawing()
 
@@ -190,39 +190,39 @@ match_engine :: proc(game: ^gm.Match) {
 
     }
 
-    ass.clear_assets()
+    ass.asset_man_clear()
 }
 
-camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
+match_engine_camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
 
     if rl.IsKeyDown(.LEFT_CONTROL) && rl.IsKeyDown(.EQUAL) {
-        camera.zoom += g.zoom_speed * dt
+        camera.zoom += g.ZOOM_SPEED * dt
     }
 
     if rl.IsKeyDown(.LEFT_CONTROL) && rl.IsKeyDown(.MINUS) {
-        camera.zoom -= g.zoom_speed * dt
+        camera.zoom -= g.ZOOM_SPEED * dt
 
     }
 
     if rl.IsKeyDown(.DOWN) {
-        camera.target.y += g.camera_speed * dt
+        camera.target.y += g.CAMERA_SPEED * dt
     }
 
     if rl.IsKeyDown(.UP) {
-        camera.target.y -= g.camera_speed * dt
+        camera.target.y -= g.CAMERA_SPEED * dt
     }
 
     if rl.IsKeyDown(.LEFT) {
-        camera.target.x -= g.camera_speed * dt
+        camera.target.x -= g.CAMERA_SPEED * dt
     }
 
     if rl.IsKeyDown(.RIGHT) {
-        camera.target.x += g.camera_speed * dt
+        camera.target.x += g.CAMERA_SPEED * dt
     }
 
 }
 
-game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
+match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
     mouse_pos := rl.GetMousePosition()
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
@@ -230,10 +230,10 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
     hovering, in_bounds := gm.world_to_board(&game.board, world_pos)
 
     if in_bounds{
-        tile := gm.get_tile(&game.board, hovering)
+        tile := gm.board_get_tile(&game.board, hovering)
         if tile != nil && tile.piece_ref != nil {
 
-            if tile.piece_ref.team == gm.get_team_turn(game) do rl.SetMouseCursor(.POINTING_HAND)
+            if tile.piece_ref.team == gm.match_get_cur_turn_team(game) do rl.SetMouseCursor(.POINTING_HAND)
         }
 
         for move in game.movements {
@@ -252,9 +252,9 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
                 // fmt.println(target_tile)
 
-                cur_team := gm.get_team_turn(game)
+                cur_team := gm.match_get_cur_turn_team(game)
 
-                if tile := gm.get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
+                if tile := gm.board_get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
                     if cur_team == tile.piece_ref.team { 
                         game.selected_piece = tile.piece_ref
                         game.selected_piece.movement(tile.piece_ref, &game.board, &game.movements) 
@@ -267,12 +267,12 @@ game_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
                 for move in game.movements {
                     if move.target == target_tile {
-                        gm.move(game.selected_piece, &game.board, move.target)
+                        gm.piece_move(game.selected_piece, &game.board, move.target)
                         
                         if move.side_effect != nil {
                             move.side_effect(game, game.selected_piece.id)
                         }
-                        gm.end_turn(game)
+                        gm.match_end_turn(game)
                         game.selected_piece = nil
                         clear(&game.movements)
                         break

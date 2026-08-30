@@ -10,33 +10,33 @@ import str "core:strings"
 
 Match :: struct {
     selected_piece: ^Piece,
-    pieces: [dynamic; g.max_pieces]Piece,
-    original_formation: []PieceRecord,
+    pieces: [dynamic; g.MAX_PIECES]Piece,
+    original_formation: []Piece_Record,
     teams: []Team,
     curr_turn: int,
-    movements: [dynamic; g.max_moves]Move,
+    movements: [dynamic; g.MAX_MOVES]Move,
     board: Board,
     //returns nil when no one won yet
     win_condition: proc(game: ^Match) -> ^Team,
 }
 
-MatchRecord :: struct {
-    pieces: []PieceRecord,
+Match_Record :: struct {
+    pieces: []Piece_Record,
     board_size: [2]i32,
-    teams: []TeamRecord
+    teams: []Team_Record
 }
 
 
 record_normal_match :: proc(game: ^Match) {
 
-    record: MatchRecord
+    record: Match_Record
     record.board_size = game.board.size
-    pieces: [32]PieceRecord
-    teams: [2]TeamRecord
+    pieces: [32]Piece_Record
+    teams: [2]Team_Record
 
     for team, i in game.teams {
 
-        teams[i] = TeamRecord {
+        teams[i] = Team_Record {
             march = team.march_direction,
             name = team.name,
             color = team.color
@@ -50,7 +50,7 @@ record_normal_match :: proc(game: ^Match) {
 
     for piece, i in game.pieces {
 
-        pieces[i] = PieceRecord {
+        pieces[i] = Piece_Record {
             class = piece.class,
             position = piece.position,
             team = piece.team.name
@@ -71,7 +71,7 @@ record_normal_match :: proc(game: ^Match) {
     _ = os.write_entire_file("standard.json", json_data)
 }
 
-last_king_standing_win :: proc(game: ^Match) -> ^Team {
+match_win_rule_last_king_standing :: proc(game: ^Match) -> ^Team {
 
     if len(game.teams) < 2 do return nil
 
@@ -92,7 +92,7 @@ last_king_standing_win :: proc(game: ^Match) -> ^Team {
 }
 
 // the path is relative to the executable
-make_match_from_file :: proc(filepath: string) -> ^Match {
+match_make_from_file :: proc(filepath: string) -> ^Match {
 
     file, ferr := os.read_entire_file(filepath, context.allocator)
     defer if ferr == nil do delete(file)
@@ -104,7 +104,7 @@ make_match_from_file :: proc(filepath: string) -> ^Match {
     } 
 
 
-    match_data: MatchRecord
+    match_data: Match_Record
     uerr := json.unmarshal(file, &match_data, allocator = context.temp_allocator)
     if uerr != nil {
         log.fatal("Error unmarshaling", uerr, file)
@@ -115,21 +115,21 @@ make_match_from_file :: proc(filepath: string) -> ^Match {
 
     match := new(Match)
 
-    match.board = make_board(match_data.board_size)
-    match.win_condition = last_king_standing_win
+    match.board = board_make(match_data.board_size)
+    match.win_condition = match_win_rule_last_king_standing
 
     teams := make([dynamic]Team)
 
     for team in match_data.teams {
 
-        append(&teams, make_team(str.clone(team.name), team.color, team.march))
+        append(&teams, team_make(str.clone(team.name), team.color, team.march))
     }
 
     match.teams = teams[:]
 
     populate_formation(match_data.pieces, match.teams[:], &match.pieces)
 
-    match.original_formation = make([]PieceRecord, len(match_data.pieces))
+    match.original_formation = make([]Piece_Record, len(match_data.pieces))
 
     copy(match.original_formation, match_data.pieces)
     for &piece in match.original_formation {
@@ -148,7 +148,7 @@ make_match_from_file :: proc(filepath: string) -> ^Match {
 
 }
 
-populate_formation :: proc(pieces: []PieceRecord, teams: []Team, dest: ^[dynamic; g.max_pieces]Piece) {
+populate_formation :: proc(pieces: []Piece_Record, teams: []Team, dest: ^[dynamic; g.MAX_PIECES]Piece) {
 
     for piece in pieces {
 
@@ -213,7 +213,7 @@ populate_formation :: proc(pieces: []PieceRecord, teams: []Team, dest: ^[dynamic
 //
 // }
 
-reset_match :: proc(self: ^Match) {
+match_reset :: proc(self: ^Match) {
 
     clear(&self.pieces)
     populate_formation(self.original_formation, self.teams, &self.pieces)
@@ -223,32 +223,32 @@ reset_match :: proc(self: ^Match) {
     self.curr_turn = 0
 }
 
-delete_match :: proc(match: ^Match) {
+match_delete :: proc(match: ^Match) {
 
     delete(match.teams)
-    delete_board(&match.board)
+    board_delete(&match.board)
     delete(match.original_formation)
     for &i in match.teams {
-        delete_team(&i)
+        team_delete(&i)
     }
     free(match)
 
 
 }
 
-update_match :: proc(self: ^Match) {
+match_update :: proc(self: ^Match) {
 
     winner := self.win_condition(self) 
 
     if winner != nil {
         winner.score += 1
 
-        reset_match(self)
+        match_reset(self)
     }
 
 }
 
-end_turn :: proc(self: ^Match) {
+match_end_turn :: proc(self: ^Match) {
 
     self.curr_turn += 1 
 
@@ -257,7 +257,7 @@ end_turn :: proc(self: ^Match) {
 
 }
 
-get_team_turn :: proc(self: ^Match) -> ^Team {
+match_get_cur_turn_team :: proc(self: ^Match) -> ^Team {
 
     assert(self.curr_turn >= 0 && self.curr_turn < len(self.teams), "the team index in the current turn is out of sync with the array")
 

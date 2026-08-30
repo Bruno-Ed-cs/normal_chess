@@ -20,8 +20,8 @@ scr_pos :: #force_inline proc(pos: [2]f32) -> [2]f32 {
     pos.x = clamp(pos.x, 0.0, 1.0)   
 
     return [2]f32 {
-        f32(g.window_size.x) * pos.x,
-        f32(g.window_size.y) * pos.y
+        f32(g.WINDOW_SIZE.x) * pos.x,
+        f32(g.WINDOW_SIZE.y) * pos.y
     }
 }
 
@@ -29,21 +29,21 @@ norm_pos :: #force_inline proc(pos: [2]f32) -> [2]f32 {
 
     pos := pos
 
-    pos.y = clamp(pos.y, 1.0, f32(g.window_size.y))
-    pos.x = clamp(pos.x, 1.0, f32(g.window_size.y))   
+    pos.y = clamp(pos.y, 1.0, f32(g.WINDOW_SIZE.y))
+    pos.x = clamp(pos.x, 1.0, f32(g.WINDOW_SIZE.y))   
 
     return [2]f32 {
-        f32(g.window_size.x) / pos.x,
-        f32(g.window_size.y) / pos.y
+        f32(g.WINDOW_SIZE.x) / pos.x,
+        f32(g.WINDOW_SIZE.y) / pos.y
     }
 }
 
-LongTriangle :: struct {
+Long_Triangle :: struct {
     triangle: [3]rl.Vector2,
     end: rl.Vector2
 }
 
-draw_long_triangle :: proc(shape: LongTriangle, color: rl.Color, outline: rl.Color = rl.BLANK, thickness: f32 = 1.0) {
+long_triangle_draw :: proc(shape: Long_Triangle, color: rl.Color, outline: rl.Color = rl.BLANK, thickness: f32 = 1.0) {
 
     rect := rl.Rectangle{
        x = shape.triangle[0].x,
@@ -64,17 +64,17 @@ draw_long_triangle :: proc(shape: LongTriangle, color: rl.Color, outline: rl.Col
 
 
 
-simple_button :: proc(title: string , width: f32, pos: [2]f32, padding: f32 = 10, justify: Justification = .center) -> bool {
+component_simple_button :: proc(title: string , width: f32, pos: [2]f32, padding: f32 = 10, justify: Justification = .center) -> bool {
 
     body := rl.Rectangle{ 
         x = pos.x,
         y = pos.y,
         width = width,
-        height = g.font_size + padding
+        height = g.FONT_SIZE + padding
     }
 
     label := str.clone_to_cstring(title, context.temp_allocator)
-    text_wid := rl.MeasureText(label, g.font_size)
+    text_wid := rl.MeasureText(label, g.FONT_SIZE)
 
     text_pos :[2]i32 
 
@@ -98,19 +98,19 @@ simple_button :: proc(title: string , width: f32, pos: [2]f32, padding: f32 = 10
             }
     }
 
-    col1 := g.background_color
-    col2 := g.text_color
+    col1 := g.BACKGROUND_COLOR
+    col2 := g.TEXT_COLOR
 
     if rl.CheckCollisionPointRec(rl.GetMousePosition(), body) {
 
-        col1 = g.background_hover
-        col2 = g.text_hover
+        col1 = g.BACKGROUND_HOVER
+        col2 = g.TEXT_HOVER
         rl.SetMouseCursor(.POINTING_HAND)
     }
 
-    rl.DrawRectangleRounded(body, g.roundness, g.segments, col1)
-    rl.DrawRectangleRoundedLines(body, g.roundness, g.segments, col2)
-    rl.DrawText(label, text_pos.x, text_pos.y, g.font_size, col2)
+    rl.DrawRectangleRounded(body, g.ROUNDNESS, g.SEGMENTS, col1)
+    rl.DrawRectangleRoundedLines(body, g.ROUNDNESS, g.SEGMENTS, col2)
+    rl.DrawText(label, text_pos.x, text_pos.y, g.FONT_SIZE, col2)
 
     if rl.CheckCollisionPointRec(rl.GetMousePosition(), body) && rl.IsMouseButtonPressed(.LEFT) do return true
     else do return false
