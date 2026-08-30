@@ -1,5 +1,4 @@
 import sys
-import math
 import json
 from PySide6.QtWidgets import *
 from PySide6.QtCore import QObject, Slot, Qt, Signal
@@ -72,7 +71,7 @@ class Tile(QGraphicsRectItem, QObject):
         self.sprite = None
         self.update()
 
-    def mousePressEvent(self, event: QMouseEvent):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
 
         if event.button() == Qt.MouseButton.LeftButton:
             self.left_click.emit()
