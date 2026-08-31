@@ -108,37 +108,46 @@ match_engine_run :: proc(game: ^gm.Match) {
 
         }
 
-        drawing: {
-            rl.BeginDrawing()
-            rl.ClearBackground(rl.BLACK)
-            rl.BeginMode2D(camera)
+        match_engine_draw(game, &camera, interfaces)
 
-            rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
-            mouse_pos := rl.GetMousePosition()
-            world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
-
-            // for tile in game.board.tiles {
-            //
-            //     if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
-            //         rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
-            //     }
-            // }
-
-            if game.selected_piece != nil {
-
-                pos, valid := gm.board_to_world(&game.board, game.selected_piece.position)
-                rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, gm.TILE_SIZE, gm.TILE_SIZE}, rl.BLUE)
-            }
+    }
 
 
-            for move in game.movements {
+    ass.asset_man_clear()
+}
 
-                draw_pos, in_bounds := gm.board_to_world(&game.board, move.target)
-                if !in_bounds do continue
-                    color: rl.Color = rl.BLUE
+match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
 
-                    if move.attack do color = rl.RED
-                    if move.side_effect != nil do color = rl.GREEN
+    rl.BeginDrawing()
+    rl.ClearBackground(rl.BLACK)
+    rl.BeginMode2D(camera^)
+
+    rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
+    mouse_pos := rl.GetMousePosition()
+    world_pos := rl.GetScreenToWorld2D(mouse_pos, camera^)
+
+    // for tile in game.board.tiles {
+    //
+    //     if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
+    //         rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
+    //     }
+    // }
+
+    if game.selected_piece != nil {
+
+        pos, valid := gm.board_to_world(&game.board, game.selected_piece.position)
+        rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, gm.TILE_SIZE, gm.TILE_SIZE}, rl.BLUE)
+    }
+
+
+    for move in game.movements {
+
+        draw_pos, in_bounds := gm.board_to_world(&game.board, move.target)
+        if !in_bounds do continue
+            color: rl.Color = rl.BLUE
+
+            if move.attack do color = rl.RED
+                if move.side_effect != nil do color = rl.GREEN
 
                     rec := rl.Rectangle {
                         x = draw_pos.x,
@@ -148,49 +157,45 @@ match_engine_run :: proc(game: ^gm.Match) {
                     }
 
                     rl.DrawRectangleLinesEx(rec, 2.0, color)
-            }
-
-            for &piece in game.pieces {
-                tile_pos , ok := gm.board_to_world(&game.board, piece.position)
-                if piece.alive {
-                    source := rl.Rectangle {0, 0, 32, 32}
-
-                    switch piece.class {
-
-                    case .pawn:
-                    case .rook:
-                        source.x = 32
-                        source.y = 0
-                    case .bishop:
-                        source.x = 0
-                        source.y = 32
-                    case .king:
-                        source.x = 32 * 2
-                        source.y = 32
-                    case .queen:
-                        source.x = 32 * 2
-                        source.y = 0
-                    case .knight:
-                        source.x = 32
-                        source.y = 32
-
-                    }
-
-                    rl.DrawTextureRec(piece.team.piece_sprites.texture, source , tile_pos, rl.WHITE)
-                }
-            }
-
-            rl.EndMode2D()
-
-            ui.ui_stack_execute(interfaces)
-
-            rl.EndDrawing()
-
-        }
-
     }
 
-    ass.asset_man_clear()
+    for &piece in game.pieces {
+        tile_pos , ok := gm.board_to_world(&game.board, piece.position)
+        if piece.alive {
+            source := rl.Rectangle {0, 0, 32, 32}
+
+            switch piece.class {
+
+            case .pawn:
+            case .rook:
+                source.x = 32
+                source.y = 0
+            case .bishop:
+                source.x = 0
+                source.y = 32
+            case .king:
+                source.x = 32 * 2
+                source.y = 32
+            case .queen:
+                source.x = 32 * 2
+                source.y = 0
+            case .knight:
+                source.x = 32
+                source.y = 32
+
+            }
+
+            rl.DrawTextureRec(piece.team.piece_sprites.texture, source , tile_pos, rl.WHITE)
+        }
+    }
+
+    rl.EndMode2D()
+
+    ui.ui_stack_execute(interfaces)
+
+    rl.EndDrawing()
+
+
 }
 
 match_engine_camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
