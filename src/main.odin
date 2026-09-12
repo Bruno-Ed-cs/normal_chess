@@ -8,6 +8,7 @@ import "core:log"
 import g "globals"
 import gm "game"
 import ass "asset_man"
+import eng "engine"
 
 main :: proc() {
 
@@ -51,7 +52,7 @@ main :: proc() {
 
     // log.debug(game.teams)
 
-    match_engine_run(game)
+    eng.match_engine_run(game)
 
     gm.match_delete(game)
 

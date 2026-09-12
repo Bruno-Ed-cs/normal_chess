@@ -1,10 +1,10 @@
-package main
+package match_engine
 
 import rl "vendor:raylib"
-import gm "game"
-import ass "asset_man"
-import ui "ui"
-import g "globals"
+import gm "../game"
+import ass "../asset_man"
+import ui "../ui"
+import g "../globals"
 import "core:log"
 
 
@@ -42,6 +42,7 @@ match_engine_run :: proc(game: ^gm.Match) {
 
             if !ui.ui_stack_is_interface_active(interfaces, debug_id) {
                 debug_id = ui.ui_stack_push_ui(interfaces, ui.ui_debug(game, &camera))
+
             } else {
                 ui.ui_stack_remove_ui(interfaces, debug_id) 
             }
@@ -65,55 +66,45 @@ match_engine_run :: proc(game: ^gm.Match) {
 
             match_engine_camera_control(&camera, dt)
             if !g.PAUSE do match_engine_gameplay_control(game, camera)
-            gm.board_update(&game.board, game.pieces[:])
-            gm.match_update(game)
+                gm.board_update(&game.board, game.pieces[:])
+                gm.match_update(game)
 
 
-            for &piece in game.pieces {
+                for &piece in game.pieces {
 
-                if ui.ui_stack_is_interface_active(interfaces, promotion_ui) do break
+                    if ui.ui_stack_is_interface_active(interfaces, promotion_ui) do break
 
-                if piece.class == .pawn {
+                        if piece.class == .pawn {
 
-                    if piece.team.march_direction.x != 0 {
-                        if piece.team.march_direction.x == 1 {
-                            if piece.position.x == game.board.size.x -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
+                            if piece.team.march_direction.x != 0 {
+                                if piece.team.march_direction.x == 1 {
+                                    if piece.position.x == game.board.size.x -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
+                                }
+
+                                if piece.team.march_direction.x == -1 {
+                                    if piece.position.x == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
+                                }
+                            }
+
+                            if piece.team.march_direction.y != 0 {
+
+                                if piece.team.march_direction.y == 1 {
+                                    if piece.position.y == game.board.size.y -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
+                                }
+
+                                if piece.team.march_direction.y == -1 {
+                                    if piece.position.y == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
+                                }
+                            }
                         }
 
-                        if piece.team.march_direction.x == -1 {
-                            if piece.position.x == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
-                        }
                     }
 
-                    if piece.team.march_direction.y != 0 {
-
-                        if piece.team.march_direction.y == 1 {
-                            if piece.position.y == game.board.size.y -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
-                        }
-
-                        if piece.team.march_direction.y == -1 {
-                            if piece.position.y == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
-                        }
-                    }
                 }
 
-            }
-
-            // if rl.IsKeyReleased(.SPACE) {
-            //     for &piece in game.pieces {
-            //         if piece.class == gm.Class.pawn do gm.promote(&piece, .queen)
-            //     }
-            //
-            // }
-
-        }
-
-        match_engine_draw(game, &camera, interfaces)
+                match_engine_draw(game, &camera, interfaces)
 
     }
-
-
-    ass.asset_man_clear()
 }
 
 match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
@@ -232,26 +223,12 @@ match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
     mouse_pos := rl.GetMousePosition()
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
 
-    hovering, in_bounds := gm.world_to_board(&game.board, world_pos)
-
-    if in_bounds{
-        tile := gm.board_get_tile(&game.board, hovering)
-        if tile != nil && tile.piece_ref != nil {
-
-            if tile.piece_ref.team == gm.match_get_cur_turn_team(game) do rl.SetMouseCursor(.POINTING_HAND)
-        }
-
-        for move in game.movements {
-            if move.target == tile.coordenate do rl.SetMouseCursor(.POINTING_HAND)
-        }
-
-    } 
     // fmt.println(in_bounds)
 
     check_click: if rl.IsMouseButtonPressed(.LEFT) {
 
         target_tile, in_bounds := gm.world_to_board(&game.board, world_pos)
-        if !in_bounds do break check_click
+        if !in_bounds do break check_click 
 
             if game.selected_piece == nil{
 
@@ -273,7 +250,7 @@ match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
                 for move in game.movements {
                     if move.target == target_tile {
                         gm.piece_move(game.selected_piece, &game.board, move.target)
-                        
+
                         if move.side_effect != nil {
                             move.side_effect(game, game.selected_piece.id)
                         }
@@ -292,6 +269,4 @@ match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
         }
     }
-
-
 
