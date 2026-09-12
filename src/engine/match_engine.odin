@@ -1,110 +1,161 @@
 package match_engine
 
 import rl "vendor:raylib"
+import "core:os"
 import gm "../game"
 import ass "../asset_man"
 import ui "../ui"
 import g "../globals"
 import "core:log"
 
+@(export)
+RUNNING := true
 
-match_engine_run :: proc(game: ^gm.Match) {
+interfaces: ^ui.UiStack
+camera: rl.Camera2D
+promotion_ui: int
+debug_id: int
 
-    //fmt.println(game.pieces)
-    interfaces := ui.ui_stack_make()
-    defer ui.ui_stack_delete(interfaces)
+@(export)
+match_engine_load_match :: proc(path: string) -> ^gm.Match {
 
-    camera := rl.Camera2D{
+
+    game := gm.match_make_from_file(path)
+    if game == nil do os.exit(0)
+
+    return game
+}
+
+@(export)
+match_engine_init_window :: proc() {
+
+    rl.InitWindow(g.WINDOW_SIZE.x, g.WINDOW_SIZE.y, "Normal Chess")
+    rl.SetWindowMonitor(0)
+    rl.SetWindowState({.WINDOW_RESIZABLE})
+    ass.asset_man_init()
+
+}
+
+@(export)
+match_engine_close_window :: proc() {
+
+    rl.CloseWindow()
+}
+
+@(export)
+match_engine_init :: proc(game: ^gm.Match) {
+
+
+    interfaces = ui.ui_stack_make()
+
+    camera = rl.Camera2D{
         offset = {f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)},
         rotation = 0.0,
         target = {0, 0},
         zoom = 2.6
     }
 
-    dt := rl.GetFrameTime()
 
     board_center := [2]f32{f32(game.board.sprite.width/2), f32(game.board.sprite.height/2)}
     camera.target = board_center
     camera.zoom = f32(g.WINDOW_SIZE.y) / f32(game.board.sprite.height)
 
-    debug_id: int
     ui.ui_stack_push_ui(interfaces, ui.match_ui(game))
     // ui.push_ui(interfaces, ui.promotion_ui(game, 1))
-    promotion_ui := 0
+    promotion_ui = 0
 
-    game_loop: for !rl.WindowShouldClose() {
 
-        free_all(context.temp_allocator)
+}
 
-        rl.SetMouseCursor(.DEFAULT)
+@(export)
+match_engine_delete :: proc(game: ^gm.Match) {
 
-        if rl.IsKeyReleased(.F3) {
+    ui.ui_stack_delete(interfaces)
+    gm.match_delete(game)
+    ass.asset_man_clear()
+}
 
-            if !ui.ui_stack_is_interface_active(interfaces, debug_id) {
-                debug_id = ui.ui_stack_push_ui(interfaces, ui.ui_debug(game, &camera))
+@(export)
+match_engine_run :: proc(game: ^gm.Match) {
 
-            } else {
-                ui.ui_stack_remove_ui(interfaces, debug_id) 
-            }
+    //fmt.println(game.pieces)
+
+    if (rl.WindowShouldClose()) {
+        RUNNING = false
+        return
+    }
+
+    dt := rl.GetFrameTime()
+    free_all(context.temp_allocator)
+
+    rl.SetMouseCursor(.DEFAULT)
+
+    if rl.IsKeyReleased(.F3) {
+
+        if !ui.ui_stack_is_interface_active(interfaces, debug_id) {
+            debug_id = ui.ui_stack_push_ui(interfaces, ui.ui_debug(game, &camera))
+
+        } else {
+            ui.ui_stack_remove_ui(interfaces, debug_id) 
         }
+    }
 
-        if rl.IsKeyReleased(.P) {
-            g.PAUSE = !g.PAUSE
-        }
+    if rl.IsKeyReleased(.P) {
+        g.PAUSE = !g.PAUSE
+    }
 
-        update: {
+    update: {
 
-            dt = rl.GetFrameTime()
-            g.WINDOW_SIZE.x = rl.GetScreenWidth()
-            g.WINDOW_SIZE.y = rl.GetScreenHeight()
-            camera.offset = {f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)}
-            zoom_factor := (f32(g.WINDOW_SIZE.y) / f32(game.board.size.y * gm.TILE_SIZE))
-            camera.zoom = zoom_factor - zoom_factor * 0.02
+        dt = rl.GetFrameTime()
+        g.WINDOW_SIZE.x = rl.GetScreenWidth()
+        g.WINDOW_SIZE.y = rl.GetScreenHeight()
+        camera.offset = {f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)}
+        zoom_factor := (f32(g.WINDOW_SIZE.y) / f32(game.board.size.y * gm.TILE_SIZE))
+        camera.zoom = zoom_factor - zoom_factor * 0.02
 
-            // log.debug(game.teams)
-            //its already fucked here
+        // log.debug(game.teams)
+        //its already fucked here
 
-            match_engine_camera_control(&camera, dt)
-            if !g.PAUSE do match_engine_gameplay_control(game, camera)
-                gm.board_update(&game.board, game.pieces[:])
-                gm.match_update(game)
+        match_engine_camera_control(&camera, dt)
+        if !g.PAUSE do match_engine_gameplay_control(game, camera)
+            gm.board_update(&game.board, game.pieces[:])
+            gm.match_update(game)
 
 
-                for &piece in game.pieces {
+            for &piece in game.pieces {
 
-                    if ui.ui_stack_is_interface_active(interfaces, promotion_ui) do break
+                if ui.ui_stack_is_interface_active(interfaces, promotion_ui) do break
 
-                        if piece.class == .pawn {
+                    if piece.class == .pawn {
 
-                            if piece.team.march_direction.x != 0 {
-                                if piece.team.march_direction.x == 1 {
-                                    if piece.position.x == game.board.size.x -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
-                                }
-
-                                if piece.team.march_direction.x == -1 {
-                                    if piece.position.x == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
-                                }
+                        if piece.team.march_direction.x != 0 {
+                            if piece.team.march_direction.x == 1 {
+                                if piece.position.x == game.board.size.x -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
                             }
 
-                            if piece.team.march_direction.y != 0 {
-
-                                if piece.team.march_direction.y == 1 {
-                                    if piece.position.y == game.board.size.y -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
-                                }
-
-                                if piece.team.march_direction.y == -1 {
-                                    if piece.position.y == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
-                                }
+                            if piece.team.march_direction.x == -1 {
+                                if piece.position.x == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
                             }
                         }
 
+                        if piece.team.march_direction.y != 0 {
+
+                            if piece.team.march_direction.y == 1 {
+                                if piece.position.y == game.board.size.y -1 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
+                            }
+
+                            if piece.team.march_direction.y == -1 {
+                                if piece.position.y == 0 do promotion_ui = ui.ui_stack_push_ui(interfaces, ui.ui_promotion(game, piece.id))
+                            }
+                        }
                     }
 
                 }
 
-                match_engine_draw(game, &camera, interfaces)
+            }
 
-    }
+            match_engine_draw(game, &camera, interfaces)
+
 }
 
 match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
