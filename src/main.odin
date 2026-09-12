@@ -7,8 +7,8 @@ import "core:os"
 import "core:log"
 import g "globals"
 import gm "game"
-import ass "asset_man"
 import eng "engine"
+
 
 main :: proc() {
 
@@ -28,7 +28,6 @@ main :: proc() {
         }
 
         g.LOG_LEVEL = .Debug
-        rl.SetTraceLogLevel(.ALL)
     }
 
     context.logger = log.create_console_logger(g.LOG_LEVEL)
@@ -38,22 +37,24 @@ main :: proc() {
     // log.log_allocator_init(&log_allocator, .Debug)
     // context.allocator = log.log_allocator(&log_allocator)
 
-    rl.InitWindow(g.WINDOW_SIZE.x, g.WINDOW_SIZE.y, "Normal Chess")
-    defer rl.CloseWindow()
-    rl.SetWindowMonitor(0)
-    rl.SetWindowState({.WINDOW_RESIZABLE})
-    ass.asset_man_init()
 
-    board_path: string = "assets/boards/standard.json" if len(os.args) < 2 else os.args[1]
-
-    game := gm.match_make_from_file(board_path)
-    if game == nil do os.exit(0)
     //gm.record_normal_match(game)
 
     // log.debug(game.teams)
 
-    eng.match_engine_run(game)
+    eng.match_engine_init_window()
 
-    gm.match_delete(game)
+    board_path: string = "assets/boards/standard.json" if len(os.args) < 2 else os.args[1]
+    game := eng.match_engine_load_match(board_path)
 
+    eng.match_engine_init(game)
+
+    for eng.RUNNING {
+
+        eng.match_engine_run(game)
+
+    }
+
+    eng.match_engine_delete(game)
+    eng.match_engine_close_window()
 }

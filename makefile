@@ -2,7 +2,7 @@
 all: 
 
 release: build
-	odin build ./src -out:build/normal_chess.bin 
+	odin build ./src/main.odin -file -out:build/normal_chess.bin 
 
 debug: build
 	odin build -debug -build-mode:dynamic -out:build/engine.so src/engine
