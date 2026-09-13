@@ -9,13 +9,89 @@ import rf "core:reflect"
 import str "core:strings"
 import "core:log"
 
+Ui_Type :: enum {
+
+    debug,
+    match,
+    promotion, 
+    main_menu,
+}
+
+ui_render :: proc(interface: ^Ui, top: bool) -> UiSig {
+
+    implementation : proc(workspace: rawptr, top: bool) -> UiSig 
+
+    switch interface.type {
+
+    case .debug:
+        implementation = ui_debug_call
+
+    case .match:
+        implementation = ui_match_call
+
+    case .promotion:
+        implementation = ui_promotion_call
+
+    case .main_menu:
+        implementation = ui_main_menu_call
+
+    }
+
+    return implementation(interface.workspace, top)
+}
+
+ui_cleanup :: proc(interface: ^Ui) {
+
+
+    #partial switch interface.type {
+    case .debug:
+        ui_debug_cleanup(interface.workspace)
+
+    case .promotion:
+        ui_promotion_cleanup(interface.workspace)
+    }
+
+    return
+}
+
 Debug_Info :: struct {
     game: ^gm.Match,
     camera: ^rl.Camera2D
 
 }
 
-ui_debug :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> Ui {
+ui_debug_call :: proc(workspace: rawptr, top: bool) -> UiSig {
+
+    info := cast(^Debug_Info)workspace
+
+    mouse_pos := rl.GetMousePosition()
+    world_pos := rl.GetScreenToWorld2D(mouse_pos, info.camera^)
+    rl.DrawText("Chess", 0, 0, 30, rl.YELLOW);
+    rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", g.WINDOW_SIZE.x, g.WINDOW_SIZE.y, allocator = context.temp_allocator),
+        0, 30, 30, rl.YELLOW);
+    rl.DrawText(
+        fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f",
+            info.camera.target.x, info.camera.target.y, info.camera.zoom, info.camera.rotation, allocator = context.temp_allocator),
+        0, 120, 30, rl.YELLOW);
+
+    board_pos, in_bounds := gm.world_to_board(&info.game.board, world_pos)
+    if (in_bounds) {
+        rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y, allocator = context.temp_allocator),
+            0, 250, 30, rl.YELLOW);
+    }
+
+    rl.DrawFPS(10, 300)
+
+    return UiSig.move_down
+}
+
+ui_debug_cleanup :: proc(workspace: rawptr) {
+    log.debug("freeing my debug")
+    free(workspace)
+
+}
+
+ui_debug_init :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> Ui {
 
     info := new(Debug_Info)
     info.camera = camera
@@ -23,70 +99,35 @@ ui_debug :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> Ui {
 
     return Ui {
         workspace = info,
-        callback = proc(workspace: rawptr, top: bool) -> UiSig {
-
-            info := cast(^Debug_Info)workspace
-
-            mouse_pos := rl.GetMousePosition()
-            world_pos := rl.GetScreenToWorld2D(mouse_pos, info.camera^)
-            rl.DrawText("Chess", 0, 0, 30, rl.YELLOW);
-            rl.DrawText(fmt.caprintf("window size:\nwidth: %d\nheight:%d", g.WINDOW_SIZE.x, g.WINDOW_SIZE.y, allocator = context.temp_allocator),
-                0, 30, 30, rl.YELLOW);
-            rl.DrawText(
-                fmt.caprintf("camera\nx: %.2f y: %.2f\nzoom: %.2f\nrotation: %.2f",
-                    info.camera.target.x, info.camera.target.y, info.camera.zoom, info.camera.rotation, allocator = context.temp_allocator),
-                0, 120, 30, rl.YELLOW);
-
-            board_pos, in_bounds := gm.world_to_board(&info.game.board, world_pos)
-            if (in_bounds) {
-                rl.DrawText(fmt.caprintf("Board cords: [%d %d]", board_pos.x, board_pos.y, allocator = context.temp_allocator),
-                    0, 250, 30, rl.YELLOW);
-            }
-
-            rl.DrawFPS(10, 300)
-
-            return UiSig.move_down
-        },
-
-        cleanup = proc(workspace: rawptr) {
-            log.debug("freeing my debug")
-            free(workspace)
-
-        }
-
+        type = .debug
     }
 
 }
 
 
-match_ui :: proc(match: ^gm.Match) -> Ui {
+ui_match_call :: proc(workspace: rawptr, top: bool) -> UiSig {
 
-    return Ui {
-        workspace = match,
+    game := cast(^gm.Match)workspace
+    // log.debug("teams: ", game.teams)
 
-        callback = proc(workspace: rawptr, top: bool) -> UiSig {
+    center := rl.Vector2{f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)}
 
-            game := cast(^gm.Match)workspace
-            // log.debug("teams: ", game.teams)
+    cur_team: cstring = fmt.ctprintf("Turn: {}", gm.match_get_cur_turn_team(game).name)
 
-            center := rl.Vector2{f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)}
+    scores := make([dynamic]cstring, context.temp_allocator)
+    defer delete(scores)
+    reserve(&scores, len(game.teams))
 
-            cur_team: cstring = fmt.ctprintf("Turn: {}", gm.match_get_cur_turn_team(game).name)
+    for team in game.teams {
 
-            scores := make([dynamic]cstring, context.temp_allocator)
-            defer delete(scores)
-            reserve(&scores, len(game.teams))
-
-            for team in game.teams {
-
-                append(&scores, fmt.ctprintf("%s: %d", team.name, team.score))
-            }
+        append(&scores, fmt.ctprintf("%s: %d", team.name, team.score))
+    }
 
 
-            anchor := scr_pos({
-                0.98,
-                0.02
-            })
+    anchor := scr_pos({
+        0.98,
+        0.02
+    })
 
             score_hei :f32 = anchor.y + g.FONT_SIZE + 20
             largest_wid: i32
@@ -148,8 +189,13 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
 
 
             return UiSig.ok
-        }
+}
 
+ui_match_init :: proc(match: ^gm.Match) -> Ui {
+
+    return Ui {
+        workspace = match,
+        type = .match
     }
 
 }
@@ -160,7 +206,82 @@ Promotion_Work :: struct {
 
 }
 
-ui_promotion :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
+ui_promotion_call ::proc(workspace: rawptr, top: bool) -> UiSig{
+
+    work := cast(^Promotion_Work)workspace
+
+    g.PAUSE = true
+
+    width :f32 = 240.0
+    margin :f32 = 10.0
+    padding :f32 = 10.0
+
+    anchor := scr_pos({0.5, 0.5})
+    anchor.x -= 240 / 2
+    anchor.y -= ((len(gm.Class) - 2) * f32(g.FONT_SIZE + padding + margin)) / 2
+
+    box_title := g.FONT_SIZE * 2 + margin * 2 + padding 
+    box := rl.Rectangle{
+        width = width + padding + margin,
+        height = (g.FONT_SIZE + padding + margin) * (len(gm.Class) - 2) + box_title,
+        x = anchor.x - margin - padding/2,
+        y = anchor.y - box_title
+
+    }
+
+    box_text: cstring = "Promotion!"
+    box_text_wid := rl.MeasureText(box_text, g.FONT_SIZE)
+    box_text_pos := [2]f32{
+        box.x + (box.width - f32(box_text_wid)) / 2,
+        box.y + margin + padding + g.FONT_SIZE/4
+    }
+
+    promotion: gm.Class
+    pressed := false
+    piece := gm.match_get_piece(work.game, work.piece_id) 
+    if piece == nil do return .pop
+
+        rl.DrawRectangleRounded(box, g.ROUNDNESS, g.SEGMENTS, g.BACKGROUND_COLOR)
+        rl.DrawRectangleRoundedLines(box, g.ROUNDNESS, g.SEGMENTS, g.TEXT_COLOR)
+        rl.DrawText(box_text, i32(box_text_pos.x), i32(box_text_pos.y), g.FONT_SIZE, g.TEXT_COLOR)
+
+        for opt in gm.Class {
+
+            if piece.class == opt do continue
+                if opt == .king do continue
+
+                    source := rf.enum_string(opt)
+                    first := str.to_upper(source[:1], context.temp_allocator)
+                    label := str.join({first, source[1:]}, "", context.temp_allocator) 
+
+                    if component_simple_button(label, f32(width - margin), anchor, f32(padding)) {
+                        pressed = true if top else false
+                        promotion = opt
+                    }
+
+                    anchor.y += f32(margin + g.FONT_SIZE + padding)
+
+        }
+
+        if pressed {
+
+            gm.piece_promote(piece, promotion)
+            log.debug("pressed", work.piece_id, piece)
+            g.PAUSE = false
+            return .pop
+
+        }
+
+        return .move_top
+
+}
+
+ui_promotion_cleanup :: proc(workspace: rawptr) {
+    free(workspace)
+}
+
+
+ui_promotion_init :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
 
     assert(piece_id >= 0)
 
@@ -170,93 +291,23 @@ ui_promotion :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
 
     return Ui {
         workspace = work,
-        callback = proc(workspace: rawptr, top: bool) -> UiSig{
-
-            work := cast(^Promotion_Work)workspace
-
-            g.PAUSE = true
-            
-            width :f32 = 240.0
-            margin :f32 = 10.0
-            padding :f32 = 10.0
-
-            anchor := scr_pos({0.5, 0.5})
-            anchor.x -= 240 / 2
-            anchor.y -= ((len(gm.Class) - 2) * f32(g.FONT_SIZE + padding + margin)) / 2
-
-            box_title := g.FONT_SIZE * 2 + margin * 2 + padding 
-            box := rl.Rectangle{
-                width = width + padding + margin,
-                height = (g.FONT_SIZE + padding + margin) * (len(gm.Class) - 2) + box_title,
-                x = anchor.x - margin - padding/2,
-                y = anchor.y - box_title
-
-            }
-
-            box_text: cstring = "Promotion!"
-            box_text_wid := rl.MeasureText(box_text, g.FONT_SIZE)
-            box_text_pos := [2]f32{
-                box.x + (box.width - f32(box_text_wid)) / 2,
-                box.y + margin + padding + g.FONT_SIZE/4
-            }
-
-            promotion: gm.Class
-            pressed := false
-            piece := gm.match_get_piece(work.game, work.piece_id) 
-            if piece == nil do return .pop
-
-            rl.DrawRectangleRounded(box, g.ROUNDNESS, g.SEGMENTS, g.BACKGROUND_COLOR)
-            rl.DrawRectangleRoundedLines(box, g.ROUNDNESS, g.SEGMENTS, g.TEXT_COLOR)
-            rl.DrawText(box_text, i32(box_text_pos.x), i32(box_text_pos.y), g.FONT_SIZE, g.TEXT_COLOR)
-
-            for opt in gm.Class {
-
-                if piece.class == opt do continue
-                if opt == .king do continue
-
-                source := rf.enum_string(opt)
-                first := str.to_upper(source[:1], context.temp_allocator)
-                label := str.join({first, source[1:]}, "", context.temp_allocator) 
-
-                if component_simple_button(label, f32(width - margin), anchor, f32(padding)) {
-                    pressed = true if top else false
-                    promotion = opt
-                }
-
-                anchor.y += f32(margin + g.FONT_SIZE + padding)
-
-            }
-
-            if pressed {
-
-                gm.piece_promote(piece, promotion)
-                log.debug("pressed", work.piece_id, piece)
-                g.PAUSE = false
-                return .pop
-
-            }
-
-            return .move_top
-
-        },
-
-        cleanup = proc(workspace: rawptr) {
-            free(workspace)
-        }
+        type = .promotion
     }
 
 }
 
-ui_main_menu :: proc(game: ^gm.Match) -> Ui {
+ui_main_menu_call :: proc(workspace: rawptr, top: bool) -> UiSig{
+
+
+
+    return .ok
+
+}
+
+ui_main_menu_init :: proc(game: ^gm.Match) -> Ui {
 
     return Ui {
         workspace = game,
-        callback = proc(workspace: rawptr, top: bool) -> UiSig{
-
-
-
-            return .ok
-
-        }
+        type = .main_menu
     }
 }

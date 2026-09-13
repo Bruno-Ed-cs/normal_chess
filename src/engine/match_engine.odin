@@ -13,11 +13,11 @@ import "core:log"
 RUNNING := true
 
 State :: struct {
-    interfaces: ^ui.UiStack,
-    camera: rl.Camera2D,
     promotion_ui: int,
     debug_id: int,
-    game: ^gm.Match
+    interfaces: ^ui.UiStack,
+    game: ^gm.Match,
+    camera: rl.Camera2D,
 }
 
 @(export)
@@ -42,7 +42,7 @@ match_engine_make :: proc(path: string) -> ^State {
     state.camera.target = board_center
     state.camera.zoom = f32(g.WINDOW_SIZE.y) / f32(state.game.board.sprite.height)
 
-    ui.ui_stack_push_ui(state.interfaces, ui.match_ui(state.game))
+    ui.ui_stack_push_ui(state.interfaces, ui.ui_match_init(state.game))
     // ui.push_ui(interfaces, ui.promotion_ui(game, 1))
     state.promotion_ui = 0
 
@@ -107,7 +107,7 @@ match_engine_run :: proc(st: ^State) {
     if rl.IsKeyReleased(.F3) {
 
         if !ui.ui_stack_is_interface_active(st.interfaces, st.debug_id) {
-            st.debug_id = ui.ui_stack_push_ui(st.interfaces, ui.ui_debug(st.game, &st.camera))
+            st.debug_id = ui.ui_stack_push_ui(st.interfaces, ui.ui_debug_init(st.game, &st.camera))
 
         } else {
             ui.ui_stack_remove_ui(st.interfaces, st.debug_id) 
@@ -144,22 +144,22 @@ match_engine_run :: proc(st: ^State) {
 
                         if piece.team.march_direction.x != 0 {
                             if piece.team.march_direction.x == 1 {
-                                if piece.position.x == st.game.board.size.x -1 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion(st.game, piece.id))
+                                if piece.position.x == st.game.board.size.x -1 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
                             }
 
                             if piece.team.march_direction.x == -1 {
-                                if piece.position.x == 0 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion(st.game, piece.id))
+                                if piece.position.x == 0 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
                             }
                         }
 
                         if piece.team.march_direction.y != 0 {
 
                             if piece.team.march_direction.y == 1 {
-                                if piece.position.y == st.game.board.size.y -1 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion(st.game, piece.id))
+                                if piece.position.y == st.game.board.size.y -1 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
                             }
 
                             if piece.team.march_direction.y == -1 {
-                                if piece.position.y == 0 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion(st.game, piece.id))
+                                if piece.position.y == 0 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
                             }
                         }
                     }
@@ -175,10 +175,10 @@ match_engine_run :: proc(st: ^State) {
 match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
 
     rl.BeginDrawing()
-    rl.ClearBackground(rl.BLACK)
+    rl.ClearBackground(rl.LIGHTGRAY)
     rl.BeginMode2D(camera^)
 
-    rl.DrawTextureV(game.board.sprite, game.board.position, rl.LIGHTGRAY)
+    rl.DrawTextureV(game.board.sprite, game.board.position, rl.PURPLE)
     mouse_pos := rl.GetMousePosition()
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera^)
 

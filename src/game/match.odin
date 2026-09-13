@@ -232,8 +232,6 @@ match_delete :: proc(match: ^Match) {
         team_delete(&i)
     }
     free(match)
-
-
 }
 
 match_update :: proc(self: ^Match) {

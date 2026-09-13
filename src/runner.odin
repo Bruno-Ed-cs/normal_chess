@@ -22,6 +22,8 @@ Engine_Symbols :: struct{
     match_engine_close_window: proc()
 }
 
+WATCH_INTERVAL :: 0.5
+
 get_dll_info :: proc(filepath: string) -> (mod_time: time.Time, size: i64) {
 
     lib_info_old, err := os.lstat(filepath, context.allocator)
@@ -126,7 +128,7 @@ main :: proc() {
         mod_delay += eng.GetFrameTime()
         // log.info(timestamp, timestamp_old)
 
-        if timestamp != timestamp_old && mod_delay >= 1.0{
+        if timestamp != timestamp_old && mod_delay >= WATCH_INTERVAL {
             log.info("Reloading library")
 
             // delete(new_path)
@@ -158,6 +160,7 @@ main :: proc() {
         os.file_info_delete(lib_info, context.allocator)
     }
 
+    eng.match_engine_cleanup()
     eng.match_engine_delete(state)
     eng.match_engine_close_window()
 }

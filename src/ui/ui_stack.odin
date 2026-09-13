@@ -31,9 +31,8 @@ SigIndex :: struct {
 Ui :: struct {
 
     workspace: rawptr,
-    callback: UiFunc,
-    cleanup: UiCleanup,
     id: int,
+    type: Ui_Type,
 }
 
 ui_stack_make :: proc() -> ^UiStack {
@@ -48,11 +47,7 @@ ui_stack_make :: proc() -> ^UiStack {
 
 ui_stack_delete :: proc(stack: ^UiStack) {
 
-    for ui in stack.layers {
-
-        if ui.cleanup != nil do ui.cleanup(ui.workspace)
-
-    }
+    for &ui in stack.layers do ui_cleanup(&ui)
 
     delete(stack.layers)
     free(stack)
@@ -74,14 +69,9 @@ ui_stack_push_ui :: proc(stack: ^UiStack, ui: Ui) -> int {
 
 ui_stack_clean :: proc(stack: ^UiStack) {
 
-    for ui in stack.layers {
-
-        if ui.cleanup != nil do ui.cleanup(ui.workspace)
-
-    }
+    for &ui in stack.layers do ui_cleanup(&ui)
 
     clear(&stack.layers)
-
 }
 
 
@@ -99,10 +89,8 @@ ui_stack_execute :: proc(stack: ^UiStack) {
 
     for index := 0; index < len(stack.layers); index += 1{
 
-        if stack.layers[index].callback == nil do continue
-
         top := true if index == len(stack.layers) - 1 else false
-        result := stack.layers[index].callback(stack.layers[index].workspace, top)
+        result := ui_render(&stack.layers[index], top)
 
         signal := SigIndex{
             index,
@@ -142,9 +130,7 @@ ui_stack_execute :: proc(stack: ^UiStack) {
             case .pop:
 
                 if len(stack.layers) != 0 {
-                    if ui := &stack.layers[sig.target]; ui.cleanup != nil {
-                        ui.cleanup(ui.workspace)
-                    }
+                    for &ui in stack.layers do ui_cleanup(&ui)
                     ordered_remove(&stack.layers, sig.target)
                 }
 
@@ -154,11 +140,11 @@ ui_stack_execute :: proc(stack: ^UiStack) {
 
 }
 
-ui_stack_is_type_active :: proc(stack: ^UiStack, interface: UiFunc) -> bool {
+ui_stack_is_type_active :: proc(stack: ^UiStack, interface: Ui_Type) -> bool {
 
     for ui in stack.layers {
 
-        if ui.callback == interface do return true
+        if ui.type == interface do return true
 
     }
 
@@ -194,7 +180,7 @@ ui_stack_remove_ui :: proc(stack: ^UiStack, ui_id: int) {
 
     if target >= 0 {
         ui := stack.layers[target]
-        if ui.cleanup != nil do ui.cleanup(ui.workspace)
+        for &ui in stack.layers do ui_cleanup(&ui)
         ordered_remove(&stack.layers, target)
     }
 

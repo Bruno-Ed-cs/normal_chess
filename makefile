@@ -8,6 +8,9 @@ debug: build
 	odin build -debug -build-mode:dynamic -define:RAYLIB_SHARED=true -out:build/engine.so src/engine
 	odin build -debug -out:build/normal_chess_dev.bin -file src/runner.odin
 
+iterate: build
+	odin build -debug -o:none -build-mode:dynamic -define:RAYLIB_SHARED=true -out:build/engine.so src/engine
+
 build:
 	mkdir -p build
 	cp -r assets build
