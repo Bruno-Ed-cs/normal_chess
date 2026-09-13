@@ -440,14 +440,14 @@ piece_kill :: proc(piece: ^Piece) {
 
 }
 
-team_make :: proc(name: string, color: rl.Color, cemitery: [2]i32) -> Team {
+team_make :: proc(name: string, color: rl.Color, march: [2]i32) -> Team {
 
     base_spritesheet := ass.asset_man_get_asset("sprite_sheet.png").(rl.Texture2D)
     sprite_image := rl.LoadImageFromTexture(base_spritesheet)
     defer rl.UnloadImage(sprite_image)
 
     team := Team{
-        march_direction = cemitery,
+        march_direction = march,
         name = name,
         score = 0,
         color = color,

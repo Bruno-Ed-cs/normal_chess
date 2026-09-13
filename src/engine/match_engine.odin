@@ -33,8 +33,8 @@ match_engine_init_window :: proc() {
     rl.InitWindow(g.WINDOW_SIZE.x, g.WINDOW_SIZE.y, "Normal Chess")
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
-    ass.asset_man_init()
 
+    ass.asset_man_init()
 }
 
 @(export)
@@ -71,9 +71,9 @@ match_engine_init :: proc(game: ^gm.Match) {
 @(export)
 match_engine_delete :: proc(game: ^gm.Match) {
 
+    ass.asset_man_clear()
     ui.ui_stack_delete(interfaces)
     gm.match_delete(game)
-    ass.asset_man_clear()
 }
 
 @(export)
@@ -165,10 +165,10 @@ match_engine_run :: proc(game: ^gm.Match) {
 match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
 
     rl.BeginDrawing()
-    rl.ClearBackground(rl.BLACK)
+    rl.ClearBackground(rl.BLUE)
     rl.BeginMode2D(camera^)
 
-    rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
+    rl.DrawTextureV(game.board.sprite, game.board.position, rl.YELLOW)
     mouse_pos := rl.GetMousePosition()
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera^)
 
