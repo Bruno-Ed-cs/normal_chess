@@ -135,6 +135,7 @@ main :: proc() {
                 os.exit(1)
             }
 
+
             dynlib.unload_library(eng.lib)
 
             eng.match_engine_init(game)

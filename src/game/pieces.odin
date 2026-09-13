@@ -60,11 +60,10 @@ Piece :: struct {
 
     alive: bool,
     has_moved: bool,
-    team: ^Team,
     id: i32,
     position: Board_Pos,
+    team: ^Team,
     class: Class,
-    movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int
 }
 
 Piece_Record :: struct {
@@ -73,13 +72,31 @@ Piece_Record :: struct {
     class: Class
 }
 
-Movements :: [Class]proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
-    .pawn = movement_pawn,
-    .rook = movement_rook,
-    .bishop = movement_bishop,
-    .king = movement_king,
-    .queen = movement_queen,
-    .knight = movement_knight
+
+piece_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+
+    move_count: int
+    movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int
+
+    switch self.class {
+
+    case .pawn :
+        movement = movement_pawn
+    case .rook :
+        movement = movement_rook
+    case .bishop :
+        movement = movement_bishop
+    case .king: 
+        movement = movement_king
+    case .queen :
+        movement = movement_queen
+    case .knight :
+        movement = movement_knight
+    }
+
+    movement(self, board, moves_buff)
+    return move_count
+
 }
 
 movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
@@ -398,23 +415,6 @@ make_piece :: proc(class: Class, position: Board_Pos, team: ^Team) -> (piece: Pi
     }
     next_id += 1
 
-    switch class {
-    
-    case .pawn:
-        piece.movement = movement_pawn
-    case .rook:
-        piece.movement = movement_rook
-    case .bishop:
-        piece.movement = movement_bishop
-    case .king:
-        piece.movement = movement_king
-    case .queen:
-        piece.movement = movement_queen
-    case .knight:
-        piece.movement = movement_knight
-
-    }
-
     return
 }
 
@@ -490,10 +490,8 @@ team_delete :: proc(team: ^Team) {
 
 piece_promote :: proc(target: ^Piece, new_role: Class) {
 
-    moves := Movements
 
     target.class = new_role
-    target.movement = moves[new_role]
 
 }
 
