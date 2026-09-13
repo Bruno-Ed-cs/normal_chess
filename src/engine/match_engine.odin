@@ -175,7 +175,7 @@ match_engine_run :: proc(st: ^State) {
 match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
 
     rl.BeginDrawing()
-    rl.ClearBackground(rl.LIGHTGRAY)
+    rl.ClearBackground(rl.RED)
     rl.BeginMode2D(camera^)
 
     rl.DrawTextureV(game.board.sprite, game.board.position, rl.PURPLE)

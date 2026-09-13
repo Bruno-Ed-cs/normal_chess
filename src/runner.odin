@@ -8,21 +8,47 @@ import "core:dynlib"
 import g "globals"
 import str "core:strings"
 import "core:time"
+import rl "vendor:raylib"
 
 Engine_Symbols :: struct{
     lib: dynlib.Library,
     version: int,
     RUNNING: ^bool,
     GetFrameTime: proc() -> f32,
-    match_engine_run: proc(game: rawptr),
+    IsKeyReleased: proc(key: int) -> bool,
+    match_engine_run: proc(state: rawptr),
     match_engine_make: proc(path:string) -> rawptr,
-    match_engine_delete: proc(game: rawptr),
+    match_engine_delete: proc(state: rawptr),
     match_engine_cleanup: proc(),
     match_engine_init_window: proc(),
     match_engine_close_window: proc()
 }
 
 WATCH_INTERVAL :: 0.5
+
+dll_reload :: proc (symbols: ^Engine_Symbols, source_lib: string, bin_dir: string) -> bool {
+
+    log.info("Reloading library")
+
+    // delete(new_path)
+    symbols.version += 1
+    new_path := fmt.tprintf("{}/engine_{}.so", bin_dir, symbols.version)
+
+    if !copy_dll(new_path, source_lib) do return false
+
+    lib_old := symbols.lib
+    symbols.lib, _ = dynlib.load_library(new_path)
+    count, ok := dynlib.initialize_symbols(symbols, new_path)
+
+    if count <= 0 || !ok {
+        log.info("Error loading the library symbols" ,count)
+        os.exit(1)
+    }
+
+    dynlib.unload_library(lib_old)
+
+    return true
+}
 
 get_dll_info :: proc(filepath: string) -> (mod_time: time.Time, size: i64) {
 
@@ -132,26 +158,24 @@ main :: proc() {
             log.info("Reloading library")
 
             // delete(new_path)
-            eng.version += 1
-            new_path = fmt.tprintf("{}/engine_{}.so", bin_dir, eng.version)
-            if !copy_dll(new_path, lib_source_path) do continue
             timestamp_old = timestamp
 
             eng.match_engine_cleanup()
-            lib_old := eng.lib
-            eng.lib, _ = dynlib.load_library(new_path)
-            count, ok := dynlib.initialize_symbols(&eng, new_path)
 
-            if count <= 0 || !ok {
-                log.info("Error loading the library symbols" ,count)
-                os.exit(1)
-            }
-
-
-            dynlib.unload_library(lib_old)
+            if !dll_reload(&eng, lib_source_path, bin_dir) do continue
 
         }
 
+        if eng.IsKeyReleased(int(rl.KeyboardKey.F5)) {
+
+            eng.match_engine_cleanup()
+            eng.match_engine_delete(state)
+
+            log.info("Full reset")
+            if !dll_reload(&eng, lib_source_path, bin_dir) do os.exit(1)
+
+            state = eng.match_engine_make(board_path)
+        }
 
         // fmt.println("aaaa")
         eng.match_engine_run(state)
