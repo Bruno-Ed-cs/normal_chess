@@ -15,9 +15,9 @@ Engine_Symbols :: struct{
     RUNNING: ^bool,
     GetFrameTime: proc() -> f32,
     match_engine_run: proc(game: rawptr),
-    match_engine_init: proc(game: rawptr),
-    match_engine_load_match:proc(path: string) -> ^rawptr,
-    match_engine_delete: proc(game: ^rawptr),
+    match_engine_make: proc(path:string) -> rawptr,
+    match_engine_delete: proc(game: rawptr),
+    match_engine_cleanup: proc(),
     match_engine_init_window: proc(),
     match_engine_close_window: proc()
 }
@@ -102,8 +102,7 @@ main :: proc() {
     board_path: string = "assets/boards/standard.json" if len(os.args) < 2 else os.args[1]
 
     eng.match_engine_init_window()
-    game := eng.match_engine_load_match(board_path)
-    eng.match_engine_init(game)
+    state := eng.match_engine_make(board_path)
 
     timestamp_old, size_old := get_dll_info(lib_source_path)
     
@@ -135,6 +134,8 @@ main :: proc() {
             new_path = fmt.tprintf("{}/engine_{}.so", bin_dir, eng.version)
             if !copy_dll(new_path, lib_source_path) do continue
             timestamp_old = timestamp
+
+            eng.match_engine_cleanup()
             lib_old := eng.lib
             eng.lib, _ = dynlib.load_library(new_path)
             count, ok := dynlib.initialize_symbols(&eng, new_path)
@@ -147,17 +148,16 @@ main :: proc() {
 
             dynlib.unload_library(lib_old)
 
-            eng.match_engine_init(game)
         }
 
 
         // fmt.println("aaaa")
-        eng.match_engine_run(game)
+        eng.match_engine_run(state)
 
         size_old = size
         os.file_info_delete(lib_info, context.allocator)
     }
 
-    eng.match_engine_delete(game)
+    eng.match_engine_delete(state)
     eng.match_engine_close_window()
 }

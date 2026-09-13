@@ -62,7 +62,7 @@ asset_man_get_asset :: proc(asset_name: string) -> Asset {
     }
 
     str.write_string(&fullpath, string(path))
-    str.write_string(&fullpath, "assets/")
+    str.write_string(&fullpath, "/assets/")
 
     dot_i := str.index(asset_name, ".")
 

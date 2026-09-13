@@ -28,6 +28,10 @@ main :: proc() {
         }
 
         g.LOG_LEVEL = .Debug
+    } else {
+
+        rl.SetTraceLogLevel(.ERROR)
+
     }
 
     context.logger = log.create_console_logger(g.LOG_LEVEL)
@@ -45,9 +49,7 @@ main :: proc() {
     eng.match_engine_init_window()
 
     board_path: string = "assets/boards/standard.json" if len(os.args) < 2 else os.args[1]
-    game := eng.match_engine_load_match(board_path)
-
-    eng.match_engine_init(game)
+    game := eng.match_engine_make(board_path)
 
     for eng.RUNNING {
 
