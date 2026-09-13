@@ -2,7 +2,7 @@ package globals
 import rl "vendor:raylib"
 import "core:log"
 
-LOG_LEVEL := log.Level.Fatal
+LOG_LEVEL := log.Level.Info
 
 WINDOW_SIZE := [2]i32{1200, 800}
 CAMERA_SPEED :: 700

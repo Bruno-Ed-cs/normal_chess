@@ -2,6 +2,7 @@ package match_engine
 
 import rl "vendor:raylib"
 import "core:os"
+import "core:fmt"
 import gm "../game"
 import ass "../asset_man"
 import ui "../ui"
@@ -45,8 +46,8 @@ match_engine_close_window :: proc() {
 @(export)
 match_engine_init :: proc(game: ^gm.Match) {
 
-
     interfaces = ui.ui_stack_make()
+    RUNNING = true
 
     camera = rl.Camera2D{
         offset = {f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)},
@@ -79,13 +80,17 @@ match_engine_delete :: proc(game: ^gm.Match) {
 match_engine_run :: proc(game: ^gm.Match) {
 
     //fmt.println(game.pieces)
-
+    os.write_string(os.stderr, "engine tick\n")
     if (rl.WindowShouldClose()) {
         RUNNING = false
         return
     }
 
+
+
     dt := rl.GetFrameTime()
+
+    // log.debug(dt)
     free_all(context.temp_allocator)
 
     rl.SetMouseCursor(.DEFAULT)

@@ -71,7 +71,7 @@ match_ui :: proc(match: ^gm.Match) -> Ui {
 
             center := rl.Vector2{f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)}
 
-            cur_team: cstring = fmt.ctprintf("Turn: %s", gm.match_get_cur_turn_team(game).name)
+            cur_team: cstring = fmt.ctprintf("Turn: {}", gm.match_get_cur_turn_team(game).name)
 
             scores := make([dynamic]cstring, context.temp_allocator)
             defer delete(scores)
