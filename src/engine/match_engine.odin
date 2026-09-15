@@ -175,10 +175,10 @@ match_engine_run :: proc(st: ^State) {
 match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
 
     rl.BeginDrawing()
-    rl.ClearBackground(rl.RED)
+    rl.ClearBackground(rl.BLACK)
     rl.BeginMode2D(camera^)
 
-    rl.DrawTextureV(game.board.sprite, game.board.position, rl.PURPLE)
+    rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
     mouse_pos := rl.GetMousePosition()
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera^)
 

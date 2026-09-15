@@ -17,7 +17,12 @@ Match :: struct {
     movements: [dynamic; g.MAX_MOVES]Move,
     board: Board,
     //returns nil when no one won yet
-    win_condition: proc(game: ^Match) -> ^Team,
+    win_condition: Win_Rule
+}
+
+Win_Rule :: enum {
+    last_king_standing,
+
 }
 
 Match_Record :: struct {
@@ -116,7 +121,7 @@ match_make_from_file :: proc(filepath: string) -> ^Match {
     match := new(Match)
 
     match.board = board_make(match_data.board_size)
-    match.win_condition = match_win_rule_last_king_standing
+    match.win_condition = .last_king_standing
 
     teams := make([dynamic]Team)
 
@@ -236,7 +241,14 @@ match_delete :: proc(match: ^Match) {
 
 match_update :: proc(self: ^Match) {
 
-    winner := self.win_condition(self) 
+    winner: ^Team
+
+    switch self.win_condition {
+
+    case .last_king_standing:
+        winner = match_win_rule_last_king_standing(self)
+
+    }
 
     if winner != nil {
         winner.score += 1

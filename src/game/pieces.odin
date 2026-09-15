@@ -382,18 +382,30 @@ movement_pawn :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
     }
 
     move_len := 1 if self.has_moved else 2
-    last_move := self.position
+    cur_pos := self.position
     for index in 1..=move_len {
 
-        move := last_move + self.team.march_direction
+        // left := self.team.march_direction
+        // left.x *= -1
+        // left = swizzle(left, 1, 0)
+        //
+        // right := self.team.march_direction
+        // right.y *= -1
+        // right = swizzle(right, 1, 0)
+
+        move := cur_pos + self.team.march_direction
+        // move1 := cur_pos + left
+        // move2 := cur_pos + right
 
         tile := board_get_tile(board, move)
         if tile == nil do continue
         if tile.piece_ref != nil do continue
 
-        last_move = move
+        cur_pos = move
         moves_count += 1
         append(moves_buff, Move{ attack = false, target = move, origin = self.position})
+        // append(moves_buff, Move{ attack = false, target = move1, origin = self.position})
+        // append(moves_buff, Move{ attack = false, target = move2, origin = self.position})
 
     }
 
