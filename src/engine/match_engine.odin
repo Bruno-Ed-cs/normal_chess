@@ -2,6 +2,7 @@ package match_engine
 
 import rl "vendor:raylib"
 import "core:os"
+import "core:math/linalg"
 import "core:fmt"
 import gm "../game"
 import ass "../asset_man"
@@ -48,9 +49,9 @@ match_engine_make :: proc(path: string) -> ^State {
 
     if state.game == nil do os.exit(0)
 
-    ass.asset_man_init()
+        ass.asset_man_init()
 
-    return state
+        return state
 }
 
 @(export)
@@ -59,6 +60,7 @@ match_engine_init_window :: proc() {
     rl.InitWindow(g.WINDOW_SIZE.x, g.WINDOW_SIZE.y, "Normal Chess")
     rl.SetWindowMonitor(0)
     rl.SetWindowState({.WINDOW_RESIZABLE})
+    rl.SetTargetFPS(60)
 
 }
 
@@ -142,34 +144,38 @@ match_engine_run :: proc(st: ^State) {
 
                     if piece.class == .pawn {
 
-                        if piece.team.march_direction.x != 0 {
-                            if piece.team.march_direction.x == 1 {
-                                if piece.position.x == st.game.board.size.x -1 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
+                        promotion_fronteir := piece.team.march_direction * (st.game.board.size - 1)
+
+                        // log.info("Fronteir: ", promotion_fronteir)
+
+                        if promotion_fronteir.x != 0 {
+
+                            col := promotion_fronteir.y if promotion_fronteir.y > 0 else 0
+                            // log.info("Col: ", col)
+
+                            if piece.position.x == col{
+                                st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
                             }
 
-                            if piece.team.march_direction.x == -1 {
-                                if piece.position.x == 0 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
-                            }
                         }
 
-                        if piece.team.march_direction.y != 0 {
+                        if promotion_fronteir.y != 0 {
 
-                            if piece.team.march_direction.y == 1 {
-                                if piece.position.y == st.game.board.size.y -1 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
+                            row := promotion_fronteir.y if promotion_fronteir.y > 0 else 0
+                            // log.info("Row: ", row)
+                            if piece.position.y == row{
+                                st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
                             }
 
-                            if piece.team.march_direction.y == -1 {
-                                if piece.position.y == 0 do st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
-                            }
                         }
+
                     }
 
                 }
 
-            }
+                match_engine_draw(st.game, &st.camera, st.interfaces)
 
-            match_engine_draw(st.game, &st.camera, st.interfaces)
-
+    }
 }
 
 match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
@@ -289,6 +295,11 @@ match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
     world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
 
     // fmt.println(in_bounds)
+
+    if rl.IsKeyReleased(.R) {
+        gm.match_reset(game)
+
+    }
 
     check_click: if rl.IsMouseButtonPressed(.LEFT) {
 

@@ -4,6 +4,7 @@ import rl "vendor:raylib"
 import ass "../asset_man"
 import "core:fmt"
 import "core:log"
+import "core:math/linalg"
 import g "../globals"
 
 Dir :: enum {up, down, left, right}
@@ -136,60 +137,131 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
             }
         }
 
+        //Castleling 
         if !self.has_moved {
-            for x in self.position.x + 1..<board.size.x {
-                // fmt.println(x)
+            left := self.team.march_direction
+            left.x *= -1
+            left = left.yx
 
-                pos := board_get_tile(board, {x, self.position.y})
-                if pos != nil && pos.piece_ref != nil {
-                    if pos.piece_ref.class != .rook {
+            right := self.team.march_direction
+            right.y *= -1
+            right = right.yx
+
+            cur_pos_l := self.position + left
+            cur_pos_r := self.position + right
+
+            cur_tile_l := board_get_tile(board, cur_pos_l)
+            cur_tile_r := board_get_tile(board, cur_pos_r)
+
+            for (cur_tile_l != nil){
+
+                if cur_tile_l.piece_ref != nil && cur_tile_l.piece_ref.class != .rook do break
+
+                if cur_tile_l.piece_ref != nil && cur_tile_l.piece_ref.class == .rook {
+                    if !cur_tile_l.piece_ref.has_moved {
+
+                        target := self.position + (left * 2)
+                        if board_get_tile(board, target) == nil do break
+
+                        append(moves_buff, Move{
+                            attack = false, 
+                            target = target,
+                            origin = self.position,
+                            side_effect = side_effect_castleling
+                        })
+                        move_count += 1
+
                         break
-                    } else {
-                        if !pos.piece_ref.has_moved {
-                            target := Board_Pos{self.position.x + 2, self.position.y}
-                            if board_get_tile(board, target) == nil do break
-                            
-                            append(moves_buff, Move{
-                                attack = false, 
-                                target = target,
-                                origin = self.position,
-                                side_effect = side_effect_castleling
-                            })
-                            move_count += 1
-
-                        }
-
                     }
 
-                }
+                } 
+
+                cur_pos_l += left
+
+                cur_tile_l = board_get_tile(board, cur_pos_l)
             }
 
-            for x := self.position.x -1; x >= 0; x -= 1 {
-                // fmt.println(x)
-                pos := board_get_tile(board, {x, self.position.y})
-                if pos != nil && pos.piece_ref != nil {
-                    if pos.piece_ref.class != .rook {
+            for (cur_tile_r != nil){
+
+                if cur_tile_r.piece_ref != nil && cur_tile_r.piece_ref.class != .rook do break
+
+                if cur_tile_r.piece_ref != nil && cur_tile_r.piece_ref.class == .rook {
+                    if !cur_tile_r.piece_ref.has_moved {
+
+                        target := self.position + (right * 2)
+                        if board_get_tile(board, target) == nil do break
+
+                        append(moves_buff, Move{
+                            attack = false, 
+                            target = target,
+                            origin = self.position,
+                            side_effect = side_effect_castleling
+                        })
+                        move_count += 1
+
                         break
-                    } else {
-                        if !pos.piece_ref.has_moved {
-                            target := Board_Pos{self.position.x - 2, self.position.y}
-                            if board_get_tile(board, target) == nil do break
-                            
-                            append(moves_buff, Move{
-                                attack = false, 
-                                target = target,
-                                origin = self.position,
-                                side_effect = side_effect_castleling
-                            })
-                            move_count += 1
-
-                        }
-
                     }
 
-                }
+                } 
 
+                cur_pos_r += right
+                cur_tile_r = board_get_tile(board, cur_pos_r)
             }
+
+
+            // for x in self.position.x + 1..<board.size.x {
+            //     // fmt.println(x)
+            //
+            //     pos := board_get_tile(board, {x, self.position.y})
+            //     if pos != nil && pos.piece_ref != nil {
+            //         if pos.piece_ref.class != .rook {
+            //             break
+            //         } else {
+            //             if !pos.piece_ref.has_moved {
+            //                 target := Board_Pos{self.position.x + 2, self.position.y}
+            //                 if board_get_tile(board, target) == nil do break
+            //
+            //                 append(moves_buff, Move{
+            //                     attack = false, 
+            //                     target = target,
+            //                     origin = self.position,
+            //                     side_effect = side_effect_castleling
+            //                 })
+            //                 move_count += 1
+            //
+            //             }
+            //
+            //         }
+            //
+            //     }
+            // }
+            //
+            // for x := self.position.x -1; x >= 0; x -= 1 {
+            //     // fmt.println(x)
+            //     pos := board_get_tile(board, {x, self.position.y})
+            //     if pos != nil && pos.piece_ref != nil {
+            //         if pos.piece_ref.class != .rook {
+            //             break
+            //         } else {
+            //             if !pos.piece_ref.has_moved {
+            //                 target := Board_Pos{self.position.x - 2, self.position.y}
+            //                 if board_get_tile(board, target) == nil do break
+            //
+            //                 append(moves_buff, Move{
+            //                     attack = false, 
+            //                     target = target,
+            //                     origin = self.position,
+            //                     side_effect = side_effect_castleling
+            //                 })
+            //                 move_count += 1
+            //
+            //             }
+            //
+            //         }
+            //
+            //     }
+            //
+            // }
         }
 
 
@@ -199,17 +271,16 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
 
 side_effect_castleling :: proc(game: ^Match, caller: i32) {
 
-    piece := match_get_piece(game, caller)
+    king := match_get_piece(game, caller)
     distance :f32 = f32(game.board.size.x) * 10
     closest_tower: ^Piece
 
-    for row in 0..<game.board.size.x{
+    for tile in game.board.tiles {
 
-        tile := board_get_tile(&game.board, {row, piece.position.y})
-        if tile != nil && tile.piece_ref != nil{
-            if target := tile.piece_ref; target.class == .rook && target.team == piece.team{
+        if tile.piece_ref != nil {
+            if target := tile.piece_ref; target.class == .rook && target.team^ == king.team^ {
                 
-                if dist := rl.Vector2Distance(Vec2(piece.position), Vec2(target.position));distance > dist {
+                if dist := rl.Vector2Distance(Vec2(king.position), Vec2(target.position)); distance > dist {
                     log.debug(dist, target.position)
 
                     distance = dist
@@ -220,17 +291,14 @@ side_effect_castleling :: proc(game: ^Match, caller: i32) {
     }
 
     if closest_tower != nil {
-        side := closest_tower.position.x - piece.position.x 
+        king_dir := linalg.vector_normalize(cast([2]f32)king.position - cast([2]f32)closest_tower.position)
+        side := cast([2]i32)king_dir
 
-        if side <= 0 {
-            closest_tower.position.x = piece.position.x + 1
+        dest := king.position + side
 
-        } else {
-            closest_tower.position.x = piece.position.x - 1
-        }
+        piece_move(closest_tower, &game.board, dest)
 
     }
-
 
 }
 

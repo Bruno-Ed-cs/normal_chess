@@ -1,0 +1,414 @@
+{
+  "pieces": [
+    {
+      "position": [
+        9,
+        11
+      ],
+      "team": "White",
+      "class": "rook"
+    },
+    {
+      "position": [
+        5,
+        11
+      ],
+      "team": "White",
+      "class": "king"
+    },
+    {
+      "position": [
+        2,
+        11
+      ],
+      "team": "White",
+      "class": "rook"
+    },
+    {
+      "position": [
+        9,
+        10
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        8,
+        10
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        7,
+        10
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        6,
+        10
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        5,
+        10
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        4,
+        10
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        3,
+        10
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        2,
+        10
+      ],
+      "team": "White",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        11,
+        9
+      ],
+      "team": "Blue",
+      "class": "rook"
+    },
+    {
+      "position": [
+        10,
+        9
+      ],
+      "team": "Blue",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        9
+      ],
+      "team": "Red",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        0,
+        9
+      ],
+      "team": "Red",
+      "class": "rook"
+    },
+    {
+      "position": [
+        10,
+        8
+      ],
+      "team": "Blue",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        8
+      ],
+      "team": "Red",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        10,
+        7
+      ],
+      "team": "Blue",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        7
+      ],
+      "team": "Red",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        10,
+        6
+      ],
+      "team": "Blue",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        6
+      ],
+      "team": "Red",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        0,
+        6
+      ],
+      "team": "Red",
+      "class": "king"
+    },
+    {
+      "position": [
+        11,
+        5
+      ],
+      "team": "Blue",
+      "class": "king"
+    },
+    {
+      "position": [
+        10,
+        5
+      ],
+      "team": "Blue",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        5
+      ],
+      "team": "Red",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        10,
+        4
+      ],
+      "team": "Blue",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        4
+      ],
+      "team": "Red",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        10,
+        3
+      ],
+      "team": "Blue",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        3
+      ],
+      "team": "Red",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        11,
+        2
+      ],
+      "team": "Blue",
+      "class": "rook"
+    },
+    {
+      "position": [
+        10,
+        2
+      ],
+      "team": "Blue",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        1,
+        2
+      ],
+      "team": "Red",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        0,
+        2
+      ],
+      "team": "Red",
+      "class": "rook"
+    },
+    {
+      "position": [
+        9,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        8,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        7,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        6,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        5,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        4,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        3,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        2,
+        1
+      ],
+      "team": "Black",
+      "class": "pawn"
+    },
+    {
+      "position": [
+        9,
+        0
+      ],
+      "team": "Black",
+      "class": "rook"
+    },
+    {
+      "position": [
+        6,
+        0
+      ],
+      "team": "Black",
+      "class": "king"
+    },
+    {
+      "position": [
+        2,
+        0
+      ],
+      "team": "Black",
+      "class": "rook"
+    }
+  ],
+  "board_size": [
+    12,
+    12
+  ],
+  "teams": [
+    {
+      "color": [
+        234,
+        13,
+        13,
+        255
+      ],
+      "name": "Red",
+      "march": [
+        1,
+        0
+      ]
+    },
+    {
+      "color": [
+        3,
+        31,
+        157,
+        255
+      ],
+      "name": "Blue",
+      "march": [
+        -1,
+        0
+      ]
+    },
+    {
+      "color": [
+        218,
+        218,
+        218,
+        255
+      ],
+      "name": "White",
+      "march": [
+        0,
+        -1
+      ]
+    },
+    {
+      "color": [
+        16,
+        16,
+        16,
+        255
+      ],
+      "name": "Black",
+      "march": [
+        0,
+        1
+      ]
+    }
+  ]
+}
