@@ -53,6 +53,7 @@ Team_Record :: struct {
 Move :: struct {
     attack: bool,
     first_move: bool,
+    chained: bool,
     target: Board_Pos,
     origin: Board_Pos,
     side_effect: proc(game: ^Match, caller: i32),
@@ -301,6 +302,7 @@ side_effect_castleling :: proc(game: ^Match, caller: i32) {
 
         piece_move(closest_tower, game, Move{
             first_move = true, 
+            chained = true,
             attack = false,
             origin = closest_tower.position,
             target = dest,
@@ -521,11 +523,11 @@ piece_move :: proc(piece: ^Piece, game: ^Match, movement: Move) {
             tile.piece_ref = piece
         }
 
+        append(&game.history, movement)
+
         if movement.side_effect != nil {
             movement.side_effect(game, game.selected_piece.id)
         }
-
-        append(&game.history, movement)
 }
 
 piece_kill :: proc(piece: ^Piece) {

@@ -233,9 +233,11 @@ match_undo_move :: proc(self: ^Match) {
 
     if len(self.history) < 1 do return
 
-    match_undo_turn(self)
-
     move := pop(&self.history)
+
+    if !move.chained {
+        match_undo_turn(self)
+    }
 
     dest := board_get_tile(&self.board, move.target)
 
@@ -264,7 +266,10 @@ match_undo_move :: proc(self: ^Match) {
 
     }
 
-
+    if move.chained {
+        log.info("chaining undo")
+        match_undo_move(self)
+    }
 }
 
 
