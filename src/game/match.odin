@@ -10,14 +10,14 @@ import str "core:strings"
 
 Match :: struct {
     selected_piece: ^Piece,
-    pieces: [dynamic; g.MAX_PIECES]Piece,
     original_formation: []Piece_Record,
     teams: []Team,
     curr_turn: int,
+    win_condition: Win_Rule,
+    history: [dynamic]Move,
     movements: [dynamic; g.MAX_MOVES]Move,
+    pieces: [dynamic; g.MAX_PIECES]Piece,
     board: Board,
-    //returns nil when no one won yet
-    win_condition: Win_Rule
 }
 
 Win_Rule :: enum {
@@ -226,11 +226,53 @@ match_reset :: proc(self: ^Match) {
     clear(&self.movements)
     self.selected_piece = nil
     self.curr_turn = 0
+    clear(&self.history)
 }
+
+match_undo_move :: proc(self: ^Match) {
+
+    if len(self.history) < 1 do return
+
+    match_undo_turn(self)
+
+    move := pop(&self.history)
+
+    dest := board_get_tile(&self.board, move.target)
+
+    if dest != nil && dest.piece_ref != nil {
+        piece := dest.piece_ref
+        piece.position = move.origin
+
+        if move.first_move {
+            piece.has_moved = false
+        }
+
+    }
+
+    if move.attack {
+        piece: ^Piece
+        for &cur_piece in self.pieces {
+            if cur_piece.position == move.target && !cur_piece.alive {
+                piece = &cur_piece
+            }
+        }
+
+        if piece != nil {
+            piece.alive = true
+
+        }
+
+    }
+
+
+}
+
+
 
 match_delete :: proc(match: ^Match) {
 
     delete(match.teams)
+    delete(match.history)
     board_delete(&match.board)
     delete(match.original_formation)
     for &i in match.teams {
@@ -263,8 +305,16 @@ match_end_turn :: proc(self: ^Match) {
     self.curr_turn += 1 
 
     if self.curr_turn >= len(self.teams) do self.curr_turn = 0 
-    if self.curr_turn < 0 do self.curr_turn = 0
+    if self.curr_turn < 0 do self.curr_turn = len(self.teams) -1 >= 0 ? len(self.teams) -1 : 0
 
+}
+
+match_undo_turn :: proc(self: ^Match) {
+
+    self.curr_turn -= 1 
+
+    if self.curr_turn >= len(self.teams) do self.curr_turn = 0 
+    if self.curr_turn < 0 do self.curr_turn = 0
 }
 
 match_get_cur_turn_team :: proc(self: ^Match) -> ^Team {

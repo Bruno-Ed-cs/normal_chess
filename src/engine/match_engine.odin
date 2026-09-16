@@ -296,6 +296,15 @@ match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
     // fmt.println(in_bounds)
 
+    if rl.IsKeyReleased(.U) {
+        gm.match_undo_move(game)
+
+    }
+
+    if rl.IsKeyReleased(.H) {
+        for move in game.history do log.info(move)
+    }
+
     if rl.IsKeyReleased(.R) {
         gm.match_reset(game)
 
@@ -325,11 +334,7 @@ match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
                 for move in game.movements {
                     if move.target == target_tile {
-                        gm.piece_move(game.selected_piece, &game.board, move.target)
-
-                        if move.side_effect != nil {
-                            move.side_effect(game, game.selected_piece.id)
-                        }
+                        gm.piece_move(game.selected_piece, game, move)
                         gm.match_end_turn(game)
                         game.selected_piece = nil
                         clear(&game.movements)
@@ -345,4 +350,3 @@ match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
 
         }
     }
-
