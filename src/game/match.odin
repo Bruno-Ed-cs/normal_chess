@@ -305,8 +305,7 @@ match_end_turn :: proc(self: ^Match) {
     self.curr_turn += 1 
 
     if self.curr_turn >= len(self.teams) do self.curr_turn = 0 
-    if self.curr_turn < 0 do self.curr_turn = len(self.teams) -1 >= 0 ? len(self.teams) -1 : 0
-
+    if self.curr_turn < 0 do self.curr_turn = 0
 }
 
 match_undo_turn :: proc(self: ^Match) {
@@ -314,7 +313,7 @@ match_undo_turn :: proc(self: ^Match) {
     self.curr_turn -= 1 
 
     if self.curr_turn >= len(self.teams) do self.curr_turn = 0 
-    if self.curr_turn < 0 do self.curr_turn = 0
+    if self.curr_turn < 0 do self.curr_turn = len(self.teams) -1 >= 0 ? len(self.teams) -1 : 0
 }
 
 match_get_cur_turn_team :: proc(self: ^Match) -> ^Team {
