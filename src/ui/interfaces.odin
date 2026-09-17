@@ -8,6 +8,7 @@ import hl "../helpers"
 import rf "core:reflect"
 import str "core:strings"
 import "core:log"
+import "core:mem/virtual"
 
 Ui_Type :: enum {
 
@@ -42,14 +43,17 @@ ui_render :: proc(interface: ^Ui, top: bool) -> UiSig {
 
 ui_cleanup :: proc(interface: ^Ui) {
 
-
-    #partial switch interface.type {
-    case .debug:
-        ui_debug_cleanup(interface.workspace)
-
-    case .promotion:
-        ui_promotion_cleanup(interface.workspace)
+    if interface.memory != nil {
+        virtual.arena_destroy(&interface.memory.?) 
     }
+
+    // #partial switch interface.type {
+    // case .debug:
+    //     ui_debug_cleanup(interface.workspace)
+    //
+    // case .promotion:
+    //     ui_promotion_cleanup(interface.workspace)
+    // }
 
     return
 }
@@ -85,21 +89,27 @@ ui_debug_call :: proc(workspace: rawptr, top: bool) -> UiSig {
     return UiSig.move_down
 }
 
-ui_debug_cleanup :: proc(workspace: rawptr) {
-    log.debug("freeing my debug")
-    free(workspace)
-
-}
+// ui_debug_cleanup :: proc(workspace: rawptr) {
+//     log.debug("freeing my debug")
+//     free(workspace)
+//
+// }
 
 ui_debug_init :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> Ui {
 
-    info := new(Debug_Info)
+    memory: virtual.Arena
+    err := virtual.arena_init_growing(&memory)
+    assert(err == nil)
+    alloc := virtual.arena_allocator(&memory)
+
+    info := new(Debug_Info, alloc)
     info.camera = camera
     info.game = game
 
     return Ui {
         workspace = info,
-        type = .debug
+        type = .debug,
+        memory = memory
     }
 
 }
@@ -276,22 +286,28 @@ ui_promotion_call ::proc(workspace: rawptr, top: bool) -> UiSig{
 
 }
 
-ui_promotion_cleanup :: proc(workspace: rawptr) {
-    free(workspace)
-}
+// ui_promotion_cleanup :: proc(workspace: rawptr) {
+//     free(workspace)
+// }
 
 
 ui_promotion_init :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
 
+    memory: virtual.Arena
+    err := virtual.arena_init_growing(&memory)
+    assert(err == nil)
+    alloc := virtual.arena_allocator(&memory)
+
     assert(piece_id >= 0)
 
-    work := new(Promotion_Work)
+    work := new(Promotion_Work, alloc)
     work.piece_id = piece_id
     work.game = game
 
     return Ui {
         workspace = work,
-        type = .promotion
+        type = .promotion,
+        memory = memory
     }
 
 }

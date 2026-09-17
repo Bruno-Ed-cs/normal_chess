@@ -267,7 +267,7 @@ match_undo_move :: proc(self: ^Match) {
     }
 
     if move.chained {
-        log.info("chaining undo")
+        // log.info("chaining undo")
         match_undo_move(self)
     }
 }

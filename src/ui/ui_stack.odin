@@ -2,6 +2,7 @@ package ui
 
 import "core:slice"
 import "core:mem"
+import "core:mem/virtual"
 import g "../globals"
 
 ui_memory: [g.UI_MEM_SIZE]byte
@@ -33,6 +34,7 @@ Ui :: struct {
     workspace: rawptr,
     id: int,
     type: Ui_Type,
+    memory: Maybe(virtual.Arena),
 }
 
 ui_stack_make :: proc() -> ^UiStack {
