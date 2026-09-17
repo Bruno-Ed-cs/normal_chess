@@ -5,14 +5,13 @@ import "core:mem"
 import "core:mem/virtual"
 import g "../globals"
 
-ui_memory: [g.UI_MEM_SIZE]byte
-
 UiFunc :: proc(workspace: rawptr, top: bool) -> UiSig
 UiCleanup :: proc(workspace: rawptr)
 
 UiStack :: struct {
-    layers: [dynamic]Ui,
     next_id: int,
+    temp_mem: virtual.Arena,
+    layers: [dynamic]Ui,
 }
 
 UiSig :: enum {
@@ -42,6 +41,8 @@ ui_stack_make :: proc() -> ^UiStack {
     stack := new(UiStack)
     stack.layers = make([dynamic]Ui, 0, 5)
     stack.next_id = 1
+    err := virtual.arena_init_growing(&stack.temp_mem)
+    assert(err == nil)
 
     return stack
 }
@@ -79,9 +80,7 @@ ui_stack_clean :: proc(stack: ^UiStack) {
 
 ui_stack_execute :: proc(stack: ^UiStack) {
 
-    ui_arena: mem.Arena
-    mem.arena_init(&ui_arena, ui_memory[:])
-    context.temp_allocator = mem.arena_allocator(&ui_arena)
+    context.temp_allocator = virtual.arena_allocator(&stack.temp_mem)
     defer(free_all(context.temp_allocator))
 
     sig_buff := make([dynamic]SigIndex, context.temp_allocator)
