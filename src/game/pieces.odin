@@ -2,6 +2,7 @@ package game
 
 import rl "vendor:raylib"
 import ass "../asset_man"
+import h "../helpers"
 import "core:fmt"
 import "core:log"
 import "core:math/linalg"
@@ -141,13 +142,9 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
 
     //Castleling 
     if !self.has_moved {
-        left := self.team.march_direction
-        left.x *= -1
-        left = left.yx
+        left := h.direction_rotate_90_counter(self.team.march_direction)
 
-        right := self.team.march_direction
-        right.y *= -1
-        right = right.yx
+        right := h.direction_rotate_90_clock(self.team.march_direction)
 
         cur_pos_l := self.position + left
         cur_pos_r := self.position + right

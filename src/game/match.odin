@@ -9,11 +9,11 @@ import "core:os"
 import str "core:strings"
 
 Match :: struct {
+    curr_turn: int,
+    win_condition: Win_Rule,
     selected_piece: ^Piece,
     original_formation: []Piece_Record,
     teams: []Team,
-    curr_turn: int,
-    win_condition: Win_Rule,
     history: [dynamic]Move,
     movements: [dynamic; g.MAX_MOVES]Move,
     pieces: [dynamic; g.MAX_PIECES]Piece,
