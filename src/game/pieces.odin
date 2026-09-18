@@ -494,23 +494,26 @@ movement_pawn :: proc(self: ^Piece, game: ^Match) -> int {
         if tile := board_get_tile(&game.board, self.position + side); 
         tile != nil && tile.piece_ref != nil && tile.piece_ref.class == .pawn && tile.piece_ref.team^ != self.team^{
 
-            top := len(game.history) -1 
+            for x in 1..<len(game.teams){
+                top := len(game.history) - x
 
-            if top >= 0 {
-                origin := game.history[top].origin
-                target := game.history[top].target
-                dist := linalg.distance(cast([2]f32)origin, cast([2]f32)target)
+                if top >= 0 {
+                    origin := game.history[top].origin
+                    target := game.history[top].target
+                    dist := linalg.distance(cast([2]f32)origin, cast([2]f32)target)
 
-                if target == side + self.position && dist == 2 {
+                    if target == side + self.position && dist == 2 {
 
-                    append(&game.movements, Move {
-                        first_move = !self.has_moved,
-                        origin = self.position,
-                        side_effect = side_effect_en_pesant,
-                        target = self.position + side + self.team.march_direction
+                        append(&game.movements, Move {
+                            first_move = !self.has_moved,
+                            origin = self.position,
+                            side_effect = side_effect_en_pesant,
+                            target = self.position + side + self.team.march_direction
 
-                    })
-                    moves_count += 1
+                        })
+                        moves_count += 1
+                        break
+                    }
                 }
             }
         }
@@ -524,6 +527,23 @@ movement_pawn :: proc(self: ^Piece, game: ^Match) -> int {
 
 side_effect_en_pesant :: proc(game: ^Match, caller: i32) {
 
+    caller := match_get_piece(game, caller)
+    if caller == nil do return
+
+    dir := h.direction_rotate_180(caller.team.march_direction)
+    target_tile := board_get_tile(&game.board, caller.position + dir)
+
+    if target_tile != nil && target_tile.piece_ref != nil {
+
+        piece_move(nil, game, Move{
+            attack = true,
+            origin = target_tile.coordenate,
+            chained = true,
+            first_move = false,
+            target = target_tile.coordenate
+        })
+
+    }
 }
 
 make_piece :: proc(class: Class, position: Board_Pos, team: ^Team) -> (piece: Piece) {
@@ -549,19 +569,21 @@ piece_move :: proc(piece: ^Piece, game: ^Match, movement: Move) {
 
     if tile == nil do return
 
+    if piece != nil {
         piece.has_moved = true
         piece.position = movement.target
+    }
 
-        if tile.piece_ref != nil {
-            piece_kill(tile.piece_ref)
-            tile.piece_ref = piece
-        }
+    if tile.piece_ref != nil {
+        piece_kill(tile.piece_ref)
+        tile.piece_ref = piece
+    }
 
-        append(&game.history, movement)
+    append(&game.history, movement)
 
-        if movement.side_effect != nil {
-            movement.side_effect(game, game.selected_piece.id)
-        }
+    if movement.side_effect != nil {
+        movement.side_effect(game, game.selected_piece.id)
+    }
 }
 
 piece_kill :: proc(piece: ^Piece) {
