@@ -1,3 +1,4 @@
+#+feature using-stmt
 package game
 
 import rl "vendor:raylib"
@@ -11,7 +12,7 @@ import g "../globals"
 Dir :: enum {up, down, left, right}
 Diag :: enum {up_left, up_right, down_left, down_right}
 
-Directions :: [Dir][2]i32 {
+Cardinals :: [Dir][2]i32 {
     .up = {0, -1},
     .down = {0, 1},
     .left = {1, 0},
@@ -77,10 +78,10 @@ Piece_Record :: struct {
 }
 
 
-piece_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+piece_movement :: proc(self: ^Piece, game: ^Match) -> int {
 
     move_count: int
-    movement: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int
+    movement: proc(self: ^Piece, game: ^Match) -> int
 
     switch self.class {
 
@@ -98,27 +99,27 @@ piece_movement :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX
         movement = movement_knight
     }
 
-    movement(self, board, moves_buff)
+    movement(self, game)
     return move_count
 
 }
 
-movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+movement_king :: proc(self: ^Piece, game: ^Match) -> int {
 
     move_count: int
 
-    #unroll for dir in Directions {
+    #unroll for dir in Cardinals {
 
         pos := self.position + dir
-        tile := board_get_tile(board, pos)
+        tile := board_get_tile(&game.board, pos)
 
         if tile == nil {
 
         } else if tile.piece_ref == nil {
-            append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = false, target = pos, origin = self.position})
+            append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = false, target = pos, origin = self.position})
             move_count += 1
         } else if tile.piece_ref.team != self.team {
-            append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = true, target = pos, origin = self.position})
+            append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = true, target = pos, origin = self.position})
             move_count += 1
         }
 
@@ -127,15 +128,15 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
     #unroll for diag in Diagonals {
 
         pos := self.position + diag
-        tile := board_get_tile(board, pos)
+        tile := board_get_tile(&game.board, pos)
 
         if tile == nil {
 
         } else if tile.piece_ref == nil {
-            append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = false, target = pos, origin = self.position})
+            append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = false, target = pos, origin = self.position})
             move_count += 1
         } else if tile.piece_ref.team != self.team {
-            append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = true, target = pos, origin = self.position})
+            append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = true, target = pos, origin = self.position})
             move_count += 1
         }
     }
@@ -149,8 +150,8 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
         cur_pos_l := self.position + left
         cur_pos_r := self.position + right
 
-        cur_tile_l := board_get_tile(board, cur_pos_l)
-        cur_tile_r := board_get_tile(board, cur_pos_r)
+        cur_tile_l := board_get_tile(&game.board, cur_pos_l)
+        cur_tile_r := board_get_tile(&game.board, cur_pos_r)
 
         for (cur_tile_l != nil){
 
@@ -160,9 +161,9 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
                     if !cur_tile_l.piece_ref.has_moved {
 
                         target := self.position + (left * 2)
-                        if board_get_tile(board, target) == nil do break
+                        if board_get_tile(&game.board, target) == nil do break
 
-                            append(moves_buff, Move{
+                            append(&game.movements, Move{
                                 first_move = self.has_moved ? false : true, 
                                 attack = false, 
                                 target = target,
@@ -178,7 +179,7 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
 
                 cur_pos_l += left
 
-                cur_tile_l = board_get_tile(board, cur_pos_l)
+                cur_tile_l = board_get_tile(&game.board, cur_pos_l)
         }
 
         for (cur_tile_r != nil){
@@ -189,9 +190,9 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
                     if !cur_tile_r.piece_ref.has_moved {
 
                         target := self.position + (right * 2)
-                        if board_get_tile(board, target) == nil do break
+                        if board_get_tile(&game.board, target) == nil do break
 
-                            append(moves_buff, Move{
+                            append(&game.movements, Move{
                                 first_move = self.has_moved ? false : true, 
                                 attack = false, 
                                 target = target,
@@ -206,23 +207,23 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
                 } 
 
                 cur_pos_r += right
-                cur_tile_r = board_get_tile(board, cur_pos_r)
+                cur_tile_r = board_get_tile(&game.board, cur_pos_r)
         }
 
 
         // for x in self.position.x + 1..<board.size.x {
         //     // fmt.println(x)
         //
-        //     pos := board_get_tile(board, {x, self.position.y})
+        //     pos := board_get_tile(&game.board, {x, self.position.y})
         //     if pos != nil && pos.piece_ref != nil {
         //         if pos.piece_ref.class != .rook {
         //             break
         //         } else {
         //             if !pos.piece_ref.has_moved {
         //                 target := Board_Pos{self.position.x + 2, self.position.y}
-        //                 if board_get_tile(board, target) == nil do break
+        //                 if board_get_tile(&game.board, target) == nil do break
         //
-        //                 append(moves_buff, Move{
+        //                 append(&game.movements, Move{
         //                     attack = false, 
         //                     target = target,
         //                     origin = self.position,
@@ -239,16 +240,16 @@ movement_king :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
         //
         // for x := self.position.x -1; x >= 0; x -= 1 {
         //     // fmt.println(x)
-        //     pos := board_get_tile(board, {x, self.position.y})
+        //     pos := board_get_tile(&game.board, {x, self.position.y})
         //     if pos != nil && pos.piece_ref != nil {
         //         if pos.piece_ref.class != .rook {
         //             break
         //         } else {
         //             if !pos.piece_ref.has_moved {
         //                 target := Board_Pos{self.position.x - 2, self.position.y}
-        //                 if board_get_tile(board, target) == nil do break
+        //                 if board_get_tile(&game.board, target) == nil do break
         //
-        //                 append(moves_buff, Move{
+        //                 append(&game.movements, Move{
         //                     attack = false, 
         //                     target = target,
         //                     origin = self.position,
@@ -310,13 +311,13 @@ side_effect_castleling :: proc(game: ^Match, caller: i32) {
 
 }
 
-movement_queen :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+movement_queen :: proc(self: ^Piece, game: ^Match) -> int {
 
-    return movement_bishop(self, board, moves_buff) + movement_rook(self, board, moves_buff)
+    return movement_bishop(self, game) + movement_rook(self, game)
 
 }
 
-movement_bishop :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+movement_bishop :: proc(self: ^Piece, game: ^Match) -> int {
 
     moves_count: int
 
@@ -325,15 +326,15 @@ movement_bishop :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MA
         for multipliyer: i32 = 1;; multipliyer += 1 {
 
             log.debug(self.position + multipliyer * diag)
-            tile := board_get_tile(board, self.position + multipliyer * diag)
+            tile := board_get_tile(&game.board, self.position + multipliyer * diag)
 
             if tile == nil do break 
 
                 if tile.piece_ref == nil {
-                    append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = false, target = self.position + multipliyer * diag, origin = self.position})
+                    append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = false, target = self.position + multipliyer * diag, origin = self.position})
                     moves_count += 1
                 } else if tile.piece_ref.team != self.team {
-                    append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = true, target = self.position + multipliyer * diag, origin = self.position})
+                    append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = true, target = self.position + multipliyer * diag, origin = self.position})
                     moves_count += 1
                     break
                 } else {
@@ -348,36 +349,36 @@ movement_bishop :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MA
 
 }
 
-movement_knight :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+movement_knight :: proc(self: ^Piece, game: ^Match) -> int {
 
     moves_count :int
 
-    for dir in Directions {
+    for dir in Cardinals {
 
         middle := self.position + dir * 2
 
         move1 := middle + swizzle(dir, 1, 0)
         move2 := middle - swizzle(dir, 1, 0)
 
-        if tile := board_get_tile(board, move1); tile != nil {
+        if tile := board_get_tile(&game.board, move1); tile != nil {
 
             if tile.piece_ref == nil {
-                append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = false, target = move1, origin = self.position})
+                append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = false, target = move1, origin = self.position})
                 moves_count += 1
             } else if tile.piece_ref.team != self.team {
-                append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = true, target = move1, origin = self.position})
+                append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = true, target = move1, origin = self.position})
                 moves_count += 1
             }
 
         }
 
-        if tile := board_get_tile(board, move2); tile != nil {
+        if tile := board_get_tile(&game.board, move2); tile != nil {
 
             if tile.piece_ref == nil {
-                append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = false, target = move2, origin = self.position})
+                append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = false, target = move2, origin = self.position})
                 moves_count += 1
             } else if tile.piece_ref.team != self.team {
-                append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = true, target = move2, origin = self.position})
+                append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = true, target = move2, origin = self.position})
                 moves_count += 1
             }
         }
@@ -387,11 +388,11 @@ movement_knight :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MA
     return moves_count
 }
 
-movement_rook :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+movement_rook :: proc(self: ^Piece, game: ^Match) -> int {
 
     moves_count :int
 
-    for dir in Directions {
+    for dir in Cardinals {
 
         move := self.position
         walked :int = 1
@@ -399,17 +400,17 @@ movement_rook :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
         for ;;walked += 1{
 
             move += dir
-            tile := board_get_tile(board, move)
+            tile := board_get_tile(&game.board, move)
 
             if tile == nil do break
 
                 moves_count += 1
 
                 if tile.piece_ref == nil {
-                    append(moves_buff, Move{first_move = self.has_moved ? false : true, attack = false, target = move, origin = self.position})
+                    append(&game.movements, Move{first_move = self.has_moved ? false : true, attack = false, target = move, origin = self.position})
                 } else {
                     if tile.piece_ref.team != self.team {
-                        append(moves_buff, Move{ first_move = self.has_moved ? false : true, attack = true, target = move, origin = self.position})
+                        append(&game.movements, Move{ first_move = self.has_moved ? false : true, attack = true, target = move, origin = self.position})
                     }
 
                     break
@@ -424,7 +425,7 @@ movement_rook :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
 }
 
 
-movement_pawn :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_MOVES]Move) -> int {
+movement_pawn :: proc(self: ^Piece, game: ^Match) -> int {
 
     moves_count: int
 
@@ -449,9 +450,9 @@ movement_pawn :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
 
     for &diag in diagonal_killers {
         log.debug(diag)
-        if tile := board_get_tile(board, diag); tile != nil{
+        if tile := board_get_tile(&game.board, diag); tile != nil{
             if tile.piece_ref != nil && tile.piece_ref.team != self.team{
-                append(moves_buff, Move{first_move = self.has_moved ? false : true,  attack = true, target = diag, origin = self.position})
+                append(&game.movements, Move{first_move = self.has_moved ? false : true,  attack = true, target = diag, origin = self.position})
                 moves_count += 1
             }
         }
@@ -473,19 +474,55 @@ movement_pawn :: proc(self: ^Piece, board: ^Board, moves_buff: ^[dynamic; g.MAX_
         // move1 := cur_pos + left
         // move2 := cur_pos + right
 
-        tile := board_get_tile(board, move)
+        tile := board_get_tile(&game.board, move)
         if tile == nil do continue
             if tile.piece_ref != nil do continue
 
                 cur_pos = move
                 moves_count += 1
-                append(moves_buff, Move{first_move = self.has_moved ? false : true,  attack = false, target = move, origin = self.position})
-                // append(moves_buff, Move{ attack = false, target = move1, origin = self.position})
-                // append(moves_buff, Move{ attack = false, target = move2, origin = self.position})
+                append(&game.movements, Move{first_move = self.has_moved ? false : true,  attack = false, target = move, origin = self.position})
+                // append(game.movements, Move{ attack = false, target = move1, origin = self.position})
+                // append(game.movements, Move{ attack = false, target = move2, origin = self.position})
 
     }
 
+    //en pesant
+    side := h.direction_rotate_90_clock(self.team.march_direction)
+
+    #unroll for i in 0..=1 {
+
+        if tile := board_get_tile(&game.board, self.position + side); 
+        tile != nil && tile.piece_ref != nil && tile.piece_ref.class == .pawn && tile.piece_ref.team^ != self.team^{
+
+            top := len(game.history) -1 
+
+            if top >= 0 {
+                origin := game.history[top].origin
+                target := game.history[top].target
+                dist := linalg.distance(cast([2]f32)origin, cast([2]f32)target)
+
+                if target == side + self.position && dist == 2 {
+
+                    append(&game.movements, Move {
+                        first_move = !self.has_moved,
+                        origin = self.position,
+                        side_effect = side_effect_en_pesant,
+                        target = self.position + side + self.team.march_direction
+
+                    })
+                    moves_count += 1
+                }
+            }
+        }
+
+        side = h.direction_rotate_90_counter(self.team.march_direction)
+    }
+
     return moves_count
+
+}
+
+side_effect_en_pesant :: proc(game: ^Match, caller: i32) {
 
 }
 

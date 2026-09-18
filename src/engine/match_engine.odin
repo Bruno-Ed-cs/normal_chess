@@ -324,7 +324,7 @@ match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
                 if tile := gm.board_get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
                     if cur_team == tile.piece_ref.team { 
                         game.selected_piece = tile.piece_ref
-                        gm.piece_movement(tile.piece_ref, &game.board, &game.movements) 
+                        gm.piece_movement(tile.piece_ref, game) 
                         // fmt.println("open movement")
                         // fmt.println(game.movements)
                     }
