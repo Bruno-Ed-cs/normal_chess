@@ -45,7 +45,7 @@ asset_man_init :: proc() {
 asset_man_get_asset :: proc(asset_name: string) -> Asset {
 
     asset, ok := asset_bank[asset_name]
-    log.debug(asset_bank)
+    // log.debug(asset_bank)
 
     if ok {
         return asset

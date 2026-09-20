@@ -43,7 +43,6 @@ Team :: struct {
     color: rl.Color,
     name: string,
     march_direction: [2]i32,
-    piece_sprites: rl.RenderTexture2D
 }
 
 Team_Record :: struct {
@@ -594,41 +593,41 @@ piece_kill :: proc(piece: ^Piece) {
 
 team_make :: proc(name: string, color: rl.Color, march: [2]i32) -> Team {
 
-    base_spritesheet := ass.asset_man_get_asset("sprite_sheet.png").(rl.Texture2D)
-    sprite_image := rl.LoadImageFromTexture(base_spritesheet)
-    defer rl.UnloadImage(sprite_image)
+    // base_spritesheet := ass.asset_man_get_asset("sprite_sheet.png").(rl.Texture2D)
+    // sprite_image := rl.LoadImageFromTexture(base_spritesheet)
+    // defer rl.UnloadImage(sprite_image)
 
     team := Team{
         march_direction = march,
         name = name,
         score = 0,
         color = color,
-        piece_sprites = rl.LoadRenderTexture(sprite_image.width, sprite_image.height)
+        // piece_sprites = rl.LoadRenderTexture(sprite_image.width, sprite_image.height)
     }
 
-    base_pixels := rl.LoadImageColors(sprite_image)
-    defer rl.UnloadImageColors(base_pixels)
-
-    size := sprite_image.height * sprite_image.width
-
-    for i in 0..<size {
-
-        primary_col := rl.Color{255, 255, 255, 255} 
-        secondary_col := rl.Color{153, 153, 153, 255}
-
-        if base_pixels[i] == primary_col {
-            base_pixels[i] = color
-        }
-
-        if base_pixels[i] == secondary_col {
-
-            base_pixels[i] = rl.ColorBrightness(base_pixels[i], 1.20)
-            base_pixels[i] = rl.ColorAlphaBlend(base_pixels[i], color, rl.Color{70, 60, 108, 255})
-        }
-
-    }
-
-    rl.UpdateTexture(team.piece_sprites.texture, base_pixels)
+    // base_pixels := rl.LoadImageColors(sprite_image)
+    // defer rl.UnloadImageColors(base_pixels)
+    //
+    // size := sprite_image.height * sprite_image.width
+    //
+    // for i in 0..<size {
+    //
+    //     primary_col := rl.Color{255, 255, 255, 255} 
+    //     secondary_col := rl.Color{153, 153, 153, 255}
+    //
+    //     if base_pixels[i] == primary_col {
+    //         base_pixels[i] = color
+    //     }
+    //
+    //     if base_pixels[i] == secondary_col {
+    //
+    //         base_pixels[i] = rl.ColorBrightness(base_pixels[i], 1.20)
+    //         base_pixels[i] = rl.ColorAlphaBlend(base_pixels[i], color, rl.Color{70, 60, 108, 255})
+    //     }
+    //
+    // }
+    //
+    // rl.UpdateTexture(team.piece_sprites.texture, base_pixels)
 
     return team
 
@@ -636,7 +635,7 @@ team_make :: proc(name: string, color: rl.Color, march: [2]i32) -> Team {
 
 team_delete :: proc(team: ^Team) {
 
-    rl.UnloadRenderTexture(team.piece_sprites)
+    // rl.UnloadRenderTexture(team.piece_sprites)
     delete(team.name)
 }
 

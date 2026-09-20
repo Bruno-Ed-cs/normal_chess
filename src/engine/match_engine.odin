@@ -19,6 +19,7 @@ State :: struct {
     interfaces: ^ui.UiStack,
     game: ^gm.Match,
     camera: rl.Camera2D,
+    team_painter: rl.Shader,
 }
 
 @(export)
@@ -49,9 +50,17 @@ match_engine_make :: proc(path: string) -> ^State {
 
     if state.game == nil do os.exit(0)
 
-        ass.asset_man_init()
+    ass.asset_man_init()
 
-        return state
+    state.team_painter = rl.LoadShader(nil, "assets/shaders/team_painter.vert")
+
+    if !rl.IsShaderValid(state.team_painter) {
+        log.error("Invalid Shader")
+
+    }
+
+    rl.SetTraceLogLevel(.ALL)
+    return state
 }
 
 @(export)
@@ -173,38 +182,38 @@ match_engine_run :: proc(st: ^State) {
 
                 }
 
-                match_engine_draw(st.game, &st.camera, st.interfaces)
+                match_engine_draw(st)
 
     }
 }
 
-match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui.UiStack) {
+match_engine_draw :: proc(st: ^State) {
 
     rl.BeginDrawing()
     rl.ClearBackground(rl.BLACK)
-    rl.BeginMode2D(camera^)
+    rl.BeginMode2D(st.camera)
 
-    rl.DrawTextureV(game.board.sprite, game.board.position, rl.WHITE)
+    rl.DrawTextureV(st.game.board.sprite, st.game.board.position, rl.WHITE)
     mouse_pos := rl.GetMousePosition()
-    world_pos := rl.GetScreenToWorld2D(mouse_pos, camera^)
+    world_pos := rl.GetScreenToWorld2D(mouse_pos, st.camera)
 
-    // for tile in game.board.tiles {
+    // for tile in st.game.board.tiles {
     //
     //     if rl.CheckCollisionPointRec(world_pos, tile.hitbox) {
     //         rl.DrawRectangleRec(tile.hitbox, rl.BLUE)
     //     }
     // }
 
-    if game.selected_piece != nil {
+    if st.game.selected_piece != nil {
 
-        pos, valid := gm.board_to_world(&game.board, game.selected_piece.position)
+        pos, valid := gm.board_to_world(&st.game.board, st.game.selected_piece.position)
         rl.DrawRectangleRec(rl.Rectangle{ pos.x, pos.y, gm.TILE_SIZE, gm.TILE_SIZE}, rl.BLUE)
     }
 
 
-    for move in game.movements {
+    for move in st.game.movements {
 
-        draw_pos, in_bounds := gm.board_to_world(&game.board, move.target)
+        draw_pos, in_bounds := gm.board_to_world(&st.game.board, move.target)
         if !in_bounds do continue
             color: rl.Color = rl.BLUE
 
@@ -221,8 +230,13 @@ match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui
                     rl.DrawRectangleLinesEx(rec, 2.0, color)
     }
 
-    for &piece in game.pieces {
-        tile_pos , ok := gm.board_to_world(&game.board, piece.position)
+    pieces_sprite := ass.asset_man_get_asset("sprite_sheet.png").(rl.Texture2D)
+    uniform_location := rl.GetShaderLocation(st.team_painter, "team_col")
+    if uniform_location < 0 do log.error("Invalid Loaction")
+    if st.team_painter.id == 0 do log.error("The shader was not loaded")
+
+    for &piece in st.game.pieces {
+        tile_pos , ok := gm.board_to_world(&st.game.board, piece.position)
         if piece.alive {
             source := rl.Rectangle {0, 0, 32, 32}
 
@@ -247,13 +261,19 @@ match_engine_draw :: proc(game: ^gm.Match, camera: ^rl.Camera2D, interfaces: ^ui
 
             }
 
-            rl.DrawTextureRec(piece.team.piece_sprites.texture, source , tile_pos, rl.WHITE)
+            norm_col := rl.ColorNormalize(piece.team.color)
+
+            rl.SetShaderValue(st.team_painter, uniform_location, &norm_col, .VEC4)
+
+            rl.BeginShaderMode(st.team_painter)
+                rl.DrawTextureRec(pieces_sprite, source, tile_pos, rl.WHITE)
+            rl.EndShaderMode()
         }
     }
 
     rl.EndMode2D()
 
-    ui.ui_stack_execute(interfaces)
+    ui.ui_stack_execute(st.interfaces)
 
     rl.EndDrawing()
 
