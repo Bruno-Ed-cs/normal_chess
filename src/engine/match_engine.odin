@@ -20,6 +20,7 @@ State :: struct {
     game: ^gm.Match,
     camera: rl.Camera2D,
     team_painter: rl.Shader,
+    uniforms: map[string]i32,
 }
 
 @(export)
@@ -53,14 +54,29 @@ match_engine_make :: proc(path: string) -> ^State {
     ass.asset_man_init()
 
     state.team_painter = rl.LoadShader(nil, "assets/shaders/team_painter.vert")
+    state.uniforms["team_col"] = rl.GetShaderLocation(state.team_painter, "team_col")
+    if state.uniforms["team_col"] < 0 do log.error("Uniform \"team_col\" was not found")
 
     if !rl.IsShaderValid(state.team_painter) {
         log.error("Invalid Shader")
-
     }
 
     rl.SetTraceLogLevel(.ALL)
     return state
+}
+
+match_engine_reload_shaders :: proc(st: ^State) {
+
+    if rl.IsShaderValid(st.team_painter) do rl.UnloadShader(st.team_painter)
+
+    st.team_painter = rl.LoadShader(nil, "assets/shaders/team_painter.vert")
+    st.uniforms["team_col"] = rl.GetShaderLocation(st.team_painter, "team_col")
+    if st.uniforms["team_col"] < 0 do log.error("Uniform \"team_col\" was not found")
+
+    if !rl.IsShaderValid(st.team_painter) {
+        log.error("Invalid Shader")
+    }
+
 }
 
 @(export)
@@ -87,12 +103,14 @@ match_engine_cleanup :: proc() {
 }
 
 @(export)
-match_engine_delete :: proc(state: ^State) {
+match_engine_delete :: proc(st: ^State) {
 
-    ui.ui_stack_delete(state.interfaces)
-    gm.match_delete(state.game)
+    if rl.IsShaderValid(st.team_painter) do rl.UnloadShader(st.team_painter)
+    ui.ui_stack_delete(st.interfaces)
+    gm.match_delete(st.game)
 
-    free(state)
+    delete(st.uniforms)
+    free(st)
 }
 
 @(export)
@@ -142,7 +160,7 @@ match_engine_run :: proc(st: ^State) {
         //its already fucked here
 
         match_engine_camera_control(&st.camera, dt)
-        if !g.PAUSE do match_engine_gameplay_control(st.game, st.camera)
+        if !g.PAUSE do match_engine_gameplay_control(st)
             gm.board_update(&st.game.board, st.game.pieces[:])
             gm.match_update(st.game)
 
@@ -231,9 +249,7 @@ match_engine_draw :: proc(st: ^State) {
     }
 
     pieces_sprite := ass.asset_man_get_asset("sprite_sheet.png").(rl.Texture2D)
-    uniform_location := rl.GetShaderLocation(st.team_painter, "team_col")
-    if uniform_location < 0 do log.error("Invalid Loaction")
-    if st.team_painter.id == 0 do log.error("The shader was not loaded")
+    // if st.team_painter.id == 0 do log.error("The shader was not loaded")
 
     for &piece in st.game.pieces {
         tile_pos , ok := gm.board_to_world(&st.game.board, piece.position)
@@ -263,7 +279,7 @@ match_engine_draw :: proc(st: ^State) {
 
             norm_col := rl.ColorNormalize(piece.team.color)
 
-            rl.SetShaderValue(st.team_painter, uniform_location, &norm_col, .VEC4)
+            rl.SetShaderValue(st.team_painter, st.uniforms["team_col"], &norm_col, .VEC4)
 
             rl.BeginShaderMode(st.team_painter)
                 rl.DrawTextureRec(pieces_sprite, source, tile_pos, rl.WHITE)
@@ -309,62 +325,67 @@ match_engine_camera_control :: proc(camera: ^rl.Camera2D, dt: f32) {
 
 }
 
-match_engine_gameplay_control :: proc(game: ^gm.Match, camera: rl.Camera2D) {
+match_engine_gameplay_control :: proc(st: ^State) {
 
     mouse_pos := rl.GetMousePosition()
-    world_pos := rl.GetScreenToWorld2D(mouse_pos, camera)
+    world_pos := rl.GetScreenToWorld2D(mouse_pos, st.camera)
 
     // fmt.println(in_bounds)
 
+    if rl.IsKeyReleased(.F2) {
+        match_engine_reload_shaders(st)
+
+    }
+
     if rl.IsKeyReleased(.U) {
-        gm.match_undo_move(game)
+        gm.match_undo_move(st.game)
 
     }
 
     if rl.IsKeyReleased(.H) {
-        for move in game.history do log.info(move)
+        for move in st.game.history do log.info(move)
     }
 
     if rl.IsKeyReleased(.R) {
-        gm.match_reset(game)
+        gm.match_reset(st.game)
 
     }
 
     check_click: if rl.IsMouseButtonPressed(.LEFT) {
 
-        target_tile, in_bounds := gm.world_to_board(&game.board, world_pos)
+        target_tile, in_bounds := gm.world_to_board(&st.game.board, world_pos)
         if !in_bounds do break check_click 
 
-            if game.selected_piece == nil{
+            if st.game.selected_piece == nil{
 
                 // fmt.println(target_tile)
 
-                cur_team := gm.match_get_cur_turn_team(game)
+                cur_team := gm.match_get_cur_turn_team(st.game)
 
-                if tile := gm.board_get_tile(&game.board, target_tile); tile != nil && tile.piece_ref != nil {
+                if tile := gm.board_get_tile(&st.game.board, target_tile); tile != nil && tile.piece_ref != nil {
                     if cur_team == tile.piece_ref.team { 
-                        game.selected_piece = tile.piece_ref
-                        gm.piece_movement(tile.piece_ref, game) 
+                        st.game.selected_piece = tile.piece_ref
+                        gm.piece_movement(tile.piece_ref, st.game) 
                         // fmt.println("open movement")
-                        // fmt.println(game.movements)
+                        // fmt.println(st.game.movements)
                     }
                 }
 
             } else {
 
-                for move in game.movements {
+                for move in st.game.movements {
                     if move.target == target_tile {
-                        gm.piece_move(game.selected_piece, game, move)
-                        gm.match_end_turn(game)
-                        game.selected_piece = nil
-                        clear(&game.movements)
+                        gm.piece_move(st.game.selected_piece, st.game, move)
+                        gm.match_end_turn(st.game)
+                        st.game.selected_piece = nil
+                        clear(&st.game.movements)
                         break
                     }
 
 
                 }
-                game.selected_piece = nil
-                clear(&game.movements)
+                st.game.selected_piece = nil
+                clear(&st.game.movements)
 
             }
 

@@ -22,7 +22,8 @@ void main() {
     }
 
     if (texel == secondary_col) {
-        finalColor = mix(team_col, secondary_col, 0.4) * fragColor;
+        vec4 shade = vec4(1.0 - team_col.xyz, team_col.w);
+        finalColor = mix(shade, secondary_col, 0.650) * fragColor;
         // finalColor = vec4(0, 0, 0, 0);
     }
 }
