@@ -15,9 +15,9 @@ Match :: struct {
     original_formation: []Piece_Record,
     teams: []Team,
     history: [dynamic]Move,
+    board: Board,
     movements: [dynamic; g.MAX_MOVES]Move,
     pieces: [dynamic; g.MAX_PIECES]Piece,
-    board: Board,
 }
 
 Win_Rule :: enum {
@@ -276,13 +276,13 @@ match_undo_move :: proc(self: ^Match) {
 
 match_delete :: proc(match: ^Match) {
 
-    delete(match.teams)
     delete(match.history)
     board_delete(&match.board)
     delete(match.original_formation)
     for &i in match.teams {
         team_delete(&i)
     }
+    delete(match.teams)
     free(match)
 }
 
