@@ -1,7 +1,9 @@
 package match_engine
 
+import "core:reflect"
 import rl "vendor:raylib"
 import "core:os"
+import eng "../match_engine"
 import "core:math/linalg"
 import "core:fmt"
 import gm "../game"
@@ -9,18 +11,19 @@ import ass "../asset_man"
 import ui "../ui"
 import g "../globals"
 import "core:log"
+import app "../appstate"
 
-@(export)
-RUNNING := true
 
 State :: struct {
+    app_state: app.App_State,
     promotion_ui: int,
     debug_id: int,
-    interfaces: ^ui.UiStack,
     game: ^gm.Match,
     camera: rl.Camera2D,
     team_painter: rl.Shader,
     uniforms: map[string]i32,
+    gameplay_ui: ui.UiStack,
+    main_menu_ui: ui.UiStack,
 }
 
 @(export)
@@ -28,10 +31,14 @@ match_engine_make :: proc(path: string) -> ^State {
 
     state := new(State)
 
+    uis := transmute([]i32)reflect.enum_field_values(Ui_Type)
+
     state^ = State {
 
+        app_state = .Main_Menu,
         game = gm.match_make_from_file(path),
-        interfaces = ui.ui_stack_make(),
+        gameplay_ui = ui.ui_stack_make(uis[:], ui_render),
+        main_menu_ui = ui.ui_stack_make(uis[:], ui_render),
 
         camera = rl.Camera2D{
             offset = {f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)},
@@ -45,7 +52,7 @@ match_engine_make :: proc(path: string) -> ^State {
     state.camera.target = board_center
     state.camera.zoom = f32(g.WINDOW_SIZE.y) / f32(state.game.board.sprite.height)
 
-    ui.ui_stack_push_ui(state.interfaces, ui.ui_match_init(state.game))
+    ui.ui_stack_push_ui(&state.gameplay_ui, ui_match_init(state.game))
     // ui.push_ui(interfaces, ui.promotion_ui(game, 1))
     state.promotion_ui = 0
 
@@ -53,7 +60,7 @@ match_engine_make :: proc(path: string) -> ^State {
 
     ass.asset_man_init()
 
-    state.team_painter = rl.LoadShader(nil, "assets/shaders/team_painter.vert")
+    state.team_painter = rl.LoadShader(nil, "./assets/shaders/team_painter.vert")
     state.uniforms["team_col"] = rl.GetShaderLocation(state.team_painter, "team_col")
     if state.uniforms["team_col"] < 0 do log.error("Uniform \"team_col\" was not found")
 
@@ -69,7 +76,7 @@ match_engine_reload_shaders :: proc(st: ^State) {
 
     if rl.IsShaderValid(st.team_painter) do rl.UnloadShader(st.team_painter)
 
-    st.team_painter = rl.LoadShader(nil, "assets/shaders/team_painter.vert")
+    st.team_painter = rl.LoadShader(nil, "./assets/shaders/team_painter.vert")
     st.uniforms["team_col"] = rl.GetShaderLocation(st.team_painter, "team_col")
     if st.uniforms["team_col"] < 0 do log.error("Uniform \"team_col\" was not found")
 
@@ -96,7 +103,21 @@ match_engine_close_window :: proc() {
 }
 
 @export
-match_engine_cleanup :: proc() {
+match_engine_cleanup :: proc(st: ^State) {
+
+    uis := transmute([]i32)reflect.enum_field_values(Ui_Type)
+
+
+    clear(&st.gameplay_ui.types)
+    clear(&st.main_menu_ui.types)
+
+    for type in uis {
+        append(&st.gameplay_ui.types, type)
+        append(&st.main_menu_ui.types, type)
+    }
+
+    st.gameplay_ui.ui_render = ui_render
+    st.main_menu_ui.ui_render = ui_render
 
     ass.asset_man_clear()
 
@@ -106,8 +127,12 @@ match_engine_cleanup :: proc() {
 match_engine_delete :: proc(st: ^State) {
 
     if rl.IsShaderValid(st.team_painter) do rl.UnloadShader(st.team_painter)
-    ui.ui_stack_delete(st.interfaces)
+    ui.ui_stack_delete(&st.gameplay_ui)
+    ui.ui_stack_delete(&st.main_menu_ui)
     gm.match_delete(st.game)
+
+    ui.ui_stack_delete(&st.main_menu_ui)
+    ui.ui_stack_delete(&st.gameplay_ui)
 
     delete(st.uniforms)
     free(st)
@@ -118,13 +143,15 @@ match_engine_run :: proc(st: ^State) {
 
     //fmt.println(st.game.pieces)
     if (rl.WindowShouldClose()) {
-        RUNNING = false
+        g.RUNNING = false
         return
     } else {
 
-        RUNNING = true
+        g.RUNNING = true
 
     }
+    g.WINDOW_SIZE.x = rl.GetScreenWidth()
+    g.WINDOW_SIZE.y = rl.GetScreenHeight()
 
     dt := rl.GetFrameTime()
 
@@ -135,11 +162,11 @@ match_engine_run :: proc(st: ^State) {
 
     if rl.IsKeyReleased(.F3) {
 
-        if !ui.ui_stack_is_interface_active(st.interfaces, st.debug_id) {
-            st.debug_id = ui.ui_stack_push_ui(st.interfaces, ui.ui_debug_init(st.game, &st.camera))
+        if !ui.ui_stack_is_interface_active(&st.gameplay_ui, st.debug_id) {
+            st.debug_id = ui.ui_stack_push_ui(&st.gameplay_ui, ui_debug_init(st.game, &st.camera))
 
         } else {
-            ui.ui_stack_remove_ui(st.interfaces, st.debug_id) 
+            ui.ui_stack_remove_ui(&st.gameplay_ui, st.debug_id) 
         }
     }
 
@@ -147,11 +174,43 @@ match_engine_run :: proc(st: ^State) {
         g.PAUSE = !g.PAUSE
     }
 
-    update: {
+    switch st.app_state {
 
-        dt = rl.GetFrameTime()
-        g.WINDOW_SIZE.x = rl.GetScreenWidth()
-        g.WINDOW_SIZE.y = rl.GetScreenHeight()
+    case .Gameplay: {
+
+        match_engine_gameplay_update(st)
+    }
+
+    case .Main_Menu: {
+
+        match_engine_main_menu_update(st)
+    }
+
+    } //switch
+
+}
+
+match_engine_main_menu_update :: proc(st:^State) {
+
+    if !ui.ui_stack_is_type_active(&st.main_menu_ui, i32(Ui_Type.main_menu)) {
+
+        ui.ui_stack_push_ui(&st.main_menu_ui, ui_main_menu_init(st))
+
+    }
+
+    rl.BeginDrawing()
+
+    rl.ClearBackground(rl.BLACK)
+
+    ui.ui_stack_execute(&st.main_menu_ui)
+
+    rl.EndDrawing()
+
+}
+
+match_engine_gameplay_update :: proc(st: ^State) {
+
+        dt := rl.GetFrameTime()
         st.camera.offset = {f32(g.WINDOW_SIZE.x /2), f32(g.WINDOW_SIZE.y /2)}
         zoom_factor := (f32(g.WINDOW_SIZE.y) / f32(st.game.board.size.y * gm.TILE_SIZE))
         st.camera.zoom = zoom_factor - zoom_factor * 0.02
@@ -167,7 +226,7 @@ match_engine_run :: proc(st: ^State) {
 
             for &piece in st.game.pieces {
 
-                if ui.ui_stack_is_interface_active(st.interfaces, st.promotion_ui) do break
+                if ui.ui_stack_is_interface_active(&st.gameplay_ui, st.promotion_ui) do break
 
                     if piece.class == .pawn {
 
@@ -181,7 +240,7 @@ match_engine_run :: proc(st: ^State) {
                             // log.info("Col: ", col)
 
                             if piece.position.x == col{
-                                st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
+                                st.promotion_ui = ui.ui_stack_push_ui(&st.gameplay_ui, ui_promotion_init(st.game, piece.id))
                             }
 
                         }
@@ -191,7 +250,7 @@ match_engine_run :: proc(st: ^State) {
                             row := promotion_fronteir.y if promotion_fronteir.y > 0 else 0
                             // log.info("Row: ", row)
                             if piece.position.y == row{
-                                st.promotion_ui = ui.ui_stack_push_ui(st.interfaces, ui.ui_promotion_init(st.game, piece.id))
+                                st.promotion_ui = ui.ui_stack_push_ui(&st.gameplay_ui, ui_promotion_init(st.game, piece.id))
                             }
 
                         }
@@ -202,7 +261,7 @@ match_engine_run :: proc(st: ^State) {
 
                 match_engine_draw(st)
 
-    }
+
 }
 
 match_engine_draw :: proc(st: ^State) {
@@ -289,7 +348,7 @@ match_engine_draw :: proc(st: ^State) {
 
     rl.EndMode2D()
 
-    ui.ui_stack_execute(st.interfaces)
+    ui.ui_stack_execute(&st.gameplay_ui)
 
     rl.EndDrawing()
 

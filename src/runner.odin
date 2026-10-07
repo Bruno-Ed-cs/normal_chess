@@ -19,7 +19,7 @@ Engine_Symbols :: struct{
     match_engine_run: proc(state: rawptr),
     match_engine_make: proc(path:string) -> rawptr,
     match_engine_delete: proc(state: rawptr),
-    match_engine_cleanup: proc(),
+    match_engine_cleanup: proc(state: rawptr),
     match_engine_init_window: proc(),
     match_engine_close_window: proc()
 }
@@ -160,7 +160,7 @@ main :: proc() {
             // delete(new_path)
             timestamp_old = timestamp
 
-            eng.match_engine_cleanup()
+            eng.match_engine_cleanup(state)
 
             if !dll_reload(&eng, lib_source_path, bin_dir) do continue
 
@@ -168,7 +168,7 @@ main :: proc() {
 
         if eng.IsKeyReleased(int(rl.KeyboardKey.F5)) {
 
-            eng.match_engine_cleanup()
+            eng.match_engine_cleanup(state)
             eng.match_engine_delete(state)
 
             log.info("Full reset")
@@ -184,7 +184,7 @@ main :: proc() {
         os.file_info_delete(lib_info, context.allocator)
     }
 
-    eng.match_engine_cleanup()
+    eng.match_engine_cleanup(state)
     eng.match_engine_delete(state)
     eng.match_engine_close_window()
 }

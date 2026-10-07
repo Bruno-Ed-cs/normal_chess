@@ -4,6 +4,9 @@ import "core:log"
 
 LOG_LEVEL := log.Level.Info
 
+@(export)
+RUNNING := true
+
 WINDOW_SIZE := [2]i32{1200, 800}
 CAMERA_SPEED :: 700
 ZOOM_SPEED :: 1.0

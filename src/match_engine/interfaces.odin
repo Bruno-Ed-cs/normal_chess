@@ -1,5 +1,5 @@
 #+feature using-stmt
-package ui
+package match_engine
 import gm "../game"
 import "core:fmt"
 import g "../globals"
@@ -9,20 +9,21 @@ import rf "core:reflect"
 import str "core:strings"
 import "core:log"
 import "core:mem/virtual"
+import "../ui"
 
-Ui_Type :: enum {
+Ui_Type :: enum(i32){
 
-    debug,
+    debug = 1,
     match,
     promotion, 
     main_menu,
 }
 
-ui_render :: proc(interface: ^Ui, top: bool) -> UiSig {
+ui_render :: proc(interface: ^ui.Ui, top: bool) -> ui.UiSig {
 
-    implementation : proc(workspace: rawptr, top: bool) -> UiSig 
+    implementation : proc(workspace: rawptr, top: bool) -> ui.UiSig 
 
-    switch interface.type {
+    switch Ui_Type(interface.type) {
 
     case .debug:
         implementation = ui_debug_call
@@ -41,22 +42,6 @@ ui_render :: proc(interface: ^Ui, top: bool) -> UiSig {
     return implementation(interface.workspace, top)
 }
 
-ui_cleanup :: proc(interface: ^Ui) {
-
-    if interface.memory != nil {
-        virtual.arena_destroy(&interface.memory.?) 
-    }
-
-    // #partial switch interface.type {
-    // case .debug:
-    //     ui_debug_cleanup(interface.workspace)
-    //
-    // case .promotion:
-    //     ui_promotion_cleanup(interface.workspace)
-    // }
-
-    return
-}
 
 Debug_Info :: struct {
     game: ^gm.Match,
@@ -64,7 +49,7 @@ Debug_Info :: struct {
 
 }
 
-ui_debug_call :: proc(workspace: rawptr, top: bool) -> UiSig {
+ui_debug_call :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
 
     info := cast(^Debug_Info)workspace
 
@@ -86,7 +71,7 @@ ui_debug_call :: proc(workspace: rawptr, top: bool) -> UiSig {
 
     rl.DrawFPS(10, 300)
 
-    return UiSig.move_down
+    return ui.UiSig.move_down
 }
 
 // ui_debug_cleanup :: proc(workspace: rawptr) {
@@ -95,7 +80,7 @@ ui_debug_call :: proc(workspace: rawptr, top: bool) -> UiSig {
 //
 // }
 
-ui_debug_init :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> Ui {
+ui_debug_init :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> ui.Ui {
 
     memory: virtual.Arena
     err := virtual.arena_init_growing(&memory)
@@ -106,16 +91,16 @@ ui_debug_init :: proc(game: ^gm.Match, camera: ^rl.Camera2D) -> Ui {
     info.camera = camera
     info.game = game
 
-    return Ui {
+    return ui.Ui {
         workspace = info,
-        type = .debug,
+        type = i32(Ui_Type.debug),
         memory = memory
     }
 
 }
 
 
-ui_match_call :: proc(workspace: rawptr, top: bool) -> UiSig {
+ui_match_call :: proc(workspace: rawptr, top: bool) -> ui.UiSig {
 
     game := cast(^gm.Match)workspace
     // log.debug("teams: ", game.teams)
@@ -134,7 +119,7 @@ ui_match_call :: proc(workspace: rawptr, top: bool) -> UiSig {
     }
 
 
-    anchor := scr_pos({
+    anchor := ui.scr_pos({
         0.98,
         0.02
     })
@@ -198,14 +183,14 @@ ui_match_call :: proc(workspace: rawptr, top: bool) -> UiSig {
             // fmt.println(team_color, oposite_color)
 
 
-            return UiSig.ok
+            return ui.UiSig.ok
 }
 
-ui_match_init :: proc(match: ^gm.Match) -> Ui {
+ui_match_init :: proc(match: ^gm.Match) -> ui.Ui {
 
-    return Ui {
+    return ui.Ui {
         workspace = match,
-        type = .match
+        type = i32(Ui_Type.match)
     }
 
 }
@@ -216,7 +201,7 @@ Promotion_Work :: struct {
 
 }
 
-ui_promotion_call ::proc(workspace: rawptr, top: bool) -> UiSig{
+ui_promotion_call ::proc(workspace: rawptr, top: bool) -> ui.UiSig{
 
     work := cast(^Promotion_Work)workspace
 
@@ -226,7 +211,7 @@ ui_promotion_call ::proc(workspace: rawptr, top: bool) -> UiSig{
     margin :f32 = 10.0
     padding :f32 = 10.0
 
-    anchor := scr_pos({0.5, 0.5})
+    anchor := ui.scr_pos({0.5, 0.5})
     anchor.x -= 240 / 2
     anchor.y -= ((len(gm.Class) - 2) * f32(g.FONT_SIZE + padding + margin)) / 2
 
@@ -264,7 +249,7 @@ ui_promotion_call ::proc(workspace: rawptr, top: bool) -> UiSig{
                     first := str.to_upper(source[:1], context.temp_allocator)
                     label := str.join({first, source[1:]}, "", context.temp_allocator) 
 
-                    if component_simple_button(label, f32(width - margin), anchor, f32(padding)) {
+                    if ui.component_simple_button(label, f32(width - margin), anchor, f32(padding)) {
                         pressed = true if top else false
                         promotion = opt
                     }
@@ -291,7 +276,7 @@ ui_promotion_call ::proc(workspace: rawptr, top: bool) -> UiSig{
 // }
 
 
-ui_promotion_init :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
+ui_promotion_init :: proc(game: ^gm.Match, piece_id: i32) -> ui.Ui {
 
     memory: virtual.Arena
     err := virtual.arena_init_growing(&memory)
@@ -304,26 +289,65 @@ ui_promotion_init :: proc(game: ^gm.Match, piece_id: i32) -> Ui {
     work.piece_id = piece_id
     work.game = game
 
-    return Ui {
+    return ui.Ui {
         workspace = work,
-        type = .promotion,
+        type = i32(Ui_Type.promotion),
         memory = memory
     }
 
 }
 
-ui_main_menu_call :: proc(workspace: rawptr, top: bool) -> UiSig{
+ui_main_menu_call :: proc(workspace: rawptr, top: bool) -> ui.UiSig{
 
+    state := cast(^State)workspace
 
+    anchor := ui.scr_pos({0.5, 0.5})
+
+    title_font_size: i32 = g.FONT_SIZE * 3;
+    title: cstring = "Normal Chess"
+    title_wid := rl.MeasureText(title, title_font_size)
+    title_pos := [2]i32{
+        i32(anchor.x) - title_wid/2,
+        i32(anchor.y) - title_font_size - 250
+    }
+
+    rl.DrawRing(anchor, 25.0, 30.0, 0.0, 360.0, 1, rl.WHITE)
+    rl.DrawText(title, title_pos.x, title_pos.y, g.FONT_SIZE * 3, rl.WHITE)
+
+    button_width: f32 = 250
+
+    play_button_pos := [2]f32{
+        anchor.x - button_width/2,
+        anchor.y + g.FONT_SIZE + 10
+
+    }
+
+    quit_button_pos := [2]f32{
+
+        anchor.x - button_width/2,
+        anchor.y + g.FONT_SIZE * 2 + 30
+    }
+
+    if ui.component_simple_button("Play", button_width, play_button_pos) {
+
+        state.app_state = .Gameplay
+
+    }
+
+    if ui.component_simple_button("Quit", button_width, quit_button_pos) {
+
+        g.RUNNING = false
+
+    }
 
     return .ok
 
 }
 
-ui_main_menu_init :: proc(game: ^gm.Match) -> Ui {
+ui_main_menu_init :: proc(st: ^State) -> ui.Ui {
 
-    return Ui {
-        workspace = game,
-        type = .main_menu
+    return ui.Ui {
+        workspace = st,
+        type = i32(Ui_Type.main_menu)
     }
 }

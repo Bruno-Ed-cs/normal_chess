@@ -21,7 +21,7 @@ Match :: struct {
 }
 
 Win_Rule :: enum {
-    last_king_standing,
+    Last_King_Standing,
 
 }
 
@@ -121,7 +121,7 @@ match_make_from_file :: proc(filepath: string) -> ^Match {
     match := new(Match)
 
     match.board = board_make(match_data.board_size)
-    match.win_condition = .last_king_standing
+    match.win_condition = .Last_King_Standing
 
     teams := make([dynamic]Team)
 
@@ -292,7 +292,7 @@ match_update :: proc(self: ^Match) {
 
     switch self.win_condition {
 
-    case .last_king_standing:
+    case .Last_King_Standing:
         winner = match_win_rule_last_king_standing(self)
 
     }

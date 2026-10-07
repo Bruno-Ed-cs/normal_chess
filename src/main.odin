@@ -7,7 +7,7 @@ import "core:os"
 import "core:log"
 import g "globals"
 import gm "game"
-import eng "engine"
+import eng "match_engine"
 
 
 main :: proc() {
@@ -51,7 +51,7 @@ main :: proc() {
     board_path: string = "assets/boards/standard.json" if len(os.args) < 2 else os.args[1]
     game := eng.match_engine_make(board_path)
 
-    for eng.RUNNING {
+    for g.RUNNING {
 
         eng.match_engine_run(game)
 
