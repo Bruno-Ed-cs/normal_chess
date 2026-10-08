@@ -156,3 +156,41 @@ rows_get_next :: proc() -> [2]f32 {
 
 }
 
+Cols :: struct {
+    gap: f32,
+    cur_col: f32,
+    origin: [2]f32,
+} 
+
+cols: Cols = {}
+
+cols_begin :: proc(position: [2]f32, gap: f32) {
+
+    cols = Cols{
+        origin = position,
+        cur_col = 0,
+        gap = gap
+
+    }
+
+}
+
+cols_end :: proc() {
+
+    cols = {}
+
+}
+              
+cols_get_next :: proc() -> [2]f32 {
+
+    next := [2]f32 {
+        cols.origin.x + cols.gap * cols.cur_col,
+        cols.origin.y, 
+
+    }
+
+    cols.cur_col += 1
+
+    return next
+
+}
