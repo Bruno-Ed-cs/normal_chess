@@ -11,11 +11,14 @@ import ass "../asset_man"
 import ui "../ui"
 import g "../globals"
 import "core:log"
-import app "../appstate"
 
+App_State :: enum {
+    Gameplay,
+    Main_Menu,
+}
 
 State :: struct {
-    app_state: app.App_State,
+    app_state: App_State,
     promotion_ui: int,
     debug_id: int,
     game: ^gm.Match,
