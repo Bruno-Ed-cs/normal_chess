@@ -160,10 +160,10 @@ main :: proc() {
             // delete(new_path)
             timestamp_old = timestamp
 
-            eng.match_engine_cleanup(state)
 
             if !dll_reload(&eng, lib_source_path, bin_dir) do continue
 
+            eng.match_engine_cleanup(state)
         }
 
         if eng.IsKeyReleased(int(rl.KeyboardKey.F5)) {
