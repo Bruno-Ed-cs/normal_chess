@@ -18,6 +18,7 @@ Ui_Type :: enum(i32){
     match,
     promotion, 
     main_menu,
+    pause,
 }
 
 ui_render :: proc(interface: ^ui.Ui, top: bool) -> ui.UiSig {
@@ -26,17 +27,11 @@ ui_render :: proc(interface: ^ui.Ui, top: bool) -> ui.UiSig {
 
     switch Ui_Type(interface.type) {
 
-    case .debug:
-        implementation = ui_debug_call
-
-    case .match:
-        implementation = ui_match_call
-
-    case .promotion:
-        implementation = ui_promotion_call
-
-    case .main_menu:
-        implementation = ui_main_menu_call
+    case .pause: implementation = ui_pause_call
+    case .debug: implementation = ui_debug_call
+    case .match: implementation = ui_match_call
+    case .promotion: implementation = ui_promotion_call
+    case .main_menu: implementation = ui_main_menu_call
 
     }
 
@@ -205,7 +200,6 @@ Promotion_Work :: struct {
 ui_promotion_call ::proc(workspace: rawptr, top: bool) -> ui.UiSig{
 
     work := cast(^Promotion_Work)workspace
-
     g.PAUSE = true
 
     width :f32 = 240.0
@@ -241,6 +235,7 @@ ui_promotion_call ::proc(workspace: rawptr, top: bool) -> ui.UiSig{
         rl.DrawRectangleRoundedLines(box, g.ROUNDNESS, g.SEGMENTS, g.TEXT_COLOR)
         rl.DrawText(box_text, i32(box_text_pos.x), i32(box_text_pos.y), g.FONT_SIZE, g.TEXT_COLOR)
 
+        ui.rows_begin(anchor, g.FONT_SIZE + padding + margin)
         for opt in gm.Class {
 
             if piece.class == opt do continue
@@ -250,14 +245,14 @@ ui_promotion_call ::proc(workspace: rawptr, top: bool) -> ui.UiSig{
                     first := str.to_upper(source[:1], context.temp_allocator)
                     label := str.join({first, source[1:]}, "", context.temp_allocator) 
 
-                    if ui.component_simple_button(label, f32(width - margin), anchor, f32(padding)) {
+                    if ui.component_simple_button(label, f32(width - margin), ui.rows_get_next(), f32(padding)) {
                         pressed = true if top else false
                         promotion = opt
                     }
 
-                    anchor.y += f32(margin + g.FONT_SIZE + padding)
 
         }
+        ui.rows_end()
 
         if pressed {
 
@@ -329,17 +324,28 @@ ui_main_menu_call :: proc(workspace: rawptr, top: bool) -> ui.UiSig{
         anchor.y + g.FONT_SIZE * 2 + 30
     }
 
-    if ui.component_simple_button("Play", button_width, play_button_pos) {
+    row_pos := [2]f32{
+        anchor.x - button_width/2,
+        anchor.y + g.FONT_SIZE + 10
+    }
+
+    row_gap: f32 = 10 + g.FONT_SIZE + 20
+
+    ui.rows_begin(row_pos, row_gap)
+
+    if ui.component_simple_button("Play", button_width, ui.rows_get_next()) {
 
         state.app_state = .Gameplay
 
     }
 
-    if ui.component_simple_button("Quit", button_width, quit_button_pos) {
+    if ui.component_simple_button("Quit", button_width, ui.rows_get_next()) {
 
         g.RUNNING = false
 
     }
+
+    ui.rows_end()
 
     return .ok
 
@@ -352,3 +358,17 @@ ui_main_menu_init :: proc(st: ^State) -> ui.Ui {
         type = i32(Ui_Type.main_menu)
     }
 }
+
+ui_pause_init :: proc(st: ^State) -> ui.Ui {
+
+    return ui.Ui {
+
+    }
+
+}
+
+ui_pause_call :: proc(workspace: rawptr, top: bool) -> ui.UiSig{
+
+     return .ok
+}
+

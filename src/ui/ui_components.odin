@@ -116,3 +116,43 @@ component_simple_button :: proc(title: string , width: f32, pos: [2]f32, padding
     else do return false
 
 }
+
+Rows :: struct {
+    gap: f32,
+    cur_line: f32,
+    origin: [2]f32,
+}
+
+rows : Rows = {}
+
+rows_begin :: proc(position: [2]f32, gap: f32) {
+
+    rows = Rows{
+        origin = position,
+        cur_line = 0,
+        gap = gap
+
+    }
+
+}
+
+rows_end :: proc() {
+
+    rows = {}
+
+}
+              
+rows_get_next :: proc() -> [2]f32 {
+
+    next := [2]f32 {
+        rows.origin.x,
+        rows.origin.y + rows.gap * rows.cur_line
+
+    }
+
+    rows.cur_line += 1
+
+    return next
+
+}
+
