@@ -194,3 +194,75 @@ cols_get_next :: proc() -> [2]f32 {
     return next
 
 }
+
+Grid_Filling :: enum {
+    By_Row,
+    By_Col,
+    // Random
+
+}
+
+Grid :: struct {
+    cell_dimention: [2]f32,
+    cur_cell: [2]f32,
+    origin: [2]f32,
+    rows: i32,
+    cols: i32,
+    fill_order: Grid_Filling,
+} 
+
+grid: Grid = {}
+
+grid_begin :: proc(position: [2]f32, cell_dimentions: [2]f32, rows: i32, cols: i32, fill_order: Grid_Filling) {
+
+    grid = Grid{
+        origin = position,
+        cur_cell = {},
+        cell_dimention = cell_dimentions,
+        cols = cols,
+        rows = rows,
+        fill_order = fill_order
+
+    }
+
+}
+
+grid_end :: proc() {
+
+    grid = {}
+
+}
+              
+grid_get_next :: proc() -> [2]f32 {
+
+
+    next := [2]f32 {
+        grid.origin.x + grid.cell_dimention.x * grid.cur_cell.x,
+        grid.origin.y + grid.cell_dimention.y * grid.cur_cell.y,
+    }
+
+    switch grid.fill_order {
+    case .By_Row: 
+
+        grid.cur_cell.y += 1
+        if i32(grid.cur_cell.y) >= grid.rows {
+            grid.cur_cell.y = 0
+            grid.cur_cell.x += 1
+        }
+
+    case .By_Col:
+
+        grid.cur_cell.x += 1
+        if i32(grid.cur_cell.x) >= grid.cols {
+            grid.cur_cell.y += 1
+            grid.cur_cell.x = 0
+        }
+
+    // case .Random:
+
+    }
+
+
+    return next
+
+}

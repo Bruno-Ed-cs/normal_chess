@@ -235,7 +235,7 @@ ui_promotion_call ::proc(workspace: rawptr, top: bool) -> ui.UiSig{
         rl.DrawRectangleRoundedLines(box, g.ROUNDNESS, g.SEGMENTS, g.TEXT_COLOR)
         rl.DrawText(box_text, i32(box_text_pos.x), i32(box_text_pos.y), g.FONT_SIZE, g.TEXT_COLOR)
 
-        ui.rows_begin(anchor, g.FONT_SIZE + padding + margin)
+        ui.grid_begin(anchor, {width, g.FONT_SIZE + padding + margin}, 2, 1, .By_Col)
         for opt in gm.Class {
 
             if piece.class == opt do continue
@@ -245,14 +245,14 @@ ui_promotion_call ::proc(workspace: rawptr, top: bool) -> ui.UiSig{
                     first := str.to_upper(source[:1], context.temp_allocator)
                     label := str.join({first, source[1:]}, "", context.temp_allocator) 
 
-                    if ui.component_simple_button(label, f32(width - margin), ui.rows_get_next(), f32(padding)) {
+                    if ui.component_simple_button(label, f32(width - margin), ui.grid_get_next(), f32(padding)) {
                         pressed = true if top else false
                         promotion = opt
                     }
 
 
         }
-        ui.rows_end()
+        ui.grid_end()
 
         if pressed {
 
