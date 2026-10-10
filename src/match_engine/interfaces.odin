@@ -362,13 +362,42 @@ ui_main_menu_init :: proc(st: ^State) -> ui.Ui {
 ui_pause_init :: proc(st: ^State) -> ui.Ui {
 
     return ui.Ui {
-
+        type = i32(Ui_Type.pause),
+        workspace = st
     }
 
 }
 
 ui_pause_call :: proc(workspace: rawptr, top: bool) -> ui.UiSig{
 
-     return .ok
+    st := cast(^State)workspace
+    g.PAUSE = true
+
+    anchor := ui.scr_pos({0.5, 0.5})
+    title: cstring = "Pause"
+    button_wid :: 250
+    margin :: 10
+
+    text_width := rl.MeasureText(title, g.FONT_SIZE * 2)
+    text_height := g.FONT_SIZE * 2
+    
+
+    rl.DrawText(title, i32(anchor.x) - text_width/2, i32(anchor.y - 50), g.FONT_SIZE * 2, rl.YELLOW)
+
+    ui.rows_begin({anchor.x - button_wid/2, anchor.y + 10}, g.FONT_SIZE + margin + 10)
+
+    if ui.component_simple_button("Continue", button_wid, ui.rows_get_next()) {
+        g.PAUSE = false
+        return .pop
+    }
+
+    if ui.component_simple_button("Main Menu", button_wid, ui.rows_get_next()) {
+        st.app_state = .Main_Menu
+        return .pop
+    }
+
+    ui.rows_end()
+
+    return .move_top
 }
 

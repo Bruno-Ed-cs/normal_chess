@@ -173,8 +173,22 @@ match_engine_run :: proc(st: ^State) {
         }
     }
 
-    if rl.IsKeyReleased(.P) {
-        g.PAUSE = !g.PAUSE
+    if rl.IsKeyPressed(.P) {
+
+        @(static)
+        pause_id: int
+
+        if  !ui.ui_stack_is_type_active(&st.gameplay_ui, i32(Ui_Type.pause)) {
+
+            pause_id = ui.ui_stack_push_ui(&st.gameplay_ui, ui_pause_init(st))
+
+        } else {
+
+            ui.ui_stack_remove_ui(&st.gameplay_ui, pause_id)
+
+        }
+
+
     }
 
     switch st.app_state {

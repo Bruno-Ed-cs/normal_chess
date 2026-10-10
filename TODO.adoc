@@ -1,5 +1,5 @@
 = TODO
 
-* [~] Ui layouts
+* [X] Ui layouts
 * [] Ui pager
 * [] Plan game

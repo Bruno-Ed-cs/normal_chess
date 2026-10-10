@@ -5,8 +5,8 @@ import "core:mem"
 import "core:mem/virtual"
 import g "../globals"
 
-MAX_LAYERS :: 100
-MAX_TYPES :: 500
+MAX_LAYERS :: 25
+MAX_TYPES :: 100
 
 UiStack :: struct {
     next_id: int,
